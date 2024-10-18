@@ -15,17 +15,17 @@ const userSchema=new Schema({
          type: String, required: true 
         },
     bloodType: {
-         type: String, required: true 
+         type: String
         },                          
     location: 
     { 
     
         city:{
-            type: String, required: true 
+            type: String
 
              },
         state:{
-            type: String, required: true 
+            type: String
 
              }
     },
