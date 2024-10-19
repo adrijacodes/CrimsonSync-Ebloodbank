@@ -24,22 +24,14 @@ const Register = () => {
     setError(null);
     // setSuccess(null);
     try {
-      const res = await fetch("http://localhost:3000/api/auth/signup", {
+      const res = await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
-      //const textResponse = await res.text();
-      //   if (!res.ok) {
-      //     const errorResponse = await res.json(); // Ensure the error is JSON
-      //     setError(errorResponse.message);
-      //     setLoading(false);
-      //     return;
-      //   }
-      // const data = JSON.parse(textResponse);
-      // console.log(data);
+     
       const data = await res.json();
       console.log(data);
 
@@ -51,22 +43,21 @@ const Register = () => {
       setLoading(false);
       setError(null);
     navigate('/register');
-      // setLoading(false);
+   
     } catch (error) {
       console.error("Fetch error:", error);
       setError(error.message);
     }
-    //   console.error('There was a problem with the fetch operation:', error);
-    // }
+  
     setLoading(false);
     setError(null)
     setFormData({ username: "", email: "", password: "" });
   };
-  //   console.log(formData);
+
 
   return (
     <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
+      <h1 className="text-3xl text-center font-semibold my-7">Create Account</h1>
       <form action="" onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="text"
@@ -99,10 +90,10 @@ const Register = () => {
       <div className="flex justify-center gap-2 mt-5">
         <p>Have an account?</p>
         <Link to={"/register"}>
-          <span className="text-blue-700">Register</span>
+          <span className="text-red-600">Login</span>
         </Link>
       </div>
-      {error && <p className="text-red-500 mt-5">{error}</p>}
+      {error && <p className="text-red-600 mt-5">{error}</p>}
      
     </div>
   );
