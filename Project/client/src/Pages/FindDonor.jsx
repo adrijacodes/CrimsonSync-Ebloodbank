@@ -18,6 +18,8 @@ const FindDonor = () => {
         <div className="mb-4">
           <label className="block mb-2">Blood Group:</label>
           <select className="w-full px-4 py-2 border rounded">
+          <input type="text" 
+          placeholder='Enter your bloodgroup'/>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>

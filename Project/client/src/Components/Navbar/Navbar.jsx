@@ -8,8 +8,8 @@ const Navbar = () => {
     {/* Left-aligned title */}
     <Link to='/' className="flex-1">
       <h1 className="font-bold text:sm sm:text-xl flex flex-wrap">
-        <span className="text-white text-2xl">Crimson</span>
-        <span className="text-white text-2xl">Sync</span>
+        <span className="text-white text-3xl">Crimson</span>
+        <span className="text-white text-3xl">Sync</span>
       </h1>
     </Link>
 

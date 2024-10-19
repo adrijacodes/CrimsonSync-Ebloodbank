@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import React from 'react';
+
 
 const DonateBlood = () => {
-  const [donationDate, setDonationDate] = useState(new Date());
+ 
 
   return (
     <div className="min-h-screen bg-gray-100 p-5">
@@ -39,15 +38,6 @@ const DonateBlood = () => {
           </select>
         </div>
 
-        {/* Calendar Date Picker for selecting donation date */}
-        <div className="mb-4">
-          <label className="block mb-2">Select Donation Date:</label>
-          <DatePicker
-            selected={donationDate}
-            onChange={(date) => setDonationDate(date)}
-            className="w-full px-4 py-2 border rounded"
-          />
-        </div>
 
         <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded">
           Register as Donor
