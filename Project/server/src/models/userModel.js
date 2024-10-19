@@ -49,6 +49,11 @@ const userSchema=new Schema({
         type: String, enum: ['MON', 'TUES', 'WED','THURS','FRI','SAT','SUN','EVERYDAY'],default: ['EVERYDAY']
      },
      userBloodDonationHistory:String,
+     isAdmin:
+     {
+        type:Boolean,
+        default:false
+     },
     role: { 
         type: String, enum: ['recipient', 'donor', 'both'], default: 'both' 
     }, 
