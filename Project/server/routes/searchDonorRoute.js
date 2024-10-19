@@ -1,7 +1,7 @@
-import express from "express"
-import {searchdonors} from "../controllers/searchdonorcontroller.js"
-const router=express.Router()
+import express from "express";
+import { searchdonors } from "../controllers/searchdonorcontroller.js";
+const router = express.Router();
 
-router.post('/',searchdonors)
+router.post("/", searchdonors);
 
-export default router
+export default router;
