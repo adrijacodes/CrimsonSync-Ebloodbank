@@ -4,7 +4,7 @@ import Navbar from "./Components/Navbar/Navbar";
 import Register from "./Components/Register/Register";
 import Homepage from "./Components/Homepage/Homepage";
 
-const App = () => {
+export  const App = () => {
   return (
     <BrowserRouter>
     <Navbar/>
@@ -16,6 +16,5 @@ const App = () => {
  
   </BrowserRouter>
   );
-};
+}
 
-export default App;
