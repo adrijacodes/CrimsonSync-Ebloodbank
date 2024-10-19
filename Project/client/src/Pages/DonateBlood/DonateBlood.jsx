@@ -1,11 +1,5 @@
-<<<<<<< HEAD
-import  { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-=======
-import React from 'react';
 
->>>>>>> bdab8fe11c99d580fca62645f72b051deca0c9f0
+
 
 const DonateBlood = () => {
  
