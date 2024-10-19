@@ -1,0 +1,13 @@
+@keyframes blood-flow {
+    0% {
+      background-position: 200% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  .animate-blood-flow {
+    background-size: 200% 100%;
+    animation: blood-flow 4s linear infinite; /* Linear flow from left to right */
+  }
