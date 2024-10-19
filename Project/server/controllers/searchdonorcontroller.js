@@ -20,10 +20,12 @@ export const searchdonors=async(req,res,next)=>{
                 message: "No matches found!" 
             });
         }
-
+        const usernames = availableDonors.map(donor => donor.username);
+        
+        
         res.status(200).json({
             success: true,
-            data: availableDonors
+            data: usernames
         });
     }
     catch(error)
