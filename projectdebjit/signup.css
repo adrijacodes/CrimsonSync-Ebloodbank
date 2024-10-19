@@ -1,0 +1,44 @@
+ body{
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    border: 1px solid black;
+    flex-basis: content;
+    }
+  
+
+  button {
+    background-color: blue;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border-color: black;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  
+  .container {
+    width: 200px;
+    height: 200px;
+    background: transparent;
+    border: 3px;
+    outline: none;
+    border-color: black;
+  }
+  
+  input :-ms-input-placeholder{
+    
+    border: 2px solid black;
+    border-radius: 40px;
+    
+  }
+
+  .register-link{
+    font-size: small;
+    align-items: center;
+  }
+  
