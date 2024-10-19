@@ -1,6 +1,6 @@
-
 import { Link } from 'react-router-dom';
-
+import { BsCalendarEvent } from "react-icons/bs";
+import { CgProfile } from "react-icons/cg";
 const Navbar = () => {
   return (
     <header className="bg-red-600 shadow-md">
@@ -19,6 +19,9 @@ const Navbar = () => {
         <Link to='/'>
           <li className='px-4 hover:underline'>Home</li>
         </Link>
+        <Link to='/finddonor'>
+          <li className='px-4 hover:underline'>Find Donor</li>
+        </Link>
         <Link to='/about'>
           <li className='px-4 hover:underline'>About</li>
         </Link>
@@ -28,7 +31,16 @@ const Navbar = () => {
       </ul>
     </nav>
 
-    {/* Placeholder for potential right-aligned content */}
+    <div className="flex items-center space-x-4  ml-auto">
+          <Link to="/events" className="text-white hover:text-red-300">
+            <BsCalendarEvent className="text-2xl" />
+          </Link>
+          <Link to="/profile" className="text-white hover:text-red-300">
+            <CgProfile className="text-2xl" />
+          </Link>
+        </div>
+
+
     <div className="flex-1"></div>
   </div>
 </header>
