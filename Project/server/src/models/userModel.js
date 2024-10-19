@@ -36,6 +36,10 @@ const userSchema=new Schema({
     isRecipient: { 
         type: Boolean, default: false
      },  
+     urgencyType:{
+        type:String,
+        enum:['within 2 hours','today','tomorrow','flexible']
+     },
     role: { 
         type: String, enum: ['recipient', 'donor', 'both'], default: 'both' 
     }, 

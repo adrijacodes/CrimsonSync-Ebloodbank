@@ -1,9 +1,10 @@
 import express from "express"
-import mongoose from 'mongoose'
+
 
 import cors from "cors"
 import morgan from "morgan"
 import authRouter from "../routes/authRoute.js"
+import searchDonorRouter from "../routes/searchDonorRoute.js"
 
 const app=express()
 
@@ -18,6 +19,7 @@ app.get('/',(req,res)=>{
     res.send("Hello WORLD")
 })
 app.use('/api/auth',authRouter)
+app.use('/api/searchDonors',searchDonorRouter)
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';
