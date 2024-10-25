@@ -65,46 +65,28 @@ const Register = () => {
   //   console.log(formData);
 
   return (
-    <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
-      <form action="" onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="username"
-          className="border p-3 rounded-lg"
-          id="username"
-          onChange={handleChange}
-        />
-        <input
-          type="email"
-          placeholder="email"
-          className="border p-3 rounded-lg"
-          id="email"
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          placeholder="password"
-          className="border p-3 rounded-lg"
-          id="password"
-          onChange={handleChange}
-        />
-        <button
-          disabled={loading}
-          className="bg-red-600 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
-        >
-          {loading ? "loading...." : "Sign Up"}
-        </button>
-      </form>
-      <div className="flex justify-center gap-2 mt-5">
-        <p>Have an account?</p>
-        <Link to={"/register"}>
-          <span className="text-blue-700">Register</span>
+    
+    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('../src/assets/blood.webp')" }}>
+      <div className="flex items-center justify-center h-[100vh]">
+        <form className="bg-slate-200 border-slate-400 p-8 rounded-3xl shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-30">
+          <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+          <input type="text" placeholder="Name" className="block w-full p-2 mb-4 border rounded-3xl" />
+          <input type="email" placeholder="Email" className="block w-full p-2 mb-4 border rounded-3xl" />
+          <input type="password" placeholder="Password" className="block w-full p-2 mb-4 border rounded-3xl" />
+          <button className="bg-red-500 text-white w-full py-2 rounded">Sign Up</button>
+          <div className="flex justify-center gap-2 mt-5">
+        <p className="text-red-400">Already have an account?</p>
+        <Link to={"/Login"}>
+          <span className="text-blue-400">Sign In</span>
         </Link>
       </div>
-      {error && <p className="text-red-500 mt-5">{error}</p>}
-     
+
+        </form>
+      </div>
     </div>
+
+    
+
   );
 };
 
