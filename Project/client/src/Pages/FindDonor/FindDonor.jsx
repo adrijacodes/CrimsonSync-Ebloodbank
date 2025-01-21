@@ -50,34 +50,34 @@ const FindDonor = () => {
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center">
             <div className="w-full max-w-md p-5 bg-white shadow-md rounded">
-                <h1 className="text-4xl text-center font-bold text-red-600 mb-6">Find Blood Donor</h1>
+                <h1 className="text-4xl text-center font-bold text-red-600 mb-6 font-Alkatra">Find Blood Donor</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label className="block mb-2">Location:</label>
+                        <label className="block mb-2 font-Itim" >Location:</label>
                         <input
                             type="text"
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
-                            placeholder="Enter your city"
-                            className="w-full px-4 py-2 border rounded"
+                            placeholder="Enter your city "
+                            className="w-full px-4 py-2 border rounded font-Itim"
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block mb-2">State:</label>
+                        <label className="block mb-2 font-Itim">State:</label>
                         <input
                             type="text"
                             value={state}
                             onChange={(e) => setState(e.target.value)}
                             placeholder="Enter your state"
-                            className="w-full px-4 py-2 border rounded"
+                            className="w-full px-4 py-2 border rounded font-Itim"
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block mb-2">Blood Group:</label>
+                        <label className="block mb-2 font-Itim">Blood Group:</label>
                         <select
                             value={bloodGroup}
                             onChange={(e) => setBloodGroup(e.target.value)}
-                            className="w-full px-4 py-2 border rounded"
+                            className="w-full px-4 py-2 border rounded font-Itim"
                         >
                             <option value="" disabled>Select your blood group</option>
                             <option value="A+">A+</option>
@@ -91,11 +91,11 @@ const FindDonor = () => {
                         </select>
                     </div>
                     <div className="mb-4">
-                        <label className="block mb-2">Urgency Type:</label>
+                        <label className="block mb-2 font-Itim">Urgency Type:</label>
                         <select
                             value={urgency}
                             onChange={(e) => setUrgency(e.target.value)}
-                            className="w-full px-4 py-2 border rounded"
+                            className="w-full px-4 py-2 border rounded font-Itim"
                         >
                             <option value="Within 2 Hours">Within 2 Hours</option>
                             <option value="Today">Today</option>
@@ -105,15 +105,15 @@ const FindDonor = () => {
                     </div>
                    
                     <div className="mb-4">
-                        <label className="block mb-2">Select Donation Date:</label>
+                        <label className="block mb-2 font-Itim">Select Donation Date:</label>
                         <DatePicker
                             selected={donorDate}
                             onChange={(date) => setDonorDate(date)}
-                            className="w-full px-4 py-2 border rounded"
+                            className="w-full px-4 py-2 border rounded font-Itim"
                         />
                     </div>
                     
-                    <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded w-full" disabled={loading}>
+                    <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded w-full font-Alkatra" disabled={loading}>
                         {loading ? "Searching..." : "Search"}
                     </button>
                     {error && <p className="text-red-600 mt-4">{error}</p>}

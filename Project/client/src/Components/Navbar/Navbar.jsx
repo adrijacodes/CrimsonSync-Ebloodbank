@@ -8,14 +8,14 @@ const Navbar = () => {
     {/* Left-aligned title */}
     <Link to='/' className="flex-1">
       <h1 className="font-bold text:sm sm:text-xl flex flex-wrap">
-        <span className="text-white text-3xl">Crimson</span>
-        <span className="text-white text-3xl">Sync</span>
+        <span className="text-white text-3xl font-Alkatra">Crimson</span>
+        <span className="text-white text-3xl font-Alkatra">Sync</span>
       </h1>
     </Link>
 
     {/* Centered navigation links */}
     <nav className="flex-1">
-      <ul className='flex justify-center text-white font-semibold font-sans'>
+      <ul className='flex justify-center text-white font-Itim text-xl'>
         <Link to='/'>
           <li className='px-4 hover:underline'>Home</li>
         </Link>
