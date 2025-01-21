@@ -1,10 +1,11 @@
 import express from "express";
-
+import ApiError from "./utils/ApiError.js";
 import cors from "cors";
 import morgan from "morgan";
-import authRouter from "../routes/authRoute.js";
-import searchDonorRouter from "../routes/searchDonorRoute.js";
-import eventRoutes from "../routes/eventRoutes.js";
+// import authRouter from "../routes/authRoute.js";
+// import searchDonorRouter from "../routes/searchDonorRoute.js";
+import eventRoutes from './routes/eventRoutes.js'; 
+
 const app = express();
 
 app.use(cors());
@@ -15,17 +16,24 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Hello WORLD");
 });
-app.use("/api/auth", authRouter);
-app.use("/api/searchDonors", searchDonorRouter);
+// app.use("/api/auth", authRouter);
+// app.use("/api/searchDonors", searchDonorRouter);
 app.use("/api/events", eventRoutes);
-app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
 
-  res.status(statusCode).json({
+app.use((err, req, res, next) => {
+  if (err instanceof ApiError) {
+   
+    return res.status(err.status).json({
+      success: false,
+      status: err.status,
+      message: err.message,
+    });
+  }
+ 
+  return res.status(500).json({
     success: false,
-    statusCode,
-    message,
+    status: 500,
+    message: "Internal Server Error",
   });
 });
 
