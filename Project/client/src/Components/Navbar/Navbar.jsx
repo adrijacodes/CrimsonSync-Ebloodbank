@@ -8,8 +8,9 @@ const Navbar = () => {
     {/* Left-aligned title */}
     <Link to='/' className="flex-1">
       <h1 className="font-bold text:sm sm:text-xl flex flex-wrap">
-        <span className="text-white text-3xl font-Alkatra">Crimson</span>
-        <span className="text-white text-3xl font-Alkatra">Sync</span>
+        <span className="text-white text-2xl">Crimson</span>
+        <span className="text-white text-2xl">Sync</span>
+        
       </h1>
     </Link>
 
@@ -19,15 +20,13 @@ const Navbar = () => {
         <Link to='/'>
           <li className='px-4 hover:underline'>Home</li>
         </Link>
-        <Link to='/finddonor'>
-          <li className='px-4 hover:underline'>Find Donor</li>
-        </Link>
-        <Link to='/about'>
+        <Link to='/About'>
           <li className='px-4 hover:underline'>About</li>
         </Link>
         <Link to='/register'>
           <li className='px-4 hover:underline'>Register</li>
         </Link>
+
       </ul>
     </nav>
 

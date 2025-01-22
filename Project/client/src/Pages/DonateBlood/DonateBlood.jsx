@@ -57,6 +57,6 @@ const DonateBlood = () => {
       </div>
     </div>
   );
-};
+}
 
 export default DonateBlood;
