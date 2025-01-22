@@ -69,7 +69,7 @@ const Register = () => {
     <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('../src/assets/blood.webp')" }}>
       <div className="flex items-center justify-center h-[100vh]">
         <form className="bg-slate-200 border-slate-400 p-8 rounded-3xl shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-30">
-          <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+          <h2 className="text-2xl font-bold mb-4 text-center">Create Account</h2>
           <input type="text" placeholder="Name" className="block w-full p-2 mb-4 border rounded-3xl" />
           <input type="email" placeholder="Email" className="block w-full p-2 mb-4 border rounded-3xl" />
           <input type="password" placeholder="Password" className="block w-full p-2 mb-4 border rounded-3xl" />

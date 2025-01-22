@@ -4,7 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 const FindDonor = () => {
     const [donornDate, setDonordate] = useState(new Date());
   return (
-    <div className="min-h-screen bg-gray-100 p-5">
+    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('../src/assets/blood.webp')" }}>
       <h1 className="text-4xl text-center font-bold text-red-600 mb-6">Find a Blood Donor</h1>
       <form>
         <div className="mb-4">

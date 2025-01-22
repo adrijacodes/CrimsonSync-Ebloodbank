@@ -6,6 +6,7 @@ import Login from "./Components/Login/Login";
 import Homepage from "./Components/Homepage/Homepage";
 import FindDonor from "./Pages/FindDonor";
 import DonateBlood from "./Pages/DonateBlood/DonateBlood";
+import About from "./Components/About/About";
 
 
 
@@ -17,6 +18,7 @@ const App = () => {
     <Navbar/>
     <Routes>
     <Route path="/" element={<Homepage />}/>
+    <Route path="/" element={<About />}/>
     <Route path="/register" element={<Register />}/>
       <Route path="/login" element={<Login />}/>
       <Route path="/finddonor" element={<FindDonor />}/>
