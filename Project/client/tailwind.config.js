@@ -5,12 +5,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {
-      fontFamily:{
-        Alkatra: ["Alkatra","system-ui"],
-        Itim: ["Itim", "cursive"]
-      }
-    },
+    extend: {},
   },
   plugins: [],
 }

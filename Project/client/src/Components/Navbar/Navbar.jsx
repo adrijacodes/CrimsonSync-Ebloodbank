@@ -16,7 +16,7 @@ const Navbar = () => {
 
     {/* Centered navigation links */}
     <nav className="flex-1">
-      <ul className='flex justify-center text-white font-Itim text-xl'>
+      <ul className='flex justify-center text-white font-semibold font-sans'>
         <Link to='/'>
           <li className='px-4 hover:underline'>Home</li>
         </Link>
