@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 
-const SearchEventPage = () => {
-  const role = localStorage.getItem('role');
+const SearchEvent = () => {
+  const role = localStorage.getItem('role'); // "admin" or "user"
   const [city, setCity] = useState('');
-  const [searchResult, setSearchResult] = useState<string | null>(null);
+  const [searchResult, setSearchResult] = useState(null);
   const [newEvent, setNewEvent] = useState('');
   const [addSuccess, setAddSuccess] = useState(false);
 
   const handleSearch = () => {
     if (city.trim()) {
-      setSearchResult(`Showing events in ${city}...`);
+      setSearchResult(`📍 Showing events in ${city}...`);
     } else {
       setSearchResult(null);
     }
@@ -17,7 +17,6 @@ const SearchEventPage = () => {
 
   const handleAddEvent = () => {
     if (newEvent.trim()) {
-      // Simulate adding event 
       setAddSuccess(true);
       setTimeout(() => setAddSuccess(false), 3000);
       setNewEvent('');
@@ -26,11 +25,11 @@ const SearchEventPage = () => {
 
   return (
     <div className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
-      <h1 className="text-3xl font-bold text-center mb-6">
-        {role === 'admin' ? 'Admin: Add & Search Events' : 'Search Events Near You'}
+      <h1 className="text-3xl font-bold text-center mb-6 font-serif">
+        {role === 'admin' ? 'Admin Panel: Add & Search Events' : 'Search Events Near You'}
       </h1>
 
-      {/* Search Section (Visible to all) */}
+      {/* Search by City - everyone sees this */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Search by City</h2>
         <input
@@ -49,7 +48,7 @@ const SearchEventPage = () => {
         {searchResult && <p className="mt-3 text-green-600">{searchResult}</p>}
       </div>
 
-      {/* Add Event - Admin only */}
+      {/* Only admin can see this section */}
       {role === 'admin' && (
         <div className="mt-10 pt-6 border-t">
           <h2 className="text-xl font-semibold mb-2">Add New Event</h2>
@@ -67,9 +66,7 @@ const SearchEventPage = () => {
             Add Event
           </button>
           {addSuccess && (
-            <p className="mt-3 text-green-600">
-              ✅ Event added successfully!
-            </p>
+            <p className="mt-3 text-green-600">✅ Event added successfully!</p>
           )}
         </div>
       )}
@@ -77,4 +74,4 @@ const SearchEventPage = () => {
   );
 };
 
-export default SearchEventPage;
+export default SearchEvent;
