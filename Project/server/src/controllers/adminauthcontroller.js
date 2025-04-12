@@ -1,66 +1,56 @@
-// @ts-nocheck
-import { generateUsername } from "../utils/usernamegenerate.js";
-import bcrypt from "bcryptjs";
 import ApiError from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import AsyncHandler from "express-async-handler";
-import User from "../models/userModel.js";
+import Admin from "../models/adminModel.js";
+import bcrypt from "bcrypt";
 
-// User Registration
+export const registerAdmin = AsyncHandler(async (req, res) => {
+  const { adminName, email, password } = req.body;
 
-export const registerUser = AsyncHandler(async (req, res, next) => {
-  const { name, email, password } = req.body;
-  if (!email || !password || !name) {
+ 
+  if (!email || !password || !adminName) {
     throw new ApiError(400, "All fields are required.");
   }
-  // checking if existing user
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new ApiError(409, "User with this email already exists.");
+
+  const existingAdmin = await Admin.findOne({ email });
+  if (existingAdmin) {
+    throw new ApiError(409, "Admin with this email already exists.");
   }
+  //const hashedPassword = await bcrypt.hash(password, 10);
 
-//   const hashedPassword = await bcrypt.hash(password, 10);
-  const username = generateUsername();
-
-  const user = await User.create({
-    name: name?.toLowerCase(),
+  const admin = await Admin.create({
+    adminName: adminName?.toLowerCase(),
     email,
-    password,
-    username: username,
+    password
   });
 
-  const createdUser = await User.findById(user._id).select(
-    "-password -createdAt -updatedAt -__v -_id"
-  );
-
-  if (!createdUser) {
+  const createdAdmin = await Admin.findById(admin._id).select("-password -__v -createdAt -updatedAt");
+  if (!createdAdmin) {
     throw new ApiError(500, "Error registering the admin.");
   }
 
-  const token = await user.generateUserAccessToken();
+  const token = await admin.generateUserAccessToken();
   if (!token) {
     throw new ApiError(500, "Error generating access token.");
   }
 
-  // returning response
   return res
     .status(201)
     .json(
       new ApiResponse(
-        { UserInfo: createdUser, accessToken: token },
-        "User registered successfully.",
+        { AdminInfo: createdAdmin, accessToken: token },
+        "Admin registered successfully.",
         true
       )
     );
 });
-
-// User Login
-export const loginUser = AsyncHandler(async (req, res, next) => {
+// Admin Login
+export const loginAdmin = AsyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   // checking for insufficient data
   if (!email || !password) throw ApiError(400, "All fields required!");
 
-  const user = await User.findOne({ email });
+  const user = await Admin.findOne({ email });
   if (!user) {
     throw new ApiError(400, "Invalid login credentials!User does not exist");
   }
@@ -99,9 +89,8 @@ export const loginUser = AsyncHandler(async (req, res, next) => {
     );
 });
 
-
-// User Logout
- export const userLogout = AsyncHandler(async (req, res) => {
+// Admin Logout
+ export const adminLogout = AsyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
