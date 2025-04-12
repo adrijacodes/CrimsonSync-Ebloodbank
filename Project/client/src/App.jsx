@@ -4,11 +4,9 @@ import Navbar from "./Components/Navbar/Navbar";
 import Register from "./Components/Register/Register";
 import Login from "./Components/Login/Login";
 import Homepage from "./Components/Homepage/Homepage";
-import SearchBlood from "./Pages/SearchBlood";
 import DonateBlood from "./Pages/DonateBlood/DonateBlood";
 import About from "./Components/About/About";
-
-
+import SearchBlood from "./Pages/SearchBlood";
 
 
 const App = () => {
@@ -20,9 +18,12 @@ const App = () => {
     <Route path="/" element={<Homepage />}/>
     <Route path="/about" element={<About />}/>
     <Route path="/register" element={<Register />}/>
-    <Route path="/login" element={<Login />}/>
-    <Route path="/SearchBlood" element={<SearchBlood />}/>
-    <Route path="/donateblood" element={<DonateBlood/>}/>
+      <Route path="/login" element={<Login />}/>
+      <Route path="/searchblood" element={<SearchBlood/>}/>
+     
+      <Route path="/donateblood" element={<DonateBlood/>}/>
+      
+      
     </Routes>
  
   </BrowserRouter>
@@ -30,4 +31,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default App;

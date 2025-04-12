@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import React from 'react';
+
 
 const DonateBlood = () => {
-  const [donationDate, setDonationDate] = useState(new Date());
+ 
 
   return (
-    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('../src/assets/blood.webp')" }}>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="w-full max-w-md p-5 bg-white shadow-md rounded">
       <h1 className="text-4xl  text-center font-bold text-red-600 mb-6">Donate Blood</h1>
       <form>
         <div className="mb-4">
@@ -26,6 +26,15 @@ const DonateBlood = () => {
           />
         </div>
         <div className="mb-4">
+          <label className="block mb-2">State:</label>
+          <input
+            type="text"
+            placeholder="Enter your state"
+            className="w-full px-4 py-2 border rounded"
+          />
+        </div>
+
+        <div className="mb-4">
           <label className="block mb-2">Blood Group:</label>
           <select className="w-full px-4 py-2 border rounded">
             <option value="A+">A+</option>
@@ -39,22 +48,15 @@ const DonateBlood = () => {
           </select>
         </div>
 
-        {/* Calendar Date Picker for selecting donation date */}
-        <div className="mb-4">
-          <label className="block mb-2">Select Donation Date:</label>
-          <DatePicker
-            selected={donationDate}
-            onChange={(date) => setDonationDate(date)}
-            className="w-full px-4 py-2 border rounded"
-          />
-        </div>
 
         <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded">
           Register as Donor
         </button>
+      
       </form>
+      </div>
     </div>
   );
-};
+}
 
 export default DonateBlood;
