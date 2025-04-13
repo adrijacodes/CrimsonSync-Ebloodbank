@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 const SearchEvent = () => {
-  const role = localStorage.getItem('role'); // "admin" or "user"
   const [city, setCity] = useState('');
   const [searchResult, setSearchResult] = useState(null);
   const [newEvent, setNewEvent] = useState('');
@@ -26,10 +25,10 @@ const SearchEvent = () => {
   return (
     <div className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
       <h1 className="text-3xl font-bold text-center mb-6 font-serif">
-        {role === 'admin' ? 'Admin Panel: Add & Search Events' : 'Search Events Near You'}
+        Find Events nearby!!!
       </h1>
 
-      {/* Search by City - everyone sees this */}
+      {/* Search by City */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Search by City</h2>
         <input
@@ -48,28 +47,26 @@ const SearchEvent = () => {
         {searchResult && <p className="mt-3 text-green-600">{searchResult}</p>}
       </div>
 
-      {/* Only admin can see this section */}
-      {role === 'admin' && (
-        <div className="mt-10 pt-6 border-t">
-          <h2 className="text-xl font-semibold mb-2">Add New Event</h2>
-          <input
-            type="text"
-            placeholder="Event Name"
-            value={newEvent}
-            onChange={(e) => setNewEvent(e.target.value)}
-            className="w-full p-2 border rounded mb-2"
-          />
-          <button
-            onClick={handleAddEvent}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Add Event
-          </button>
-          {addSuccess && (
-            <p className="mt-3 text-green-600">✅ Event added successfully!</p>
-          )}
-        </div>
-      )}
+      {/* Add New Event */}
+      <div className="mt-10 pt-6 border-t">
+        <h2 className="text-xl font-semibold mb-2">Add New Event</h2>
+        <input
+          type="text"
+          placeholder="Event Name"
+          value={newEvent}
+          onChange={(e) => setNewEvent(e.target.value)}
+          className="w-full p-2 border rounded mb-2"
+        />
+        <button
+          onClick={handleAddEvent}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Add Event
+        </button>
+        {addSuccess && (
+          <p className="mt-3 text-green-600">✅ Event added successfully!</p>
+        )}
+      </div>
     </div>
   );
 };
