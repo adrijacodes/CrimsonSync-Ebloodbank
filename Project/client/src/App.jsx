@@ -8,10 +8,11 @@ import SearchBlood from "./Pages/SearchBlood";
 import About from "./Components/About/About";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import SearchEvent from "./Pages/SearchEvent";
+import NewEvent from "./Pages/NewEvent";
 
 const AppWrapper = () => {
   const location = useLocation();
-  const hiddenLayoutRoutes = ["/Login", "/register","/SearchEvent"]; 
+  const hiddenLayoutRoutes = ["/Login", "/register","/SearchEvent", "/NewEvent"]; 
   const shouldHideLayout = hiddenLayoutRoutes.includes(location.pathname);
 
   return (
@@ -26,6 +27,7 @@ const AppWrapper = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/SearchBlood" element={<SearchBlood />} />
           <Route path="/SearchEvent" element={<SearchEvent />} />
+          <Route path="/NewEvent" element={<NewEvent />} />
         </Routes>
       </div>
 
