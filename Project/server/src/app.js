@@ -1,20 +1,39 @@
-import express from "express"
-import morgan from "morgan"
-const app=express()
+import express from "express";
+import ApiError from "./utils/ApiError.js";
+import cors from "cors";
+import morgan from "morgan";
+import authRoutes from "../src/routes/authRoute.js";
+// import searchDonorRouter from "../routes/searchDonorRoute.js";
+import eventRoutes from "./routes/eventRoutes.js";
+import adminRoutes from "./routes/adminAuthRoutes.js";
 
-app.use(morgan('dev'))
-// app.set('view engine','ejs')
-// app.set('views',path.join(__dirname,'views'))
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json()); 
-// app.use(methodOverride('_method'));
+const app = express();
 
-
-app.get('/',(req,res)=>{
-    res.send("Hello WORLD")
-})
-
-
+app.use(cors());
+app.use(morgan("dev"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 
-export {app}
+app.use("/api/auth/user", authRoutes);
+// app.use("/api/searchDonors", searchDonorRouter);
+app.use("/api/events", eventRoutes);
+app.use("/api/auth/admin", adminRoutes);
+
+app.use((err, req, res, next) => {
+  if (err instanceof ApiError) {
+    return res.status(err.status).json({
+      success: false,
+      status: err.status,
+      message: err.message,
+    });
+  }
+
+  return res.status(500).json({
+    success: false,
+    status: 500,
+    message: "Internal Server Error",
+  });
+});
+
+export { app };

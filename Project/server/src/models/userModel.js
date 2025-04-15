@@ -1,4 +1,8 @@
+//@ts-nocheck
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken";
+import { TOKENEXPIRY, TOKENSECRETKEY } from "../../envAccess.js";
 const Schema=mongoose.Schema
 
 const userSchema=new Schema({
@@ -6,6 +10,10 @@ const userSchema=new Schema({
      { 
         type: String,
          required: true
+     },
+     username:{
+        type: String,
+        required: true
      },
     email:
      { 
@@ -15,17 +23,17 @@ const userSchema=new Schema({
          type: String, required: true 
         },
     bloodType: {
-         type: String, required: true 
+         type: String
         },                          
     location: 
     { 
     
         city:{
-            type: String, required: true 
+            type: String
 
              },
         state:{
-            type: String, required: true 
+            type: String
 
              }
     },
@@ -36,11 +44,46 @@ const userSchema=new Schema({
     isRecipient: { 
         type: Boolean, default: false
      },  
+     availability:{
+        type: String, enum: ['MON', 'TUES', 'WED','THURS','FRI','SAT','SUN','NONE'], default: 'NONE'
+     },
+     userBloodDonationHistory:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"BloodRequests"
+      }],
     role: { 
-        type: String, enum: ['recipient', 'donor', 'both'], default: 'both' 
+        type: String, enum: ['recipient', 'donor' ], default: 'recipient' 
     }, 
   }, { timestamps: true }
 )
 
+
+userSchema.pre("save", async function (next) {
+    if (this.isModified("password") && this.password) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
+  });
+userSchema.methods.passwordValidityCheck = async function (password) {
+    try {
+      return await bcrypt.compare(password, this.password);
+    } catch (error) {
+      console.error("Error comparing passwords:", error);
+      return false;
+    }
+  };
+userSchema.methods.generateUserAccessToken = async function () {
+  const token = jwt.sign(
+    {
+      email: this.email,
+    },
+    TOKENSECRETKEY,
+    { expiresIn: TOKENEXPIRY }
+  );
+  
+  return token;
+};
+
+
 const User=mongoose.model("Users",userSchema)
-export {User}
+export  default User

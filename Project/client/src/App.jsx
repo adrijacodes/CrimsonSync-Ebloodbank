@@ -34,7 +34,7 @@ const AppWrapper = () => {
       {!shouldHideLayout && <Footer />} 
     </div>
   );
-};
+}
 
 const App = () => (
   <BrowserRouter>
