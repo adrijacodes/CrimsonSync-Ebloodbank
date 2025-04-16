@@ -7,6 +7,9 @@ import Homepage from "./Components/Homepage/Homepage";
 import DonateBlood from "./Pages/DonateBlood/DonateBlood";
 import About from "./Components/About/About";
 import SearchBlood from "./Pages/SearchBlood";
+import Donorlist from "./Pages/Donorlist/Donorlist";
+
+
 
 
 const App = () => {
@@ -20,7 +23,7 @@ const App = () => {
     <Route path="/register" element={<Register />}/>
       <Route path="/login" element={<Login />}/>
       <Route path="/searchblood" element={<SearchBlood/>}/>
-     
+      <Route path="/donorlist" element={<Donorlist/>}/>
       <Route path="/donateblood" element={<DonateBlood/>}/>
       
       
