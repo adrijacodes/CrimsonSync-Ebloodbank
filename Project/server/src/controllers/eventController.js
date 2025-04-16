@@ -37,7 +37,7 @@ export const registerEvents = AsyncHandler(async (req, res) => {
 
 export const getEvents = AsyncHandler(async (req, res) => {
   const { city } = req.body; 
-  console.log("its entering")
+
  
   const eventsList = await Event.find({ "location.city": city });
   if (eventsList.length === 0) {
