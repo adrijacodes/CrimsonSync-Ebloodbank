@@ -26,7 +26,7 @@ const Donorlist = () => {
            animate="visible"
            transition={{ duration: 0.8, delay: 0.6 }}
          >
-           <h2 className="text-4xl text-center font-bold font-itim mb-6 font-serif">What Our Users Say</h2>
+           <h2 className="text-4xl text-center font-bold font-itim mb-6 font-serif">List Of Donors</h2>
            <motion.div
              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
              initial="hidden"
