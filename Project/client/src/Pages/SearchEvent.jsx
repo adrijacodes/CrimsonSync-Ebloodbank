@@ -1,39 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EventCard from '../Components/Event Card/EventCard';
 
 const SearchEvent = () => {
   const [city, setCity] = useState('');
-  const [allEvents, setAllEvents] = useState([]);
   const [searchResult, setSearchResult] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await fetch('http://localhost:8001/api/events');
-        const data = await res.json();
-
-        // Debug log to inspect the structure
-        console.log('Fetched event data:', data);
-
-        // Adjust this depending on your actual backend response
-        const events = data.data || data.events || data; 
-        setAllEvents(events);
-      } catch (err) {
-        console.error('Error fetching events:', err);
-      }
-    };
-
-    fetchEvents();
-  }, []);
-
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (city.trim()) {
-      const results = allEvents.filter(
-        (event) => event.city.toLowerCase() === city.trim().toLowerCase()
-      );
-      setSearchResult(results);
+      setLoading(true);
+      try {
+        const res = await fetch('http://localhost:8001/api/events', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ city: city.trim() }),
+        });
+
+        const data = await res.json();
+        const events = data.events || data.data || [];
+        setSearchResult(events);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+        setSearchResult([]);
+      } finally {
+        setLoading(false);
+      }
     } else {
       setSearchResult(null);
     }
@@ -62,6 +57,7 @@ const SearchEvent = () => {
             placeholder="Enter city name..."
             value={city}
             onChange={(e) => setCity(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             className="w-full p-3 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-black"
           />
           <button
@@ -73,7 +69,9 @@ const SearchEvent = () => {
         </div>
 
         {/* Results Section */}
-        {searchResult !== null && (
+        {loading ? (
+          <p className="text-gray-500 font-serif">🔄 Searching events...</p>
+        ) : searchResult !== null ? (
           <div>
             {searchResult.length ? (
               <>
@@ -92,7 +90,7 @@ const SearchEvent = () => {
               </p>
             )}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
