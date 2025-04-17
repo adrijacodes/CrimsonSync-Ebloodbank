@@ -13,7 +13,6 @@ const Navbar = () => {
       </h1>
     </Link>
 
-    {/* Centered navigation links */}
     <nav className="flex-1">
       <ul className='flex justify-center text-white font-semibold font-sans'>
         <Link to='/'>
