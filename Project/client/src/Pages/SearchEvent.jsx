@@ -13,7 +13,8 @@ const SearchEvent = () => {
       try {
         const res = await fetch('http://localhost:8001/api/events');
         const data = await res.json();
-
+        // console.log(res);
+        
         // Debug log to inspect the structure
         console.log('Fetched event data:', data);
 
@@ -29,14 +30,16 @@ const SearchEvent = () => {
   }, []);
 
   const handleSearch = () => {
-    if (city.trim()) {
-      const results = allEvents.filter(
-        (event) => event.city.toLowerCase() === city.trim().toLowerCase()
-      );
-      setSearchResult(results);
-    } else {
-      setSearchResult(null);
-    }
+    // if (city.trim()) {
+    //   const results = allEvents.filter(
+    //     (event) => event.city.toLowerCase() === city.trim().toLowerCase()
+    //   );
+    //   setSearchResult(results);
+    // } else {
+    //   setSearchResult(null);
+    console.log("entering");
+    
+    // }
   };
 
   return (
