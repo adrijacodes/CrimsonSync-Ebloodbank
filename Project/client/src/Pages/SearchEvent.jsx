@@ -1,113 +1,95 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const mockEvents = [
-  {
-    id: 1,
-    name: 'Blood Donation Camp',
-    city: 'Delhi',
-    date: '2025-04-20',
-    location: 'AIIMS Hospital',
-  },
-  {
-    id: 2,
-    name: 'Health Awareness Walk',
-    city: 'Mumbai',
-    date: '2025-04-25',
-    location: 'Marine Drive',
-  },
-  {
-    id: 3,
-    name: 'Plasma Donation Drive',
-    city: 'Delhi',
-    date: '2025-04-22',
-    location: 'Red Cross Center',
-  },
-  {
-    id: 4,
-    name: 'Free Health Checkup Camp',
-    city: 'Chennai',
-    date: '2025-04-30',
-    location: 'Apollo Hospital',
-  },
-];
+import EventCard from '../Components/Event Card/EventCard';
 
 const SearchEvent = () => {
   const [city, setCity] = useState('');
+  const [allEvents, setAllEvents] = useState([]);
   const [searchResult, setSearchResult] = useState(null);
-
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch('http://localhost:8001/api/events');
+        const data = await res.json();
+
+        // Debug log to inspect the structure
+        console.log('Fetched event data:', data);
+
+        // Adjust this depending on your actual backend response
+        const events = data.data || data.events || data; 
+        setAllEvents(events);
+      } catch (err) {
+        console.error('Error fetching events:', err);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const handleSearch = () => {
     if (city.trim()) {
-      const results = mockEvents.filter(
+      const results = allEvents.filter(
         (event) => event.city.toLowerCase() === city.trim().toLowerCase()
       );
-
-      setSearchResult(results.length ? results : []);
+      setSearchResult(results);
     } else {
       setSearchResult(null);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-red-200 px-4">
-      <div className="max-w-xl w-full p-6 bg-white bg-opacity-50 shadow-lg rounded-lg">
-        <h1 className="text-3xl font-bold text-center mb-6 font-serif">
-          Find Events Nearby!!!
-        </h1>
+    <div className="min-h-screen bg-white py-10 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold font-serif">
+            Search Blood Donation Events Nearby!
+          </h1>
+          <button
+            onClick={() => navigate('/NewEvent')}
+            className="bg-white text-black px-4 py-2 text-xl rounded-full font-serif border border-gray-300 hover:bg-gray-100"
+          >
+            + Add Event
+          </button>
+        </div>
 
-        {/* Search by City */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="text-xl font-semibold font-serif">Search by City</h2>
-            <button
-              onClick={() => navigate('/NewEvent')}
-              className="bg-green-600 text-white px-4 py-2 rounded-full text-lg font-serif"
-            >
-              + Add Event
-            </button>
-          </div>
+        {/* Search Input */}
+        <div className="flex items-center gap-3 mb-8">
           <input
             type="text"
-            placeholder="Enter city name"
+            placeholder="Enter city name..."
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className="w-full p-2 border rounded-full mb-2"
+            className="w-full p-3 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-black"
           />
           <button
             onClick={handleSearch}
-            className="bg-red-600 text-white px-4 py-2 rounded-full font-serif w-full"
+            className="bg-red-600 text-white px-6 py-3 text-xl rounded-full font-serif hover:bg-red-700 transition"
           >
             Search
           </button>
         </div>
 
-        {/* Search Results */}
-        {searchResult && (
-          <div className="mt-6">
+        {/* Results Section */}
+        {searchResult !== null && (
+          <div>
             {searchResult.length ? (
               <>
-                <p className="text-green-600 font-semibold mb-3">
-                  📍 Showing events in {city}:
+                <p className="text-gray-700 font-medium mb-4 font-serif">
+                  📍 Showing events in <span className="font-bold">{city}</span>:
                 </p>
-                <ul className="space-y-4">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 font-serif">
                   {searchResult.map((event) => (
-                    <li
-                      key={event.id}
-                      className="p-4 border border-gray-300 rounded-lg shadow-sm bg-gray-50"
-                    >
-                      <h3 className="text-lg font-bold text-red-700">
-                        {event.name}
-                      </h3>
-                      <p className="text-sm">📅 {event.date}</p>
-                      <p className="text-sm">📍 {event.location}</p>
-                    </li>
+                    <EventCard key={event._id} event={event} />
                   ))}
-                </ul>
+                </div>
               </>
             ) : (
-              <p className="text-red-600">❌ No events found in {city}</p>
+              <p className="text-red-600 font-medium font-serif">
+                ❌ No events found in "{city}"
+              </p>
             )}
           </div>
         )}

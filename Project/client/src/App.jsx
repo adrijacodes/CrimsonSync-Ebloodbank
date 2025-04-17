@@ -6,18 +6,22 @@ import Footer from "./Components/Footer/Footer";
 import Homepage from "./Components/Homepage/Homepage";
 import SearchBlood from "./Pages/SearchBlood";
 import About from "./Components/About/About";
-import ProtectedRoute from "./Components/ProtectedRoute";
 import SearchEvent from "./Pages/SearchEvent";
 import NewEvent from "./Pages/NewEvent";
+import EventDetails from "./Pages/EventDetails";
 
 const AppWrapper = () => {
   const location = useLocation();
-  const hiddenLayoutRoutes = ["/Login", "/register","/SearchEvent", "/NewEvent"]; 
-  const shouldHideLayout = hiddenLayoutRoutes.includes(location.pathname);
+
+  const hiddenLayoutRoutes = ["/Login", "/register"];
+  const hideLayoutForPattern = /^\/event\/\d+$/; // matches /event/1, /event/99, etc.
+
+  const shouldHideLayout =
+    hiddenLayoutRoutes.includes(location.pathname) || hideLayoutForPattern.test(location.pathname);
 
   return (
     <div className="min-h-screen flex flex-col justify-between">
-      {!shouldHideLayout && <Navbar />} 
+      {!shouldHideLayout && <Navbar />}
 
       <div className="flex-grow">
         <Routes>
@@ -28,13 +32,14 @@ const AppWrapper = () => {
           <Route path="/SearchBlood" element={<SearchBlood />} />
           <Route path="/SearchEvent" element={<SearchEvent />} />
           <Route path="/NewEvent" element={<NewEvent />} />
+          <Route path="/event/:id" element={<EventDetails />} /> 
         </Routes>
       </div>
 
-      {!shouldHideLayout && <Footer />} 
+      {!shouldHideLayout && <Footer />}
     </div>
   );
-}
+};
 
 const App = () => (
   <BrowserRouter>

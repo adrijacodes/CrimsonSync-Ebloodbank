@@ -108,9 +108,9 @@ const HomePage = () => {
           </button>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-semibold font-sans text-red-600">
+          {/* <p className="text-2xl font-semibold font-sans text-red-600">
             {activeTab === 'blood' ? '🔍 Search Required Blood!' : '📅 Search Events Nearby!'}
-          </p>
+          </p> */}
         </div>
       </div>
 

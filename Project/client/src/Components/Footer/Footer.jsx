@@ -18,8 +18,8 @@ const Footer = () => {
           <h2 className="text-lg font-semibold mb-2">Quick Links</h2>
           <ul className="space-y-1 text-sm">
             <li><a href="/about" className="hover:text-red-300">About Us</a></li>
-            <li><a href="/events" className="hover:text-red-300">Events</a></li>
-            <li><a href="/donate" className="hover:text-red-300">Become a Donor</a></li>
+            <li><a href="/SearchEvent" className="hover:text-red-300">search Events</a></li>
+            <li><a href="/SearchBlood" className="hover:text-red-300">Search Blood</a></li>
             <li><a href="/contact" className="hover:text-red-300">Contact</a></li>
           </ul>
         </div>

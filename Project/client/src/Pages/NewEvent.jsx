@@ -36,7 +36,7 @@ const NewEvent = () => {
 
   return (
     <div
-      className="min-h-screen flex justify-center items-center bg-cover bg-center px-4 bg-red-200">
+      className="min-h-screen flex justify-center items-center bg-cover bg-center px-4 bg-white">
       <div className="max-w-2xl w-full p-6 bg-white bg-opacity-50 shadow-lg rounded-lg">
         <h1 className="text-3xl font-bold text-center mb-6 font-serif">Add New Event</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
