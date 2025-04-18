@@ -1,4 +1,3 @@
-// EventCard.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -36,7 +35,7 @@ const EventCard = ({ event }) => {
   );
 };
 
-// ✅ Add prop validation
+// Add prop validation
 EventCard.propTypes = {
   event: PropTypes.shape({
     _id: PropTypes.string.isRequired,

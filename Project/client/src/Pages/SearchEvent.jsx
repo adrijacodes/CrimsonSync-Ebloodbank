@@ -4,32 +4,29 @@ import EventCard from '../Components/Event Card/EventCard';
 
 const SearchEvent = () => {
   const [city, setCity] = useState('');
+  const [searchedCity, setSearchedCity] = useState('');
   const [searchResult, setSearchResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
-  const capitalizeFirstLetter = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  };
-  
+
+  const capitalizeFirstLetter = (str) =>
+    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
   const handleSearch = async () => {
     if (city.trim()) {
-      // Capitalize the first letter of the city name
       const capitalizedCity = capitalizeFirstLetter(city.trim());
-  
+      setSearchedCity(capitalizedCity); // ✅ set searchedCity
+
       try {
-        setLoading(true); // Start loading before the fetch request
-        const res = await fetch(`http://localhost:8001/api/events/search?city=${encodeURIComponent(capitalizedCity.trim())}`);
-        
+        setLoading(true);
+        const res = await fetch(
+          `http://localhost:8001/api/events/search?city=${encodeURIComponent(capitalizedCity)}`
+        );
         const data = await res.json();
-        console.log(data);
-       
         if (data.success) {
-          const events = data.data.eventsList || [];
-          console.log(events);
-          setSearchResult(events);
+          setSearchResult(data.data.eventsList || []);
         } else {
-          console.error('Error: ', data.message);
+          console.error('Error:', data.message);
           setSearchResult([]);
         }
       } catch (error) {
@@ -39,13 +36,12 @@ const SearchEvent = () => {
         setLoading(false);
       }
 
-      // Clear the city input field after search
-      setCity('');
+      setCity(''); // Clear input
     } else {
       setSearchResult(null);
+      setSearchedCity('');
     }
   };
-  
 
   return (
     <div className="min-h-screen bg-white py-10 px-4">
@@ -89,7 +85,7 @@ const SearchEvent = () => {
             {searchResult.length ? (
               <>
                 <p className="text-gray-700 font-medium mb-4 font-serif">
-                  📍 Showing events in <span className="font-bold">{city}</span>:
+                  📍 Showing events in <span className="font-bold">{searchedCity}</span>:
                 </p>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 font-serif">
                   {searchResult.map((event) => (
@@ -99,7 +95,7 @@ const SearchEvent = () => {
               </>
             ) : (
               <p className="text-red-600 font-medium font-serif">
-                ❌ No events found in "{city}"
+                ❌ No events found in "{searchedCity}"
               </p>
             )}
           </div>
