@@ -113,6 +113,8 @@ export const viewAdmins = AsyncHandler(async (req, res) => {
 });
 // search admins by name,email
 export const searchAdmins = AsyncHandler(async (req, res) => {
+  //console.log("entering");
+  
   const { searchTerm } = req.query;
   if (!searchTerm) {
     return res.status(400).json({ message: "Search term is required" });
@@ -124,8 +126,10 @@ export const searchAdmins = AsyncHandler(async (req, res) => {
       { email: { $regex: searchTerm, $options: "i" } }, // Search by email
     ],
   }).select("-password -createdAt -updatedAt -__v ");
+  //console.log(admins);
+  
   const Total_Admins = admins.length;
-  if (users.length === 0) {
+  if (admins.length === 0) {
     return res.status(404).json(new ApiResponse({}, "No admins found!!", true));
   }
 
