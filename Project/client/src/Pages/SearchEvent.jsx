@@ -7,22 +7,31 @@ const SearchEvent = () => {
   const [searchResult, setSearchResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+  
   const handleSearch = async () => {
     if (city.trim()) {
-      setLoading(true);
+      // Capitalize the first letter of the city name
+      const capitalizedCity = capitalizeFirstLetter(city.trim());
+  
       try {
-        const res = await fetch('http://localhost:8001/api/events', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ city: city.trim() }),
-        });
-
+        const res = await fetch(`http://localhost:8001/api/events/search?city=${encodeURIComponent(capitalizedCity.trim())}`);
+    
+        
         const data = await res.json();
-        const events = data.events || data.data || [];
-        setSearchResult(events);
+       console.log(data);
+       
+        if (data.success) {
+          const events = data.data.eventsList || [];
+          console.log(events);
+          setSearchResult(events);
+        } else {
+          console.error('Error: ', data.message);
+          setSearchResult([]);
+        }
       } catch (error) {
         console.error('Error fetching search results:', error);
         setSearchResult([]);
@@ -33,6 +42,7 @@ const SearchEvent = () => {
       setSearchResult(null);
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-white py-10 px-4">

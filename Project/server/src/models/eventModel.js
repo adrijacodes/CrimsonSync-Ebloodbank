@@ -12,7 +12,7 @@ const eventSchema = new mongoose.Schema({
     }
      },
   description: { type: String },
-  // createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
+  
   createdAt: { type: Date, default: Date.now },
 });
 

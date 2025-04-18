@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
+  const { venue, city } = event.location || {}; // Destructure safely
 
-  // Safe destructuring with optional chaining
-  const { venue, city } = event?.location || {}; 
+
 
   if (!event) {
     return <div>Loading...</div>; // Fallback while event data is being loaded
@@ -14,10 +14,12 @@ const EventCard = ({ event }) => {
   return (
     <div
       className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition"
-      onClick={() => navigate(`/event/${event._id}`)} 
+      onClick={() => navigate("/event/" + event._id)}
+//      Navigate to detailed event page
     >
+      {/* Ensure there's a fallback for image if it doesn't exist */}
       <img
-        src={event.image || '/path/to/default-image.jpg'} // Provide default image
+        src={event.image || '/path/to/default-image.jpg'} // Provide a default image if no image exists
         alt={event.eventName || 'Event Image'}
         className="w-full h-40 object-cover"
       />

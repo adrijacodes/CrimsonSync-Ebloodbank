@@ -34,27 +34,67 @@ export const registerEvents = AsyncHandler(async (req, res) => {
     .json(new ApiResponse(newEvent, "Event added successfully", true));
 });
 
+// Get all events
 
 export const getEvents = AsyncHandler(async (req, res) => {
-  const { city } = req.body; 
-  console.log("its entering")
- 
-  const eventsList = await Event.find({ "location.city": city });
-  if (eventsList.length === 0) {
-    return res
-      .status(404)
-      .json(
-        new ApiResponse("", "No blood donation camps found!", false)
-      );
+  const { city, filter } = req.query;
+  const now = new Date();
+  const isAdmin = req.user?.role === 'admin';
+
+  const query = { "location.city": city };
+
+  if (filter === 'upcoming') {
+    const tomorrow = new Date(); 
+    tomorrow.setDate(now.getDate() + 1);  
+    tomorrow.setHours(0, 0, 0, 0);   
+    
+    query.date = { $gte: tomorrow };   
   }
 
-  res
-    .status(200)
-    .json(
-      new ApiResponse(
-        eventsList,
-        "Nearby events returned successfully",
-        true
-      )
+  else if (filter === 'today') {
+    query.date = {
+      '$gte': new Date("2025-04-17T00:00:00.000Z"),  
+   '$lt': new Date("2025-04-18T00:00:00.000Z")
+     };
+  }
+
+  else if (filter === 'expired') {
+    if (!isAdmin) {
+      return res.status(403).json(
+        new ApiResponse(null, "You are not authorized to view expired events.", false)
+      );
+    }
+
+    const expiredEvents = new Date(now);
+    expiredEvents.setDate(now.getDate() - 1);  
+    expiredEvents.setHours(0, 0, 0, 0); 
+    query.date = { $lte: expiredEvents };   
+  }
+
+  console.log("Query being used:", query);
+
+  const [count, eventsList] = await Promise.all([
+    Event.countDocuments(query),
+    Event.find(query)
+  ]);
+
+  if (eventsList.length === 0) {
+    return res.status(404).json(
+      new ApiResponse(null, "No events found based on your search criteria.", false)
     );
+  }
+  
+  
+  
+  res.status(200).json(
+    new ApiResponse(
+    {
+    "totalresults": count,
+    "eventsList": eventsList
+  },
+      "Events returned successfully based on your filter.",
+      true
+    )
+  );
 });
+
