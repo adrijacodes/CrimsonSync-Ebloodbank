@@ -112,3 +112,5 @@ export const loginUser = AsyncHandler(async (req, res, next) => {
       )
     );
   });
+
+// User Search
