@@ -83,27 +83,27 @@ const SearchEvent = () => {
 
         {/* Results Section */}
         {loading ? (
-          <p className="text-gray-500 font-serif">🔄 Searching events...</p>
-        ) : searchResult !== null ? (
-          <div>
-            {searchResult.length ? (
-              <>
-                <p className="text-gray-700 font-medium mb-4 font-serif">
-                  📍 Showing events in <span className="font-bold">{city}</span>:
-                </p>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 font-serif">
-                  {searchResult.map((event) => (
-                    <EventCard key={event._id} event={event} />
-                  ))}
-                </div>
-              </>
-            ) : (
-              <p className="text-red-600 font-medium font-serif">
-                ❌ No events found in "{city}"
-              </p>
-            )}
-          </div>
-        ) : null}
+  <p className="text-gray-500 font-serif">🔄 Searching events...</p>
+) : searchResult !== null && city.trim() !== '' ? (  // ✅ extra condition added
+  <div>
+    {searchResult.length ? (
+      <>
+        <p className="text-gray-700 font-medium mb-4 font-serif">
+          📍 Showing events in <span className="font-bold">{city}</span>:
+        </p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 font-serif">
+          {searchResult.map((event) => (
+            <EventCard key={event._id} event={event} />
+          ))}
+        </div>
+      </>
+    ) : (
+      <p className="text-red-600 font-medium font-serif">
+        ❌ No events found in "{city}"
+      </p>
+    )}
+  </div>
+) : null}
       </div>
     </div>
   );
