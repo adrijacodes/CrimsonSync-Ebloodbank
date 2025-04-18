@@ -1,4 +1,3 @@
-// EventCard.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -13,13 +12,6 @@ const EventCard = ({ event }) => {
   }
 
   const selectedImage = randomIndex();  // Get the random image from the helper
-
-
-
-  if (!event) {
-    return <div>Loading...</div>; // Fallback while event data is being loaded
-  }
-  const ImageList = randomIndex();
 
   return (
     <div
@@ -43,7 +35,7 @@ const EventCard = ({ event }) => {
   );
 };
 
-// ✅ Add prop validation
+// Add prop validation
 EventCard.propTypes = {
   event: PropTypes.shape({
     _id: PropTypes.string.isRequired,

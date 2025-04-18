@@ -1,4 +1,3 @@
-// Helpers/ImageList.js
 
 import PC1 from '../assets/EventphotoCards/PC1.jpg';
 import PC2 from '../assets/EventphotoCards/PC2.jpg';
