@@ -1,13 +1,18 @@
+// EventCard.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-//import PC1 from '../../assets/EventphotoCards/PC1.jpg';
-import randomIndex from '../../Helpers/ImageList';
+import randomIndex from '../../Helpers/randomIndex.jsx';  // Import the helper function
 
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
   const { venue, city } = event.location || {};
-  //const { _id: eventId, eventName } = event;
+
+  if (!event) {
+    return <div>Loading...</div>; // Fallback while event data is being loaded
+  }
+
+  const selectedImage = randomIndex();  // Get the random image from the helper
 
 
 
@@ -22,7 +27,7 @@ const EventCard = ({ event }) => {
       onClick={() => navigate("/event/" + event._id)}
     >
       <img
-        src={ImageList}
+        src={selectedImage}  // Use the selected image in your img tag
         alt={event.eventName || 'Event Image'}
         className="w-full h-40 object-cover"
       />
