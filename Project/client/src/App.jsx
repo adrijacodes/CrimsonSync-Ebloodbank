@@ -9,6 +9,7 @@ import About from "./Components/About/About";
 import SearchEvent from "./Pages/SearchEvent";
 import NewEvent from "./Pages/NewEvent";
 import EventDetails from "./Pages/EventDetails";
+import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -33,6 +34,7 @@ const AppWrapper = () => {
           <Route path="/SearchEvent" element={<SearchEvent />} />
           <Route path="/NewEvent" element={<NewEvent />} />
           <Route path="/event/:id" element={<EventDetails />} /> 
+          <Route path="/Admindashborad" element={<AdminDashboard />} />
         </Routes>
       </div>
 

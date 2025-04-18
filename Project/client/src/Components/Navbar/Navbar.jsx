@@ -24,6 +24,9 @@ const Navbar = () => {
         <Link to='/register'>
           <li className='px-4 hover:underline'>Register</li>
         </Link>
+        <li>
+            <Link to="/Admindashborad" className="px-4 hover:underline">Admin Dashboard</Link>
+          </li>
 
       </ul>
     </nav>
