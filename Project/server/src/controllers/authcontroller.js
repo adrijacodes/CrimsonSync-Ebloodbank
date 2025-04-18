@@ -100,7 +100,26 @@ export const userLogout = AsyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse({}, "User logged out.", true));
 });
 
-// Search  users (Admins Only)
+// View all users (Admins Only)
+export const viewUsers = AsyncHandler(async (req, res) => {
+  const users = await User.find().select(
+    "-password -createdAt -updatedAt -__v "
+  );
+  const Total_Users = users.length;
+  if (users.length === 0) {
+    return res.status(404).json(new ApiResponse({}, "No users found!!", true));
+  }
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        { UserList: users, "Total Users": Total_Users },
+        "Showing Search results.......",
+        true
+      )
+    );
+});
+// search users by name,email,username,role
 export const searchUsers = AsyncHandler(async (req, res) => {
   const { searchTerm } = req.query;
   if (!searchTerm) {
@@ -114,7 +133,7 @@ export const searchUsers = AsyncHandler(async (req, res) => {
       { username: { $regex: searchTerm, $options: "i" } }, // Search by username
       { role: { $regex: searchTerm, $options: "i" } }, // Search by role
     ],
-  });
+  }).select("-password -createdAt -updatedAt -__v ");
   const Total_Users = users.length;
   if (users.length === 0) {
     return res.status(404).json(new ApiResponse({}, "No users found!!", true));
