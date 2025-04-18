@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import PC1 from '../../assets/EventphotoCards/PC1.jpg';
-
+//import PC1 from '../../assets/EventphotoCards/PC1.jpg';
+import ImageList from '../../Helpers/ImageList';
 
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const EventCard = ({ event }) => {
       onClick={() => navigate("/event/" + event._id)}
     >
       <img
-        src={PC1}
+        src={ImageList}
         alt={event.eventName || 'Event Image'}
         className="w-full h-40 object-cover"
       />
