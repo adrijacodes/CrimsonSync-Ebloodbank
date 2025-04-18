@@ -18,11 +18,11 @@ const SearchEvent = () => {
       const capitalizedCity = capitalizeFirstLetter(city.trim());
   
       try {
+        setLoading(true); // Start loading before the fetch request
         const res = await fetch(`http://localhost:8001/api/events/search?city=${encodeURIComponent(capitalizedCity.trim())}`);
-    
         
         const data = await res.json();
-       console.log(data);
+        console.log(data);
        
         if (data.success) {
           const events = data.data.eventsList || [];
@@ -38,6 +38,9 @@ const SearchEvent = () => {
       } finally {
         setLoading(false);
       }
+
+      // Clear the city input field after search
+      setCity('');
     } else {
       setSearchResult(null);
     }
