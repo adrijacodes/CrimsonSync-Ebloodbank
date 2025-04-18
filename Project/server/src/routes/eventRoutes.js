@@ -4,7 +4,13 @@ import { adminRolecheck } from "../utils/userRoleChecking.js";
 import verifyUserToken from "../utils/auth.middleware.js";
 const router = express.Router();
 
-router.post("/",verifyUserToken,adminRolecheck,registerEvents);
-router.get("/", getEvents);
+//Admin: Register a new event
+router.post("/", verifyUserToken, adminRolecheck, registerEvents);
+
+//  User: Search for upcoming or today's events (NO expired events allowed)
+router.get("/search", getEvents);
+
+//  Admin: Search all events including expired
+router.get("/expiringEvents", verifyUserToken, adminRolecheck, getEvents);
 
 export default router;
