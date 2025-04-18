@@ -8,36 +8,45 @@ const AdminDashboard = () => {
   const [showUserOptions, setShowUserOptions] = useState(false);
   const [showAdminOptions, setShowAdminOptions] = useState(false);
 
+  const sectionCard =
+    'bg-red-600 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-300 p-6 flex flex-col items-center w-full';
+
+  const toggleBtn =
+    'w-full text-lg font-medium text-white bg-red-600 hover:bg-red-700 py-4 px-6 rounded-full font-serif transition duration-200 shadow';
+
+  const subBtn =
+    'w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-serif py-2 px-4 rounded-md text-sm';
+
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 "style={{ backgroundImage: "url('../src/assets/Bg1.jpeg')" }}>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-5xl ">
+    <div className="min-h-screen bg-gray-50 py-16 px-4 flex flex-col items-center justify-center">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-6xl">
 
         {/* Event Management */}
-        <div className="flex flex-col space-y-4">
+        <div className={sectionCard}>
           <button
             onClick={() => setShowEventOptions(!showEventOptions)}
-            className="bg-white text-black px-11 py-10 text-2xl rounded-full font-serif border border-gray-300 hover:bg-gray-100"
+            className={toggleBtn}
           >
-             Event Management
+            Event Management
           </button>
 
           {showEventOptions && (
-            <div className="flex flex-col space-y-3">
+            <div className="mt-4 w-full space-y-2">
               <button
                 onClick={() => navigate('/NewEvent')}
-                className="bg-red-100 hover:bg-red-200 text-red-800 font-serif py-2 px-4 rounded-lg"
+                className={subBtn}
               >
-                 +Add Event
+                + Add Event
               </button>
               <button
                 onClick={() => navigate('/ViewEvent')}
-                className="bg-red-100 hover:bg-red-200 text-red-800 font-serif py-2 px-4 rounded-lg"
+                className={subBtn}
               >
                 View Events
               </button>
               <button
                 onClick={() => navigate('/eventbycityyear')}
-                className="bg-red-100 hover:bg-red-200 text-red-800 font-serif py-2 px-4 rounded-lg"
+                className={subBtn}
               >
                 Events by City & Year
               </button>
@@ -46,25 +55,25 @@ const AdminDashboard = () => {
         </div>
 
         {/* User Management */}
-        <div className="flex flex-col space-y-4">
+        <div className={sectionCard}>
           <button
             onClick={() => setShowUserOptions(!showUserOptions)}
-            className="bg-white text-black px-11 py-10 text-2xl rounded-full font-serif border border-gray-300 hover:bg-gray-100"
+            className={toggleBtn}
           >
             User Management
           </button>
 
           {showUserOptions && (
-            <div className="flex flex-col space-y-3">
+            <div className="mt-4 w-full space-y-2">
               <button
                 onClick={() => navigate('/Viewuser')}
-                className="bg-blue-100 hover:bg-blue-200 text-blue-800 font-serif py-2 px-4 rounded-lg"
+                className={subBtn}
               >
-                 View Users
+                View Users
               </button>
               <button
                 onClick={() => navigate('/Searchuser')}
-                className="bg-blue-100 hover:bg-blue-200 text-blue-800 font-serif py-2 px-4 rounded-lg"
+                className={subBtn}
               >
                 Search User
               </button>
@@ -73,25 +82,25 @@ const AdminDashboard = () => {
         </div>
 
         {/* Admin Management */}
-        <div className="flex flex-col space-y-4">
+        <div className={sectionCard}>
           <button
             onClick={() => setShowAdminOptions(!showAdminOptions)}
-            className="bg-white text-black px-11 py-10  text-2xl rounded-full font-serif border border-gray-300 hover:bg-gray-100"
+            className={toggleBtn}
           >
             Admin Management
           </button>
 
           {showAdminOptions && (
-            <div className="flex flex-col space-y-3">
+            <div className="mt-4 w-full space-y-2">
               <button
                 onClick={() => navigate('/Viewadmin')}
-                className="bg-green-100 hover:bg-green-200 text-green-800 font-serif py-2 px-4 rounded-lg"
+                className={subBtn}
               >
                 View Admin
               </button>
               <button
                 onClick={() => navigate('/Searchadmin')}
-                className="bg-green-100 hover:bg-green-200 text-green-800 font-serif py-2 px-4 rounded-lg"
+                className={subBtn}
               >
                 Search Admin
               </button>
