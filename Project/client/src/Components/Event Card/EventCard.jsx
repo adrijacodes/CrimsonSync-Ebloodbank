@@ -1,9 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import PC1 from '../../assets/EventphotoCards/PC1.jpg';
+
 
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
-  const { venue, city } = event.location || {}; // Destructure safely
+  const { venue, city } = event.location || {};
+  //const { _id: eventId, eventName } = event;
 
 
 
@@ -15,11 +19,9 @@ const EventCard = ({ event }) => {
     <div
       className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition"
       onClick={() => navigate("/event/" + event._id)}
-//      Navigate to detailed event page
     >
-      {/* Ensure there's a fallback for image if it doesn't exist */}
       <img
-        src={event.image || '/path/to/default-image.jpg'} // Provide a default image if no image exists
+        src={PC1}
         alt={event.eventName || 'Event Image'}
         className="w-full h-40 object-cover"
       />
@@ -33,6 +35,21 @@ const EventCard = ({ event }) => {
       </div>
     </div>
   );
+};
+
+// ✅ Add prop validation
+EventCard.propTypes = {
+  event: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    eventName: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    image: PropTypes.string,
+    location: PropTypes.shape({
+      venue: PropTypes.string,
+      city: PropTypes.string,
+    }),
+  }).isRequired,
 };
 
 export default EventCard;

@@ -64,13 +64,17 @@ export const getEvents = AsyncHandler(async (req, res) => {
         new ApiResponse(null, "You are not authorized to view expired events.", false)
       );
     }
-
     const expiredEvents = new Date(now);
     expiredEvents.setDate(now.getDate() - 1);  
     expiredEvents.setHours(0, 0, 0, 0); 
     query.date = { $lte: expiredEvents };   
   }
-
+    else
+    {
+      query.date = {
+        '$gte': new Date("2025-04-17T00:00:00.000Z")
+       };
+   }
   console.log("Query being used:", query);
 
   const [count, eventsList] = await Promise.all([
@@ -84,8 +88,6 @@ export const getEvents = AsyncHandler(async (req, res) => {
     );
   }
   
-  
-  
   res.status(200).json(
     new ApiResponse(
     {
@@ -97,4 +99,6 @@ export const getEvents = AsyncHandler(async (req, res) => {
     )
   );
 });
+
+// Modify and cancel events
 
