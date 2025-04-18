@@ -19,7 +19,7 @@ export const registerUser = AsyncHandler(async (req, res, next) => {
     throw new ApiError(409, "User with this email already exists.");
   }
 
-//   const hashedPassword = await bcrypt.hash(password, 10);
+  //   const hashedPassword = await bcrypt.hash(password, 10);
   const username = generateUsername();
 
   const user = await User.create({
@@ -64,15 +64,11 @@ export const loginUser = AsyncHandler(async (req, res, next) => {
   if (!user) {
     throw new ApiError(400, "Invalid login credentials!User does not exist");
   }
- 
-
-
   // checking password
   const isPasswordValid = await user.passwordValidityCheck(password);
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid login credentials! Password incorrect.");
   }
-
 
   // generating access token
 
@@ -99,18 +95,38 @@ export const loginUser = AsyncHandler(async (req, res, next) => {
     );
 });
 
-
 // User Logout
- export const userLogout = AsyncHandler(async (req, res) => {
-    return res
+export const userLogout = AsyncHandler(async (req, res) => {
+  return res.status(200).json(new ApiResponse({}, "User logged out.", true));
+});
+
+// Search  users (Admins Only)
+export const searchUsers = AsyncHandler(async (req, res) => {
+  const { searchTerm } = req.query;
+  if (!searchTerm) {
+    return res.status(400).json({ message: "Search term is required" });
+  }
+
+  const users = await User.find({
+    $or: [
+      { name: { $regex: searchTerm, $options: "i" } }, // Search by name
+      { email: { $regex: searchTerm, $options: "i" } }, // Search by email
+      { username: { $regex: searchTerm, $options: "i" } }, // Search by username
+      { role: { $regex: searchTerm, $options: "i" } }, // Search by role
+    ],
+  });
+  const Total_Users = users.length;
+  if (users.length === 0) {
+    return res.status(404).json(new ApiResponse({}, "No users found!!", true));
+  }
+
+  return res
     .status(200)
     .json(
       new ApiResponse(
-        {  },
-        "User logged out.",
+        { UserList: users, "Total Users": Total_Users },
+        "Showing Search results.......",
         true
       )
     );
-  });
-
-// User Search
+});

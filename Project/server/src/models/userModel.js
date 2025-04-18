@@ -52,7 +52,7 @@ const userSchema=new Schema({
         ref:"BloodRequests"
       }],
     role: { 
-        type: String, enum: ['recipient', 'donor' ], default: 'recipient' 
+        type: String, enum: ['recipient', 'donor','BOTH' ], default: 'recipient' 
     }, 
   }, { timestamps: true }
 )
