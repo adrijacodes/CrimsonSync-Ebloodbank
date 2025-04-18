@@ -1,113 +1,128 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-
   const [showEventOptions, setShowEventOptions] = useState(false);
   const [showUserOptions, setShowUserOptions] = useState(false);
   const [showAdminOptions, setShowAdminOptions] = useState(false);
 
-  const sectionCard =
-    'bg-red-600 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-300 p-6 flex flex-col items-center w-full';
+  const bloodFacts = [
+    { icon: "🩸", text: "One donation can save up to 3 lives." },
+    { icon: "⏱️", text: "Every 2 seconds, someone needs blood." },
+    { icon: "🚫🏭", text: "Blood cannot be manufactured — only donated." },
+    { icon: "🅾️", text: "O-negative is the universal donor type." },
+    { icon: "💪", text: "Regular donors tend to be healthier & live longer." },
+  ];
 
-  const toggleBtn =
-    'w-full text-lg font-medium text-white bg-red-600 hover:bg-red-700 py-4 px-6 rounded-full font-serif transition duration-200 shadow';
+  const [index, setIndex] = useState(0);
 
-  const subBtn =
-    'w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-serif py-2 px-4 rounded-md text-sm';
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % bloodFacts.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16 px-4 flex flex-col items-center justify-center">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-6xl">
+    <div
+      className="min-h-screen py-10 px-4 bg-red-50"
+      style={{
+        backgroundImage: "url('/assets/Bg1.jpeg')",
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <motion.h1
+        className="text-4xl text-center font-bold text-red-800 mb-12 font-serif"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        E-Blood Bank Admin Dashboard
+      </motion.h1>
 
-        {/* Event Management */}
-        <div className={sectionCard}>
-          <button
-            onClick={() => setShowEventOptions(!showEventOptions)}
-            className={toggleBtn}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        {[
+          {
+            title: 'Event Management',
+            toggle: showEventOptions,
+            setToggle: setShowEventOptions,
+            buttons: [
+              { text: '➕ Add Event', route: '/NewEvent' },
+              { text: '📄 View Events', route: '/ViewEvent' },
+              { text: '🏙️ Events by City & Year', route: '/eventbycityyear' },
+            ]
+          },
+          {
+            title: 'User Management',
+            toggle: showUserOptions,
+            setToggle: setShowUserOptions,
+            buttons: [
+              { text: '👥 View Users', route: '/Viewuser' },
+              { text: '🔍 Search User', route: '/Searchuser' },
+            ]
+          },
+          {
+            title: 'Admin Management',
+            toggle: showAdminOptions,
+            setToggle: setShowAdminOptions,
+            buttons: [
+              { text: '🛡️ View Admins', route: '/Viewadmin' },
+              { text: '🔍 Search Admin', route: '/Searchadmin' },
+            ]
+          }
+        ].map((section, index) => (
+          <motion.div
+            key={index}
+            className="bg-white shadow-md rounded-2xl p-6 border border-red-200"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 * index }}
           >
-            Event Management
-          </button>
+            <button
+              onClick={() => section.setToggle(!section.toggle)}
+              className="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-xl text-xl font-semibold transition font-serif"
+            >
+              {section.title}
+            </button>
+            {section.toggle && (
+              <div className="mt-4 flex flex-col gap-3">
+                {section.buttons.map((btn, i) => (
+                  <motion.button
+                    key={i}
+                    onClick={() => navigate(btn.route)}
+                    className="bg-red-100 hover:bg-red-200 text-red-800 py-2 px-4 rounded-md text-base font-serif shadow-sm transition"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {btn.text}
+                  </motion.button>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        ))}
+      </div>
 
-          {showEventOptions && (
-            <div className="mt-4 w-full space-y-2">
-              <button
-                onClick={() => navigate('/NewEvent')}
-                className={subBtn}
-              >
-                + Add Event
-              </button>
-              <button
-                onClick={() => navigate('/ViewEvent')}
-                className={subBtn}
-              >
-                View Events
-              </button>
-              <button
-                onClick={() => navigate('/eventbycityyear')}
-                className={subBtn}
-              >
-                Events by City & Year
-              </button>
-            </div>
-          )}
+      {/* 🔄 Rotating Blood Fact Slider */}
+      <div className="mt-16 w-full flex justify-center items-center">
+        <div className="w-full max-w-3xl bg-red-100 rounded-2xl shadow-md p-6 text-center border border-red-200">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6 }}
+              className="text-lg sm:text-xl font-serif text-red-800 italic flex justify-center items-center gap-2"
+            >
+              <span className="text-2xl">{bloodFacts[index].icon}</span>
+              <span>{bloodFacts[index].text}</span>
+            </motion.div>
+          </AnimatePresence>
         </div>
-
-        {/* User Management */}
-        <div className={sectionCard}>
-          <button
-            onClick={() => setShowUserOptions(!showUserOptions)}
-            className={toggleBtn}
-          >
-            User Management
-          </button>
-
-          {showUserOptions && (
-            <div className="mt-4 w-full space-y-2">
-              <button
-                onClick={() => navigate('/Viewuser')}
-                className={subBtn}
-              >
-                View Users
-              </button>
-              <button
-                onClick={() => navigate('/Searchuser')}
-                className={subBtn}
-              >
-                Search User
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Admin Management */}
-        <div className={sectionCard}>
-          <button
-            onClick={() => setShowAdminOptions(!showAdminOptions)}
-            className={toggleBtn}
-          >
-            Admin Management
-          </button>
-
-          {showAdminOptions && (
-            <div className="mt-4 w-full space-y-2">
-              <button
-                onClick={() => navigate('/Viewadmin')}
-                className={subBtn}
-              >
-                View Admin
-              </button>
-              <button
-                onClick={() => navigate('/Searchadmin')}
-                className={subBtn}
-              >
-                Search Admin
-              </button>
-            </div>
-          )}
-        </div>
-
       </div>
     </div>
   );
