@@ -1,104 +1,128 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-
   const [showEventOptions, setShowEventOptions] = useState(false);
   const [showUserOptions, setShowUserOptions] = useState(false);
   const [showAdminOptions, setShowAdminOptions] = useState(false);
 
+  const bloodFacts = [
+    { icon: "🩸", text: "One donation can save up to 3 lives." },
+    { icon: "⏱️", text: "Every 2 seconds, someone needs blood." },
+    { icon: "🚫🏭", text: "Blood cannot be manufactured — only donated." },
+    { icon: "🅾️", text: "O-negative is the universal donor type." },
+    { icon: "💪", text: "Regular donors tend to be healthier & live longer." },
+  ];
+
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % bloodFacts.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 "style={{ backgroundImage: "url('../src/assets/Bg1.jpeg')" }}>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-5xl ">
+    <div
+      className="min-h-screen py-10 px-4 bg-red-50"
+      style={{
+        backgroundImage: "url('/assets/Bg1.jpeg')",
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <motion.h1
+        className="text-4xl text-center font-bold text-red-800 mb-12 font-serif"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        E-Blood Bank Admin Dashboard
+      </motion.h1>
 
-        {/* Event Management */}
-        <div className="flex flex-col space-y-4">
-          <button
-            onClick={() => setShowEventOptions(!showEventOptions)}
-            className="bg-white text-black px-11 py-10 text-2xl rounded-full font-serif border border-gray-300 hover:bg-gray-100"
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        {[
+          {
+            title: 'Event Management',
+            toggle: showEventOptions,
+            setToggle: setShowEventOptions,
+            buttons: [
+              { text: '➕ Add Event', route: '/NewEvent' },
+              { text: '📄 View Events', route: '/ViewEvent' },
+              { text: '🏙️ Events by City & Year', route: '/eventbycityyear' },
+            ]
+          },
+          {
+            title: 'User Management',
+            toggle: showUserOptions,
+            setToggle: setShowUserOptions,
+            buttons: [
+              { text: '👥 View Users', route: '/Viewuser' },
+              { text: '🔍 Search User', route: '/Searchuser' },
+            ]
+          },
+          {
+            title: 'Admin Management',
+            toggle: showAdminOptions,
+            setToggle: setShowAdminOptions,
+            buttons: [
+              { text: '🛡️ View Admins', route: '/Viewadmin' },
+              { text: '🔍 Search Admin', route: '/Searchadmin' },
+            ]
+          }
+        ].map((section, index) => (
+          <motion.div
+            key={index}
+            className="bg-white shadow-md rounded-2xl p-6 border border-red-200"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 * index }}
           >
-             Event Management
-          </button>
+            <button
+              onClick={() => section.setToggle(!section.toggle)}
+              className="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-xl text-xl font-semibold transition font-serif"
+            >
+              {section.title}
+            </button>
+            {section.toggle && (
+              <div className="mt-4 flex flex-col gap-3">
+                {section.buttons.map((btn, i) => (
+                  <motion.button
+                    key={i}
+                    onClick={() => navigate(btn.route)}
+                    className="bg-red-100 hover:bg-red-200 text-red-800 py-2 px-4 rounded-md text-base font-serif shadow-sm transition"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {btn.text}
+                  </motion.button>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        ))}
+      </div>
 
-          {showEventOptions && (
-            <div className="flex flex-col space-y-3">
-              <button
-                onClick={() => navigate('/NewEvent')}
-                className="bg-red-100 hover:bg-red-200 text-red-800 font-serif py-2 px-4 rounded-lg"
-              >
-                 +Add Event
-              </button>
-              <button
-                onClick={() => navigate('/ViewEvent')}
-                className="bg-red-100 hover:bg-red-200 text-red-800 font-serif py-2 px-4 rounded-lg"
-              >
-                View Events
-              </button>
-              <button
-                onClick={() => navigate('/eventbycityyear')}
-                className="bg-red-100 hover:bg-red-200 text-red-800 font-serif py-2 px-4 rounded-lg"
-              >
-                Events by City & Year
-              </button>
-            </div>
-          )}
+      {/* 🔄 Rotating Blood Fact Slider */}
+      <div className="mt-16 w-full flex justify-center items-center">
+        <div className="w-full max-w-3xl bg-red-100 rounded-2xl shadow-md p-6 text-center border border-red-200">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6 }}
+              className="text-lg sm:text-xl font-serif text-red-800 italic flex justify-center items-center gap-2"
+            >
+              <span className="text-2xl">{bloodFacts[index].icon}</span>
+              <span>{bloodFacts[index].text}</span>
+            </motion.div>
+          </AnimatePresence>
         </div>
-
-        {/* User Management */}
-        <div className="flex flex-col space-y-4">
-          <button
-            onClick={() => setShowUserOptions(!showUserOptions)}
-            className="bg-white text-black px-11 py-10 text-2xl rounded-full font-serif border border-gray-300 hover:bg-gray-100"
-          >
-            User Management
-          </button>
-
-          {showUserOptions && (
-            <div className="flex flex-col space-y-3">
-              <button
-                onClick={() => navigate('/Viewuser')}
-                className="bg-blue-100 hover:bg-blue-200 text-blue-800 font-serif py-2 px-4 rounded-lg"
-              >
-                 View Users
-              </button>
-              <button
-                onClick={() => navigate('/Searchuser')}
-                className="bg-blue-100 hover:bg-blue-200 text-blue-800 font-serif py-2 px-4 rounded-lg"
-              >
-                Search User
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Admin Management */}
-        <div className="flex flex-col space-y-4">
-          <button
-            onClick={() => setShowAdminOptions(!showAdminOptions)}
-            className="bg-white text-black px-11 py-10  text-2xl rounded-full font-serif border border-gray-300 hover:bg-gray-100"
-          >
-            Admin Management
-          </button>
-
-          {showAdminOptions && (
-            <div className="flex flex-col space-y-3">
-              <button
-                onClick={() => navigate('/Viewadmin')}
-                className="bg-green-100 hover:bg-green-200 text-green-800 font-serif py-2 px-4 rounded-lg"
-              >
-                View Admin
-              </button>
-              <button
-                onClick={() => navigate('/Searchadmin')}
-                className="bg-green-100 hover:bg-green-200 text-green-800 font-serif py-2 px-4 rounded-lg"
-              >
-                Search Admin
-              </button>
-            </div>
-          )}
-        </div>
-
       </div>
     </div>
   );
