@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 //import PC1 from '../../assets/EventphotoCards/PC1.jpg';
-import ImageList from '../../Helpers/ImageList';
+import randomIndex from '../../Helpers/ImageList';
 
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ const EventCard = ({ event }) => {
   if (!event) {
     return <div>Loading...</div>; // Fallback while event data is being loaded
   }
+  const ImageList = randomIndex();
 
   return (
     <div
