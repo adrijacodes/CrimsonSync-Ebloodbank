@@ -1,6 +1,4 @@
 import React from 'react';
-
-// Correct relative imports based on your folder structure
 import PC1 from '../assets/EventphotoCards/PC1.jpg';
 import PC2 from '../assets/EventphotoCards/PC2.jpg';
 import PC3 from '../assets/EventphotoCards/PC3.jpg';
