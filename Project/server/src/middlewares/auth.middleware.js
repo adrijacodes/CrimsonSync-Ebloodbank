@@ -1,7 +1,7 @@
 import AsyncHandler from "express-async-handler";
 import jwt from "jsonwebtoken";
 import { TOKENSECRETKEY } from "../../envAccess.js";
-import ApiError from "./ApiError.js";
+import ApiError from "../utils/ApiError.js";
 import Admin from "../models/adminModel.js";
 
 

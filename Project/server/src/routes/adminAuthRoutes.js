@@ -1,8 +1,8 @@
 import express from "express";
 import { registerAdmin } from "../controllers/adminauthcontroller.js";
 import { loginAdmin, adminLogout } from "../controllers/adminauthcontroller.js";
-import verifyUserToken from "../utils/auth.middleware.js";
-import { adminRolecheck } from "../utils/userRoleChecking.js";
+import verifyUserToken from "../middlewares/auth.middleware.js";
+import { adminRolecheck } from "../middlewares/userRoleChecking.js";
 import {
   searchAdmins,
   viewAdmins,

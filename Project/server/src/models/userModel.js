@@ -42,7 +42,7 @@ const userSchema=new Schema({
 
       },  
     isRecipient: { 
-        type: Boolean, default: false
+        type: Boolean, default: true
      },  
      availability:{
         type: String, enum: ['MON', 'TUES', 'WED','THURS','FRI','SAT','SUN','NONE'], default: 'NONE'
