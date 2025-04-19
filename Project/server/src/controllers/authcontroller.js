@@ -10,48 +10,61 @@ import User from "../models/userModel.js";
 
 export const registerUser = AsyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
+
   if (!email || !password || !name) {
     throw new ApiError(400, "All fields are required.");
   }
-  // checking if existing user
+
+  // Check if user already exists with the same email
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new ApiError(409, "User with this email already exists.");
   }
 
-  //   const hashedPassword = await bcrypt.hash(password, 10);
+  // Generate username 
   const username = generateUsername();
 
-  const user = await User.create({
-    name: name?.toLowerCase(),
-    email,
-    password,
-    username: username,
-  });
+  try {
+    // Attempt to create a new user
+    const user = await User.create({
+      name: name?.toLowerCase(),
+      email,
+      password,
+      username: username,
+    });
 
-  const createdUser = await User.findById(user._id).select(
-    "-password -createdAt -updatedAt -__v -_id"
-  );
+    const createdUser = await User.findById(user._id).select(
+      "-password -createdAt -updatedAt -__v -_id"
+    );
 
-  if (!createdUser) {
-    throw new ApiError(500, "Error registering the admin.");
-  }
+    if (!createdUser) {
+      throw new ApiError(500, "Error registering the user.");
+    }
 
-  const token = await user.generateUserAccessToken();
-  if (!token) {
-    throw new ApiError(500, "Error generating access token.");
-  }
+    // Generated access token for the newly created user
+    const token = await user.generateUserAccessToken();
+    if (!token) {
+      throw new ApiError(500, "Error generating access token.");
+    }
 
-  // returning response
-  return res
-    .status(201)
-    .json(
+    // Returning a success response
+    return res.status(201).json(
       new ApiResponse(
         { UserInfo: createdUser, accessToken: token },
         "User registered successfully.",
         true
       )
     );
+  } catch (error) {
+    // MongoDB validation error handling
+    if (error.name === "ValidationError") {
+      const errorMessages = Object.values(error.errors).map(
+        (err) => err.message
+      );
+      throw new ApiError(400, `Validation failed: ${errorMessages.join(", ")}`);
+    }
+
+  }
 });
 
 // User Login

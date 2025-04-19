@@ -15,36 +15,47 @@ export const registerAdmin = AsyncHandler(async (req, res) => {
   if (existingAdmin) {
     throw new ApiError(409, "Admin with this email already exists.");
   }
- 
 
-  const admin = await Admin.create({
-    name: name?.toLowerCase(),
-    email,
-    password,
-  });
+  try {
+    const admin = await Admin.create({
+      name: name?.toLowerCase(),  
+      email,
+      password,
+    });
 
-  const createdAdmin = await Admin.findById(admin._id).select(
-    "-password -__v -createdAt -updatedAt"
-  );
-  if (!createdAdmin) {
-    throw new ApiError(500, "Error registering the admin.");
-  }
-
-  const token = await admin.generateUserAccessToken();
-  if (!token) {
-    throw new ApiError(500, "Error generating access token.");
-  }
-
-  return res
-    .status(201)
-    .json(
-      new ApiResponse(
-        { AdminInfo: createdAdmin, accessToken: token },
-        "Admin registered successfully.",
-        true
-      )
+   
+    const createdAdmin = await Admin.findById(admin._id).select(
+      "-password -__v -createdAt -updatedAt"
     );
+    if (!createdAdmin) {
+      throw new ApiError(500, "Error registering the admin.");
+    }
+
+    // Generated an access token for the newly created admin
+    const token = await admin.generateUserAccessToken();
+    if (!token) {
+      throw new ApiError(500, "Error generating access token.");
+    }
+
+    // response with the admin data and token
+    return res
+      .status(201)
+      .json(
+        new ApiResponse(
+          { AdminInfo: createdAdmin, accessToken: token },
+          "Admin registered successfully.",
+          true
+        )
+      );
+  } catch (error) {
+    // MongoDB validation error handling
+    if (error.name === "ValidationError") {
+      const errorMessages = Object.values(error.errors).map(err => err.message);
+      throw new ApiError(400, `Validation failed: ${errorMessages.join(", ")}`);
+    }
+  }
 });
+
 // Admin Login
 export const loginAdmin = AsyncHandler(async (req, res, next) => {
   const { email, password } = req.body;

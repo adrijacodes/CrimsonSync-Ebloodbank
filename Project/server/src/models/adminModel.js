@@ -10,13 +10,25 @@ const adminSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
+      required: [true, "User email is required"],
+      trim: true,
+      lowercase: true,
+      validate: {
+        validator: function (v) {
+          return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
+        },
+        message: "Please enter a valid email",
+      },
+      minlength: [3, "length of email too short"],
+      maxlength: [31, "User email exceeded(max-31)"],
     },
     role: { type: String, default: "admin" },
     password: {
       type: String,
-      required: true,
+      required: [true, "User password is required"],
+      minlength: [8, "minimum size of 6 is required"],
+      maxlength: [60, "User password exceeded(max-60)"],
     },
   },
   { timestamps: true }
