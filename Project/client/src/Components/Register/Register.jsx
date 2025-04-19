@@ -1,45 +1,53 @@
-import axios from 'axios';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [role, setRole] = useState(''); // ✅ Added role state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState(""); // ✅ Added role state
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!role) {
-      alert('Please select a role.');
+      alert("Please select a role.");
       return;
     }
+    //console.log(role);
 
     const payload = {
       email,
       password,
       name,
-     // role: role.toLowerCase 
+      // role: role.toLowerCase
     };
 
     try {
-      let res="";
-      if(role==="admin"){
-        res = axios.post("http://localhost:8001/api/auth/admin/register", payload)
+      let res;
+      if (role.toLowerCase() === "admin") {
+        res = await axios.post(
+          "http://localhost:8001/api/auth/admin/register",
+          payload
+        );
+      } else {
+        res = await axios.post(
+          "http://localhost:8001/api/auth/user/register",
+          payload
+        );
       }
-      else{
-        res =axios.post("http://localhost:8001/api/auth/user/register", payload)
 
-      }
-      localStorage.setItem('token', JSON.stringify(res.data.data.access_token));
-      alert('Register Success');
-      console.log('Registration Successful', res);
-      navigate('/login');
+     
+      alert("Register Success");
+      //console.log("Registration Successful", res.data.data);
+     // console.log(res.data.data.accessToken);
+      localStorage.setItem("token", JSON.stringify(res.data.data.accessToken));
+      navigate("/");
     } catch (err) {
-      alert('Register Failed');
-      console.error('Registration Failed', err);
+      alert("Register Failed");
+      console.error("Registration Failed", err);
     }
   };
 
@@ -53,7 +61,9 @@ const Register = () => {
           onSubmit={handleSubmit}
           className="bg-slate-200 border-slate-400 p-8 rounded-3xl shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50"
         >
-          <h2 className="text-2xl font-bold mb-4 text-center">Create Account</h2>
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Create Account
+          </h2>
 
           <input
             type="text"
@@ -90,7 +100,10 @@ const Register = () => {
             <option value="User">User</option>
           </select>
 
-          <button type="submit" className="bg-red-500 text-white w-full py-2 rounded">
+          <button
+            type="submit"
+            className="bg-red-500 text-white w-full py-2 rounded"
+          >
             Sign Up
           </button>
 
