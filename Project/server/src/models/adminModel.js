@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { TOKENEXPIRY, TOKENSECRETKEY } from "../../envAccess.js";
 const adminSchema = new mongoose.Schema(
   {
-    adminName: {
+    name: {
       type: String,
       required: true,
     },
