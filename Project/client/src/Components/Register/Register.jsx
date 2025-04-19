@@ -25,22 +25,39 @@ const Register = () => {
     };
 
     try {
-      let res="";
-      if(role==="admin"){
-        res = axios.post("http://localhost:8001/api/auth/admin/register", payload)
+      let res = "";
+    
+      if (role === "admin") {
+        res = await axios.post("http://localhost:8001/api/auth/admin/register", payload);
+      } else {
+        res = await axios.post("http://localhost:8001/api/auth/user/register", payload);
       }
-      else{
-        res =axios.post("http://localhost:8001/api/auth/user/register", payload)
-
+    
+      // ✅ Only try to read token if request was successful
+      const token = res?.data?.data?.access_token;
+    
+      if (token) {
+        localStorage.setItem("token", JSON.stringify(token));
+        alert("Register Success");
+        console.log("Registration Successful", res);
+        navigate("/login");
+      } else {
+        alert("Register Failed: Token not found in response");
+        console.error("Token missing in response:", res.data);
       }
-      localStorage.setItem('token', JSON.stringify(res.data.data.access_token));
-      alert('Register Success');
-      console.log('Registration Successful', res);
-      navigate('/login');
+    
     } catch (err) {
-      alert('Register Failed');
-      console.error('Registration Failed', err);
+      // ✅ Only handle the error response here
+      alert("Register Failed");
+      console.error("Registration Failed", err);
+    
+      if (err.response) {
+        const message = err.response.data?.message || "Something went wrong.";
+        alert(`Error: ${message}`);
+        console.log("Server error:", err.response.data);
+      }
     }
+    
   };
 
   return (
