@@ -34,7 +34,7 @@ export const registerEvents = AsyncHandler(async (req, res) => {
     .json(new ApiResponse(newEvent, "Event added successfully", true));
 });
 
-// Get all events
+// Search event
 
 export const getEvents = AsyncHandler(async (req, res) => {
   const { city, filter } = req.query;
@@ -100,5 +100,41 @@ export const getEvents = AsyncHandler(async (req, res) => {
   );
 });
 
-// Modify and cancel events
+// City and Year Event report
+export const getEventsGroupedByCityAndYear = AsyncHandler(async (req, res) => {
+  const rawData = await Event.aggregate([
+    {
+      $project: {
+        city: "$location.city",
+        year: { $year: "$date" }
+      }
+    },
+    {
+      $group: {
+        _id: { city: "$city", year: "$year" },
+        totalEvents: { $sum: 1 }
+      }
+    },
+    {
+      $sort: {
+        "_id.city": 1,
+        "_id.year": 1
+      }
+    }
+  ]);
+
+  // Transforming to Recharts-friendly format
+  const resultMap = {};
+
+  rawData.forEach(({ _id, totalEvents }) => {
+    const { city, year } = _id;
+    if (!resultMap[city]) {
+      resultMap[city] = { city };
+    }
+    resultMap[city][year] = totalEvents;
+  });
+
+  const formattedData = Object.values(resultMap);
+  res.json(formattedData);
+});
 

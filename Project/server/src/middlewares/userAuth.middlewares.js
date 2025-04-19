@@ -5,7 +5,7 @@ import ApiError from "../utils/ApiError.js";
 import User from "../models/userModel.js";
 
 
-const verifyUserToken = AsyncHandler(async (req, _, next) => {
+const verifyUserToken1 = AsyncHandler(async (req, _, next) => {
   const token =
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer ", "");
@@ -40,4 +40,4 @@ const verifyUserToken = AsyncHandler(async (req, _, next) => {
   next();
 });
 
-export default verifyUserToken;
+export default verifyUserToken1;

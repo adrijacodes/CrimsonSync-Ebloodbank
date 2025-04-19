@@ -15,7 +15,7 @@ export const registerAdmin = AsyncHandler(async (req, res) => {
   if (existingAdmin) {
     throw new ApiError(409, "Admin with this email already exists.");
   }
-  //const hashedPassword = await bcrypt.hash(password, 10);
+ 
 
   const admin = await Admin.create({
     name: name?.toLowerCase(),
