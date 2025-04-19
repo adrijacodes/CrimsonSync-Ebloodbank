@@ -5,9 +5,9 @@ import Admin from "../models/adminModel.js";
 import bcrypt from "bcrypt";
 
 export const registerAdmin = AsyncHandler(async (req, res) => {
-  const { adminName, email, password } = req.body;
+  const { name, email, password } = req.body;
 
-  if (!email || !password || !adminName) {
+  if (!email || !password || !name) {
     throw new ApiError(400, "All fields are required.");
   }
 
@@ -18,7 +18,7 @@ export const registerAdmin = AsyncHandler(async (req, res) => {
   //const hashedPassword = await bcrypt.hash(password, 10);
 
   const admin = await Admin.create({
-    adminName: adminName?.toLowerCase(),
+    name: name?.toLowerCase(),
     email,
     password,
   });
