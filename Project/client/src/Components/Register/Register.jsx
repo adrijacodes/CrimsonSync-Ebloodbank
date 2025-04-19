@@ -6,23 +6,37 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const navigate = useNavigate(); // to redirect after success
+  const [role, setRole] = useState(''); // ✅ Added role state
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // prevent form refresh
+    e.preventDefault();
+
+    if (!role) {
+      alert('Please select a role.');
+      return;
+    }
+
     const payload = {
       email,
       password,
       name,
-      avatar: 'https://api.lorem.space/image/face?w=640&h=480', // optional required field
+     // role: role.toLowerCase 
     };
 
     try {
-      const res = await axios.post('https://api.escuelajs.co/api/v1/users/', payload);
-      localStorage.setItem('token', JSON.stringify(res.data.access_token));
+      let res="";
+      if(role==="admin"){
+        res = axios.post("http://localhost:8001/api/auth/admin/register", payload)
+      }
+      else{
+        res =axios.post("http://localhost:8001/api/auth/user/register", payload)
+
+      }
+      localStorage.setItem('token', JSON.stringify(res.data.data.access_token));
       alert('Register Success');
       console.log('Registration Successful', res);
-      navigate('/login'); // redirect to login
+      navigate('/login');
     } catch (err) {
       alert('Register Failed');
       console.error('Registration Failed', err);
@@ -46,7 +60,7 @@ const Register = () => {
             placeholder="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="block w-full p-2 mb-4 border rounded-3xl"
+            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
           />
 
           <input
@@ -54,7 +68,7 @@ const Register = () => {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block w-full p-2 mb-4 border rounded-3xl"
+            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
           />
 
           <input
@@ -62,10 +76,15 @@ const Register = () => {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="block w-full p-2 mb-4 border rounded-3xl"
+            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
           />
 
-          <select name="role" className="block w-full p-2 mb-4 border rounded-3xl">
+          <select
+            name="role"
+            value={role} // ✅ controlled input
+            onChange={(e) => setRole(e.target.value)} // set role state
+            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
+          >
             <option value="">--Select Role--</option>
             <option value="Admin">Admin</option>
             <option value="User">User</option>
@@ -77,7 +96,7 @@ const Register = () => {
 
           <div className="flex justify-center gap-2 mt-5">
             <p className="text-red-600">Already have an account?</p>
-            <Link to="/Login">
+            <Link to="/login">
               <span className="text-blue-700">Sign In</span>
             </Link>
           </div>
