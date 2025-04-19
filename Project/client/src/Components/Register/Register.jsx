@@ -44,6 +44,7 @@ const Register = () => {
       //console.log("Registration Successful", res.data.data);
      // console.log(res.data.data.accessToken);
       localStorage.setItem("token", JSON.stringify(res.data.data.accessToken));
+      localStorage.setItem("registered", "true"); // set a flag
       navigate("/");
     } catch (err) {
       alert("Register Failed");
