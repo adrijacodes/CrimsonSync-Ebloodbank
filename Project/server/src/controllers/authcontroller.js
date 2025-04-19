@@ -21,7 +21,7 @@ export const registerUser = AsyncHandler(async (req, res, next) => {
     throw new ApiError(409, "User with this email already exists.");
   }
 
-  // Generate username 
+  // Generate username
   const username = generateUsername();
 
   try {
@@ -48,13 +48,15 @@ export const registerUser = AsyncHandler(async (req, res, next) => {
     }
 
     // Returning a success response
-    return res.status(201).json(
-      new ApiResponse(
-        { UserInfo: createdUser, accessToken: token },
-        "User registered successfully.",
-        true
-      )
-    );
+    return res
+      .status(201)
+      .json(
+        new ApiResponse(
+          { UserInfo: createdUser, accessToken: token },
+          "User registered successfully.",
+          true
+        )
+      );
   } catch (error) {
     // MongoDB validation error handling
     if (error.name === "ValidationError") {
@@ -63,7 +65,6 @@ export const registerUser = AsyncHandler(async (req, res, next) => {
       );
       throw new ApiError(400, `Validation failed: ${errorMessages.join(", ")}`);
     }
-
   }
 });
 
@@ -162,3 +163,24 @@ export const searchUsers = AsyncHandler(async (req, res) => {
       )
     );
 });
+
+// get user Profile
+export const getUserProfile = AsyncHandler(async (req, res) => {
+  const userEmail = req.user.email;
+
+  const userDetails = await User.find({ email: userEmail }).select(
+    "-password -createdAt -updatedAt -__v -_id"
+  );
+  if (!userDetails) throw ApiError(404, "User not found!!");
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        { UserInfo: userDetails },
+        "User Details returned Successfully!",
+        true
+      )
+    );
+});
+// user profile update

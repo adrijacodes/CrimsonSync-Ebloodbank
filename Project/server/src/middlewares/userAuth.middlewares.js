@@ -9,6 +9,7 @@ const verifyUserToken1 = AsyncHandler(async (req, _, next) => {
   const token =
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer ", "");
+    //  console.log("entering");
   if (!token) {
     throw new ApiError(401, "Unauthorized request");
   }
