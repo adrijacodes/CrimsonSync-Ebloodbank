@@ -33,7 +33,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: [true, "User password is required"],
-      minlength: [8, "minimum size of 6 is required"],
+      minlength: [6, "minimum size of 6 is required"],
       maxlength: [60, "User password exceeded(max-60)"],
     },
     bloodType: {

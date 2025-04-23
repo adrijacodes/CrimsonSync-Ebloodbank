@@ -48,8 +48,9 @@ const Register = () => {
       localStorage.setItem("registered", "true"); // set a flag
       navigate("/");
     } catch (err) {
-      alert("Register Failed");
-      console.error("Registration Failed", err);
+      //if conditions
+      alert("Register Failed",err.response.data.message);
+      console.error("Registration Failed", err.response.data.message);
     }
     
   };
