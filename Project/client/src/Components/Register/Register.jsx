@@ -43,19 +43,19 @@ const Register = () => {
       alert("Register Success");
       //console.log("Registration Successful", res.data.data);
      // console.log(res.data.data.accessToken);
-      localStorage.setItem("token", JSON.stringify(res.data.data.accessToken));
+      
+     localStorage.setItem("token", JSON.stringify(res.data.data.accessToken));
+      localStorage.setItem("registered", "true"); // set a flag
       navigate("/");
     } catch (err) {
       alert("Register Failed");
       console.error("Registration Failed", err);
     }
+    
   };
 
   return (
-    <div
-      className="min-h-screen bg-contain bg-center"
-      style={{ backgroundImage: "url('../src/assets/blood2.jpg')" }}
-    >
+    <div className="min-h-screen bg-contain bg-center"style={{ backgroundImage: "url('../src/assets/blood2.jpg')" }}>
       <div className="flex items-center justify-center h-[100vh]">
         <form
           onSubmit={handleSubmit}
