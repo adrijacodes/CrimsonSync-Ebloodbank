@@ -142,5 +142,60 @@ export const userdata = [
     "isRecipient": false,
     "role": "member",
     "availability": ["WED", "THURS", "FRI"]
+  },
+  {
+    "name": "Rina Joshi",
+    "email": "rina@example.com",
+    "password": "hashedpassword14",
+    "bloodType": "B+",
+    "location": { "city": "Mumbai", "state": "Maharashtra" },
+    "isDonor": true,
+    "isRecipient": false,
+    "role": "member",
+    "availability": ["MON", "THURS", "SUN"]
+  },
+  {
+    "name": "Sandeep Reddy",
+    "email": "sandeep@example.com",
+    "password": "hashedpassword15",
+    "bloodType": "B+",
+    "location": { "city": "Mumbai", "state": "Maharashtra" },
+    "isDonor": false,
+    "isRecipient": true,
+    "role": "member",
+    "availability": ["TUES", "THURS", "SAT"]
+  },
+  {
+    "name": "Maya Shah",
+    "email": "maya@example.com",
+    "password": "hashedpassword16",
+    "bloodType": "B+",
+    "location": { "city": "Mumbai", "state": "Maharashtra" },
+    "isDonor": true,
+    "isRecipient": false,
+    "role": "member",
+    "availability": ["WED", "THURS", "SAT"]
+  },
+  {
+    "name": "Vishal Kapoor",
+    "email": "vishal@example.com",
+    "password": "hashedpassword17",
+    "bloodType": "B+",
+    "location": { "city": "Mumbai", "state": "Maharashtra" },
+    "isDonor": false,
+    "isRecipient": true,
+    "role": "member",
+    "availability": ["MON", "THURS", "FRI"]
+  },
+  {
+    "name": "Alok Gupta",
+    "email": "alok@example.com",
+    "password": "hashedpassword18",
+    "bloodType": "B+",
+    "location": { "city": "Mumbai", "state": "Maharashtra" },
+    "isDonor": true,
+    "isRecipient": false,
+    "role": "member",
+    "availability": ["TUES", "THURS", "FRI"]
   }
 ];
