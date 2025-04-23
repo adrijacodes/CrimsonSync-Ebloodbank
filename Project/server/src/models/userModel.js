@@ -14,6 +14,7 @@ const userSchema = new Schema(
     username: {
       type: String,
       required: true,
+      unique: true,
     },
     email: {
       type: String,
@@ -42,9 +43,11 @@ const userSchema = new Schema(
     location: {
       city: {
         type: String,
+        lowercase: true,
       },
       state: {
         type: String,
+        lowercase: true,
       },
     },
     isDonor: { type: Boolean, default: false },
@@ -53,9 +56,9 @@ const userSchema = new Schema(
       default: true,
     },
     availability: {
-      type: String,
-      enum: ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN", "NONE"],
-      default: "NONE",
+      type: [String],
+      enum: ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"],
+      default: ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"],
     },
     userBloodDonationHistory: [
       {
