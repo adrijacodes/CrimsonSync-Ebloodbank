@@ -65,8 +65,7 @@ const userSchema = new Schema(
     ],
     role: {
       type: String,
-      enum: ["recipient", "donor", "BOTH"],
-      default: "recipient",
+      default: "member",
     },
   },
   { timestamps: true }
