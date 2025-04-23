@@ -12,6 +12,8 @@ import EventDetails from "./Pages/EventDetails";
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
 
+import { ToastContainer } from "react-toastify";
+
 const AppWrapper = () => {
   const location = useLocation();
 
@@ -38,6 +40,8 @@ const AppWrapper = () => {
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/user-dashboard" element={<UserDashboard/>} />
         </Routes>
+        <ToastContainer position="top-right" autoClose={3000} />
+
       </div>
 
       {!shouldHideLayout && <Footer />}

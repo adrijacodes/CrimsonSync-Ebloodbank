@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const registered = localStorage.getItem("registered");
@@ -11,6 +14,45 @@ const Navbar = () => {
     setIsRegistered(registered === "true");
     setIsLoggedIn(loggedIn === "true");
   }, []);
+
+  const handleLogout = async () => {
+    const token = JSON.parse(localStorage.getItem("token"));
+    const role = localStorage.getItem("role");
+
+    if (!token || !role) {
+      toast.error("No user session found.");
+      return;
+    }
+
+    const logoutUrl =
+      role.toLowerCase() === "admin"
+        ? "http://localhost:8001/api/auth/admin/logout"
+        : "http://localhost:8001/api/auth/user/logout";
+
+    try {
+      await axios.post(
+        logoutUrl,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Clear session info
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("loggedIn");
+      localStorage.removeItem("registered");
+
+      toast.success("Logged out successfully!");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed.");
+    }
+  };
 
   return (
     <header className="bg-red-600 shadow-md">
@@ -31,21 +73,18 @@ const Navbar = () => {
               <li className="px-4 hover:underline">About</li>
             </Link>
 
-            {/* Register shown only if not registered and not logged in */}
             {!isRegistered && !isLoggedIn && (
               <Link to="/register">
                 <li className="px-4 hover:underline">Register</li>
               </Link>
             )}
 
-            {/* Login shown only if registered but not logged in */}
             {isRegistered && !isLoggedIn && (
               <Link to="/login">
                 <li className="px-4 hover:underline">Login</li>
               </Link>
             )}
 
-            {/* Dashboard links shown only if logged in */}
             {isLoggedIn && (
               <>
                 <Link to="/admin-dashboard">
@@ -57,17 +96,10 @@ const Navbar = () => {
               </>
             )}
 
-            {/* Logout shown only if logged in */}
             {isLoggedIn && (
               <li
                 className="px-4 hover:underline cursor-pointer"
-                onClick={() => {
-                  localStorage.removeItem("loggedIn");
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("role");
-                  localStorage.removeItem("registered");
-                  window.location.href = "/"; // or navigate('/login')
-                }}
+                onClick={handleLogout}
               >
                 Logout
               </li>
@@ -82,4 +114,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

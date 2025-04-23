@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,12 +14,12 @@ const Login = () => {
     e.preventDefault();
   
     if (!email || !password) {
-      alert("Email and password are required.");
+      toast.error("Email and password are required.");
       return;
     }
   
     if (!role) {
-      alert("Please select a role.");
+      toast.error("Please select a role.");
       return;
     }
   
@@ -37,13 +39,28 @@ const Login = () => {
       localStorage.setItem("role", role);
       localStorage.setItem("loggedIn", "true");
   
-      alert("Login Success");
+      toast.success("Login Success");
   
-      navigate(role.toLowerCase() === "admin" ? "/admin-dashboard" : "/");
+      navigate(role.toLowerCase() === "admin" ? "/" : "/");
+
+      // same as register
     } catch (err) {
-      alert("Login Failed");
-      console.error("Login Failed", err.response?.data || err.message);
+      let errorMessage = "Login Failed";
+    
+      if (err.response && err.response.data) {
+        const data = err.response.data;
+    
+        if (typeof data.message === "string") {
+          errorMessage = data.message;
+        } else if (typeof data.message === "object") {
+          errorMessage = Object.values(data.message).join("\n");
+        }
+      }
+    
+      toast.error(errorMessage);
+      console.error("Login Failed:", errorMessage);
     }
+    
   };
   
 
