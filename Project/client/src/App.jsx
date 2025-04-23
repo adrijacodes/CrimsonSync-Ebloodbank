@@ -15,7 +15,7 @@ import UserDashboard from "./Pages/UserDashboard/UserDashboard";
 const AppWrapper = () => {
   const location = useLocation();
 
-  const hiddenLayoutRoutes = ["/Login", "/register"];
+  const hiddenLayoutRoutes = ["/login", "/register"];
   const hideLayoutForPattern = /^\/event\/\d+$/; // matches /event/1, /event/99, etc.
 
   const shouldHideLayout =
