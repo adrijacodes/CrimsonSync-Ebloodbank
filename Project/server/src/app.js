@@ -3,7 +3,7 @@ import ApiError from "./utils/ApiError.js";
 import cors from "cors";
 import morgan from "morgan";
 import authRoutes from "../src/routes/authRoute.js";
-// import searchDonorRouter from "../routes/searchDonorRoute.js";
+import searchBloodRoutes from "../src/routes/bloodRequestSearch.js"
 import eventRoutes from "./routes/eventRoutes.js";
 import adminRoutes from "./routes/adminAuthRoutes.js";
 
@@ -16,7 +16,7 @@ app.use(express.json());
 
 
 app.use("/api/auth/user", authRoutes);
-// app.use("/api/searchDonors", searchDonorRouter);
+app.use("/api/blood-requests", searchBloodRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/auth/admin", adminRoutes);
 

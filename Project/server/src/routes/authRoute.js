@@ -17,7 +17,7 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.route("/logout").post();
+router.post("/logout",verifyUserToken1,userRolecheck,userLogout);
 
 //Protected user routes
 // get user profile
