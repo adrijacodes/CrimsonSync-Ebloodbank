@@ -51,7 +51,7 @@ const AdminDashboard = () => {
             setToggle: setShowEventOptions,
             buttons: [
               { text: '➕ Add Event', route: '/NewEvent' },
-              { text: '📄 View Events', route: '/ViewEvent' },
+              { text: '📄 View Events', route: '/view-event' },
               { text: '🏙️ Events by City & Year', route: '/eventbycityyear' },
             ]
           },
@@ -60,8 +60,8 @@ const AdminDashboard = () => {
             toggle: showUserOptions,
             setToggle: setShowUserOptions,
             buttons: [
-              { text: '👥 View Users', route: '/Viewuser' },
-              { text: '🔍 Search User', route: '/Searchuser' },
+              { text: '👥 View Users', route: '/View-user' },
+              { text: '🔍 Search User', route: '/Search-user' },
             ]
           },
           {
@@ -69,8 +69,8 @@ const AdminDashboard = () => {
             toggle: showAdminOptions,
             setToggle: setShowAdminOptions,
             buttons: [
-              { text: '🛡️ View Admins', route: '/Viewadmin' },
-              { text: '🔍 Search Admin', route: '/Searchadmin' },
+              { text: '🛡️ View Admins', route: '/View-admin' },
+              { text: '🔍 Search Admin', route: '/Search-admin' },
             ]
           }
         ].map((section, index) => (

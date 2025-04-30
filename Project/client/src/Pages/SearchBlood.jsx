@@ -1,126 +1,114 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import bloodImage from '../assets/blood2.jpg';
 
 const SearchBlood = () => {
-    const [location, setLocation] = useState("");
-    const [activeTab, setActiveTab] = useState('type');
+  const [location, setLocation] = useState('');
+  const [selectedBloodType, setSelectedBloodType] = useState('');
+  const [donors, setDonors] = useState([]); // New state for donor results
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Searching donor with:", selectedBloodType, location);
+
+    //  Mock donor data (replace this with real API later)
+    const allDonors = [
+      { name: 'Aarav Sharma', city: 'Delhi', bloodType: 'A+', contact: '9876543210' },
+      { name: 'Meera Verma', city: 'Mumbai', bloodType: 'B+', contact: '9123456780' },
+      { name: 'Kabir Joshi', city: 'Delhi', bloodType: 'A+', contact: '9823412345' },
+      { name: 'Riya Kapoor', city: 'Delhi', bloodType: 'O-', contact: '9090909090' },
+    ];
+
+    // Filter by selected blood type and location (case-insensitive)
+    const filtered = allDonors.filter(
+      (donor) =>
+        donor.bloodType === selectedBloodType &&
+        donor.city.toLowerCase() === location.toLowerCase()
+    );
+
+    setDonors(filtered); // Set the results
+  };
+
+  const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
   return (
-    <div className="min-h-screen bg-contain bg-center" style={{ backgroundImage: "url('../src/assets/blood2.jpg')" }}>
-      <div className="flex items-center justify-center h-[100vh]">
-        <form className="bg-slate-200 border-slate-400 p-8 rounded-3xl shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50">
-        
-        <div className="mb-4">
-          <label className="block mb-2 text-center text-xl font-serif">Choose Blood Type</label>
-          <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-4xl mx-auto">
-              
-          <button
-            className={`flex items-center p-2 bg-red-500 rounded cursor-pointer ${
-              activeTab === 'type'
-                ? 'bg-red-600 text-white shadow-lg font-serif'
-                : 'bg-gray-200 text-gray-800 font-serif'
-            }`}
-            onClick={() => setActiveTab('type')}
-          >
-            A+
-          </button>
+    <div
+      className="min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: `url(${bloodImage})` }}
+    >
+      <div className="flex flex-col items-center justify-start min-h-screen pt-20 px-4">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-slate-200 border-slate-400 p-8 rounded-3xl shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50 w-full max-w-3xl"
+        >
+          <div className="mb-6">
+            <label className="block mb-2 text-center text-xl font-serif">
+              Choose Your Blood Type
+            </label>
+            <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {bloodTypes.map((type) => (
+                <button
+                  type="button"
+                  key={type}
+                  className={`flex justify-center items-center p-2 rounded cursor-pointer font-serif transition-transform duration-200 ${
+                    selectedBloodType === type
+                      ? 'bg-red-600 text-white shadow-lg scale-105'
+                      : 'bg-gray-200 text-gray-800 hover:bg-red-500 hover:text-white'
+                  }`}
+                  onClick={() => setSelectedBloodType(type)}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 text-center text-xl font-serif">
+              Location
+            </label>
+            <input
+              type="text"
+              placeholder="Enter the Location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full border rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-black"
+            />
+          </div>
 
           <button
-            className={`flex items-center p-2 bg-red-500 rounded cursor-pointer ${
-              activeTab === 'type'
-                ? 'bg-red-600 text-white shadow-lg font-serif'
-                : 'bg-gray-200 text-gray-800 font-serif'
-            }`}
-            onClick={() => setActiveTab('type')}
+            type="submit"
+            className="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600 transition duration-200"
           >
-            A-
+            Search Donor
           </button>
+        </form>
 
-          <button
-            className={`flex items-center p-2 bg-red-500 rounded cursor-pointer ${
-              activeTab === 'type'
-                ? 'bg-red-600 text-white shadow-lg font-serif'
-                : 'bg-gray-200 text-gray-800 font-serif'
-            }`}
-            onClick={() => setActiveTab('type')}
-          >
-            B+
-          </button>
-
-          <button
-            className={`flex items-center p-2 bg-red-500 rounded cursor-pointer ${
-              activeTab === 'type'
-                ? 'bg-red-600 text-white shadow-lg font-serif'
-                : 'bg-gray-200 text-gray-800 font-serif'
-            }`}
-            onClick={() => setActiveTab('type')}
-          >
-            B-
-          </button>
-
-          <button
-            className={`flex items-center p-2 bg-red-500 rounded cursor-pointer ${
-              activeTab === 'type'
-                ? 'bg-red-600 text-white shadow-lg font-serif'
-                : 'bg-gray-200 text-gray-800 font-serif'
-            }`}
-            onClick={() => setActiveTab('type')}
-          >
-            AB+
-          </button>
-
-          <button
-            className={`flex items-center p-2 bg-red-500 rounded cursor-pointer ${
-              activeTab === 'type'
-                ? 'bg-red-600 text-white shadow-lg font-serif'
-                : 'bg-gray-200 text-gray-800 font-serif'
-            }`}
-            onClick={() => setActiveTab('type')}
-          >
-            AB-
-          </button>
-
-          <button
-            className={`flex items-center p-2 bg-red-500 rounded cursor-pointer ${
-              activeTab === 'type'
-                ? 'bg-red-600 text-white shadow-lg font-serif'
-                : 'bg-gray-200 text-gray-800 font-serif'
-            }`}
-            onClick={() => setActiveTab('type')}
-          >
-            O+
-          </button>
-
-          <button
-            className={`flex items-center p-2 bg-red-500 rounded cursor-pointer ${
-              activeTab === 'type'
-                ? 'bg-red-600 text-white shadow-lg font-serif'
-                : 'bg-gray-200 text-gray-800 font-serif'
-            }`}
-            onClick={() => setActiveTab('type')}
-          >
-            O-
-          </button>
-
-                 </div>
-        </div>
-        
-        <div className="mb-4">
-          <label className="block mb-2 text-center text-xl font-serif">Location</label>
-          <input
-      type="text"
-      placeholder="Enter the Location"
-      value={location}
-      onChange={(e) => setLocation(e.target.value)}
-      className="w-full border rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-red-300"
-    />
-
-        </div>
-
-        <button type="submit" className="bg-red-500 text-white w-full py-2 rounded">
-          Search Donor
-        </button>
-      </form>
-    </div>
+        {/* Donor Results */}
+        {donors.length > 0 ? (
+          <div className="mt-10 bg-white bg-opacity-80 p-6 rounded-xl shadow-md w-full max-w-3xl">
+            <h2 className="text-center text-2xl font-semibold mb-4 font-serif">Available Donors</h2>
+            <ul className="space-y-4">
+              {donors.map((donor, index) => (
+                <li
+                  key={index}
+                  className="border border-gray-300 rounded-md p-4 flex flex-col md:flex-row justify-between items-start md:items-center"
+                >
+                  <div>
+                    <p className="font-bold">{donor.name}</p>
+                    <p className="text-gray-700">Blood Type: {donor.bloodType}</p>
+                    <p className="text-gray-700">City: {donor.city}</p>
+                  </div>
+                  <p className="text-blue-600 mt-2 md:mt-0">📞 {donor.contact}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="mt-10 text-center text-white text-lg font-medium">
+            {selectedBloodType && location && 'No donors found for your selection.'}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

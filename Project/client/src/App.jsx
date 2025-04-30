@@ -13,6 +13,9 @@ import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
 
 import { ToastContainer } from "react-toastify";
+import ViewEvent from "./Pages/ViewEvent";
+import Faq from "./Pages/Faq";
+import HowItWorks from "./Pages/HowItWorks";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -31,6 +34,8 @@ const AppWrapper = () => {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/how-it-works" element={<HowItWorks/>} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/SearchBlood" element={<SearchBlood />} />
@@ -39,6 +44,7 @@ const AppWrapper = () => {
           <Route path="/event/:id" element={<EventDetails />} /> 
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/user-dashboard" element={<UserDashboard/>} />
+          <Route path="/view-event" element={<ViewEvent/>} />
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
 
