@@ -5,10 +5,8 @@ import ApiError from "../utils/ApiError.js";
 
 // Register a new event
 export const registerEvents = AsyncHandler(async (req, res) => {
- 
-  const { eventName, date, description, location: { city, venue } } = req.body;
+  const { eventName, date, description, city, venue } = req.body;
 
- 
   const existingEvent = await Event.findOne({ eventName });
   if (existingEvent) {
     throw new ApiError(400, "Event already exists on this date");
@@ -20,12 +18,13 @@ export const registerEvents = AsyncHandler(async (req, res) => {
     description,
     date,
     location: {
-      venue,
-      city,
+      venue: venue,
+      city: city,
     },
   };
 
- 
+  console.log(eventDetails);
+
   const newEvent = await Event.create(eventDetails);
   if (!newEvent) throw new ApiError(500, "Error saving event to the database");
 
@@ -39,61 +38,67 @@ export const registerEvents = AsyncHandler(async (req, res) => {
 export const getEvents = AsyncHandler(async (req, res) => {
   const { city, filter } = req.query;
   const now = new Date();
-  const isAdmin = req.user?.role === 'admin';
+  const isAdmin = req.user?.role === "admin";
 
   const query = { "location.city": city };
 
-  if (filter === 'upcoming') {
-    const tomorrow = new Date(); 
-    tomorrow.setDate(now.getDate() + 1);  
-    tomorrow.setHours(0, 0, 0, 0);   
-    
-    query.date = { $gte: tomorrow };   
-  }
+  if (filter === "upcoming") {
+    const tomorrow = new Date();
+    tomorrow.setDate(now.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
 
-  else if (filter === 'today') {
+    query.date = { $gte: tomorrow };
+  } else if (filter === "today") {
     query.date = {
-      '$gte': new Date("2025-04-17T00:00:00.000Z"),  
-   '$lt': new Date("2025-04-18T00:00:00.000Z")
-     };
-  }
-
-  else if (filter === 'expired') {
+      $gte: new Date("2025-04-17T00:00:00.000Z"),
+      $lt: new Date("2025-04-18T00:00:00.000Z"),
+    };
+  } else if (filter === "expired") {
     if (!isAdmin) {
-      return res.status(403).json(
-        new ApiResponse(null, "You are not authorized to view expired events.", false)
-      );
+      return res
+        .status(403)
+        .json(
+          new ApiResponse(
+            null,
+            "You are not authorized to view expired events.",
+            false
+          )
+        );
     }
     const expiredEvents = new Date(now);
-    expiredEvents.setDate(now.getDate() - 1);  
-    expiredEvents.setHours(0, 0, 0, 0); 
-    query.date = { $lte: expiredEvents };   
+    expiredEvents.setDate(now.getDate() - 1);
+    expiredEvents.setHours(0, 0, 0, 0);
+    query.date = { $lte: expiredEvents };
+  } else {
+    query.date = {
+      $gte: new Date("2025-04-17T00:00:00.000Z"),
+    };
   }
-    else
-    {
-      query.date = {
-        '$gte': new Date("2025-04-17T00:00:00.000Z")
-       };
-   }
   console.log("Query being used:", query);
 
   const [count, eventsList] = await Promise.all([
     Event.countDocuments(query),
-    Event.find(query)
+    Event.find(query),
   ]);
 
   if (eventsList.length === 0) {
-    return res.status(404).json(
-      new ApiResponse(null, "No events found based on your search criteria.", false)
-    );
+    return res
+      .status(404)
+      .json(
+        new ApiResponse(
+          null,
+          "No events found based on your search criteria.",
+          false
+        )
+      );
   }
-  
+
   res.status(200).json(
     new ApiResponse(
-    {
-    "totalresults": count,
-    "eventsList": eventsList
-  },
+      {
+        totalresults: count,
+        eventsList: eventsList,
+      },
       "Events returned successfully based on your filter.",
       true
     )
@@ -106,21 +111,21 @@ export const getEventsGroupedByCityAndYear = AsyncHandler(async (req, res) => {
     {
       $project: {
         city: "$location.city",
-        year: { $year: "$date" }
-      }
+        year: { $year: "$date" },
+      },
     },
     {
       $group: {
         _id: { city: "$city", year: "$year" },
-        totalEvents: { $sum: 1 }
-      }
+        totalEvents: { $sum: 1 },
+      },
     },
     {
       $sort: {
         "_id.city": 1,
-        "_id.year": 1
-      }
-    }
+        "_id.year": 1,
+      },
+    },
   ]);
 
   // Transforming to Recharts-friendly format
@@ -137,4 +142,3 @@ export const getEventsGroupedByCityAndYear = AsyncHandler(async (req, res) => {
   const formattedData = Object.values(resultMap);
   res.json(formattedData);
 });
-

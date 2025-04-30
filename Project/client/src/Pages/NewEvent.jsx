@@ -23,8 +23,10 @@ const NewEvent = () => {
     e.preventDefault();
 
     const accessToken = localStorage.getItem('token'); // Make sure this key matches your actual token key
-console.log(accessToken);
+console.log(accessToken.substring(1,(accessToken.length-1)));
     try {
+      console.log(formData);
+      
       const response = await fetch('http://localhost:8001/api/events', {
         method: 'POST',
         headers: {
