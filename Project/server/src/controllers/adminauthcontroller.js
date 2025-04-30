@@ -18,12 +18,11 @@ export const registerAdmin = AsyncHandler(async (req, res) => {
 
   try {
     const admin = await Admin.create({
-      name: name?.toLowerCase(),  
+      name: name?.toLowerCase(),
       email,
       password,
     });
 
-   
     const createdAdmin = await Admin.findById(admin._id).select(
       "-password -__v -createdAt -updatedAt"
     );
@@ -50,7 +49,9 @@ export const registerAdmin = AsyncHandler(async (req, res) => {
   } catch (error) {
     // MongoDB validation error handling
     if (error.name === "ValidationError") {
-      const errorMessages = Object.values(error.errors).map(err => err.message);
+      const errorMessages = Object.values(error.errors).map(
+        (err) => err.message
+      );
       throw new ApiError(400, `Validation failed: ${errorMessages.join(", ")}`);
     }
   }
@@ -125,7 +126,7 @@ export const viewAdmins = AsyncHandler(async (req, res) => {
 // search admins by name,email
 export const searchAdmins = AsyncHandler(async (req, res) => {
   //console.log("entering");
-  
+
   const { searchTerm } = req.query;
   if (!searchTerm) {
     return res.status(400).json({ message: "Search term is required" });
@@ -138,7 +139,7 @@ export const searchAdmins = AsyncHandler(async (req, res) => {
     ],
   }).select("-password -createdAt -updatedAt -__v ");
   //console.log(admins);
-  
+
   const Total_Admins = admins.length;
   if (admins.length === 0) {
     return res.status(404).json(new ApiResponse({}, "No admins found!!", true));
@@ -153,4 +154,66 @@ export const searchAdmins = AsyncHandler(async (req, res) => {
         true
       )
     );
+});
+// update admin password
+export const updatePassword = AsyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    throw new ApiError(400, "Current and new passwords are required.");
+  }
+
+  const adminEmail = req.user.email;
+
+  const user = await Admin.findOne({ email: adminEmail });
+  if (!user) {
+    throw new ApiError(404, "Admin not found.");
+  }
+
+  const isValid = await user.passwordValidityCheck(currentPassword);
+  if (!isValid) {
+    throw new ApiError(401, "Current password is incorrect.");
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse({}, "Password updated successfully.", true));
+});
+// get admin profile
+export const getAdminProfile = AsyncHandler(async (req, res) => {
+  const adminEmail = req.user.email;
+
+  const adminDetails = await Admin.find({ email: adminEmail }).select(
+    "-password -createdAt -updatedAt -__v -_id"
+  );
+  if (!adminDetails) throw ApiError(404, "Admin not found!!");
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        { AdminInfo: adminDetails },
+        "Admin Details returned Successfully!",
+        true
+      )
+    );
+});
+
+// Delete Admin
+export const deleteAdmin = AsyncHandler(async (req, res, next) => {
+  const adminEmail = req.user.email;
+
+  const user = await Admin.findOneAndDelete({ email: adminEmail });
+
+  if (!user) {
+    throw new ApiError(404, "Admin not found.");
+  }
+
+  // Return a success response
+  return res
+    .status(200)
+    .json(new ApiResponse({}, "Admin deleted successfully.", true));
 });

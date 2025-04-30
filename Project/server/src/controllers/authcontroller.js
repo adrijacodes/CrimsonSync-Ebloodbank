@@ -1,4 +1,5 @@
 // @ts-nocheck
+import mongoose from 'mongoose';
 import { generateUsername } from "../utils/usernamegenerate.js";
 import bcrypt from "bcryptjs";
 import ApiError from "../utils/ApiError.js";
@@ -133,35 +134,48 @@ export const viewUsers = AsyncHandler(async (req, res) => {
       )
     );
 });
-// search users by name,email,username,role
+
+// search users by name,email,username,role(Admins Only)
+
 export const searchUsers = AsyncHandler(async (req, res) => {
   const { searchTerm } = req.query;
+ 
+  
   if (!searchTerm) {
     return res.status(400).json({ message: "Search term is required" });
   }
 
-  const users = await User.find({
-    $or: [
-      { name: { $regex: searchTerm, $options: "i" } }, // Search by name
-      { email: { $regex: searchTerm, $options: "i" } }, // Search by email
-      { username: { $regex: searchTerm, $options: "i" } }, // Search by username
-      { role: { $regex: searchTerm, $options: "i" } }, // Search by role
-    ],
-  }).select("-password -createdAt -updatedAt -__v ");
+const searchConditions = [
+  { name: { $regex: searchTerm, $options: "i" } },
+  { email: { $regex: searchTerm, $options: "i" } },
+  { username: { $regex: searchTerm, $options: "i" } },
+  { role: { $regex: searchTerm, $options: "i" } },
+];
+
+if (mongoose.Types.ObjectId.isValid(searchTerm)) {
+  searchConditions.push({ _id: searchTerm });
+}
+
+
+const users = await User.find({ $or: searchConditions }).select(
+  "-password -createdAt -updatedAt -__v"
+);
+
   const Total_Users = users.length;
-  if (users.length === 0) {
-    return res.status(404).json(new ApiResponse({}, "No users found!!", true));
+
+  if (Total_Users === 0) {
+    return res
+      .status(404)
+      .json(new ApiResponse({}, "No users found!!", true));
   }
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        { UserList: users, "Total Users": Total_Users },
-        "Showing Search results.......",
-        true
-      )
-    );
+  return res.status(200).json(
+    new ApiResponse(
+      { UserList: users, "Total Users": Total_Users },
+      "Showing Search results.......",
+      true
+    )
+  );
 });
 
 // get user Profile
@@ -183,4 +197,160 @@ export const getUserProfile = AsyncHandler(async (req, res) => {
       )
     );
 });
-// user profile update
+
+/*--------------------------- user profile update ----------------------------*/
+// update user location
+
+export const updateUserLocation = AsyncHandler(async (req, res, next) => {
+  const { city, state } = req.body;
+
+  if (!city || !state) {
+    throw new ApiError(400, "City and state are required to update location.");
+  }
+
+  // Find the user by email
+  const userEmail = req.user.email;
+  const user = await User.findOne({ email: userEmail });
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  // Update the user's location
+  user.location.city = city.toLowerCase();
+  user.location.state = state.toLowerCase();
+
+  // Save the updated user data
+  const updatedUser = await user.save();
+
+  // Return a response
+  const updatedUserInfo = updatedUser.toObject();
+  delete updatedUserInfo.password;
+  delete updatedUserInfo._id;
+  delete updatedUserInfo.__v;
+  delete updatedUserInfo.createdAt;
+  delete updatedUserInfo.updatedAt;
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        { UserInfo: updatedUserInfo },
+        "User location updated successfully.",
+        true
+      )
+    );
+});
+
+//update donor/user status
+
+export const updateDonorStatus = AsyncHandler(async (req, res) => {
+  const userEmail = req.user.email; // assuming user is authenticated and email is stored in token
+
+  const { isDonor } = req.body;
+
+  if (typeof isDonor !== "boolean") {
+    throw new ApiError(
+      400,
+      "Invalid value for isDonor. Expected true or false."
+    );
+  }
+
+  const user = await User.findOneAndUpdate(
+    { email: userEmail },
+    { isDonor: isDonor },
+    { new: true, runValidators: true }
+  ).select("-password -__v -createdAt -updatedAt");
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        { UserInfo: user },
+        "Donor status updated successfully!",
+        true
+      )
+    );
+});
+
+// update user password
+
+export const updatePassword = AsyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    throw new ApiError(400, "Current and new passwords are required.");
+  }
+
+  const userEmail = req.user.email;
+
+  const user = await User.findOne({ email: userEmail });
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  const isValid = await user.passwordValidityCheck(currentPassword);
+  if (!isValid) {
+    throw new ApiError(401, "Current password is incorrect.");
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse({}, "Password updated successfully.", true));
+});
+
+// update availability
+
+export const updateAvailability = AsyncHandler(async (req, res) => {
+  const { availability } = req.body;
+
+  const validDays = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
+
+  if (
+    !Array.isArray(availability) ||
+    !availability.every((day) => validDays.includes(day))
+  ) {
+    throw new ApiError(400, "Invalid availability values provided.");
+  }
+
+  const user = await User.findOne({ email: req.user.email });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  user.availability = availability;
+  await user.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(user, "Availability updated successfully", true));
+});
+
+// Delete User
+export const deleteUser = AsyncHandler(async (req, res, next) => {
+  const userEmail = req.user.email;
+
+  
+  const user = await User.findOneAndDelete({ email: userEmail });
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  // Return a success response
+  return res
+    .status(200)
+    .json(
+      new ApiResponse({}, "User deleted successfully.", true)
+    );
+});
+
+

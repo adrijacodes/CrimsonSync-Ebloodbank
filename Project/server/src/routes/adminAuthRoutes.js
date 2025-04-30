@@ -1,6 +1,12 @@
 import express from "express";
 import { registerAdmin } from "../controllers/adminauthcontroller.js";
-import { loginAdmin, adminLogout } from "../controllers/adminauthcontroller.js";
+import {
+  loginAdmin,
+  adminLogout,
+  updatePassword,
+  getAdminProfile,
+  deleteAdmin,
+} from "../controllers/adminauthcontroller.js";
 import verifyUserToken from "../middlewares/auth.middleware.js";
 import { adminRolecheck } from "../middlewares/userRoleChecking.js";
 import {
@@ -12,6 +18,16 @@ const router = express.Router();
 router.post("/register", registerAdmin);
 router.post("/login", loginAdmin);
 router.route("/logout").post(verifyUserToken, adminRolecheck, adminLogout);
+
+//update admin password
+router
+  .route("/profile/update-password")
+  .patch(verifyUserToken, adminRolecheck, updatePassword);
+
+// update admin profile
+router.route("/profile").get(verifyUserToken, adminRolecheck, getAdminProfile);
+// delete admin
+router.delete("/profile/delete", verifyUserToken, deleteAdmin);
 
 // Search/View Admins
 router.get("/search-admins", verifyUserToken, adminRolecheck, searchAdmins);
