@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const NewEvent = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +12,6 @@ const NewEvent = () => {
     description: '',
   });
 
-  const [success, setSuccess] = useState(false);
-
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -22,11 +22,11 @@ const NewEvent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const accessToken = localStorage.getItem('token'); // Make sure this key matches your actual token key
-console.log(accessToken.substring(1,(accessToken.length-1)));
+    const accessToken = localStorage.getItem('token');
+
     try {
       console.log(formData);
-      
+
       const response = await fetch('http://localhost:8001/api/events', {
         method: 'POST',
         headers: {
@@ -43,8 +43,7 @@ console.log(accessToken.substring(1,(accessToken.length-1)));
       const result = await response.json();
       console.log('Event added:', result);
 
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      toast.success(' 🤗Event added successfully!');
 
       setFormData({
         eventName: '',
@@ -56,7 +55,7 @@ console.log(accessToken.substring(1,(accessToken.length-1)));
       });
     } catch (error) {
       console.error('Error submitting event:', error);
-      alert('Something went wrong while submitting the event.');
+      toast.error('Something went wrong while submitting the event 😥');
     }
   };
 
@@ -115,12 +114,8 @@ console.log(accessToken.substring(1,(accessToken.length-1)));
           >
             Submit
           </button>
-          {success && (
-            <p className="text-green-600 mt-2 text-center font-serif">
-              ✅ Event added successfully!
-            </p>
-          )}
         </form>
+        <ToastContainer position="top-center" autoClose={3000} />
       </div>
     </div>
   );
