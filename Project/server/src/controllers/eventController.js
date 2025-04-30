@@ -23,7 +23,7 @@ export const registerEvents = AsyncHandler(async (req, res) => {
     },
   };
 
-  console.log(eventDetails);
+
 
   const newEvent = await Event.create(eventDetails);
   if (!newEvent) throw new ApiError(500, "Error saving event to the database");
