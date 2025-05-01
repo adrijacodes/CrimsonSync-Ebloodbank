@@ -10,7 +10,7 @@ const UserList = () => {
     const fetchUsers = async () => {
       try {
         const accessToken = localStorage.getItem("token");
-        console.log("Access token being sent:", accessToken);
+        //console.log("Access token being sent:", accessToken);
 
         const response = await fetch("http://localhost:8001/api/auth/user/view-users", {
           method: "GET",
