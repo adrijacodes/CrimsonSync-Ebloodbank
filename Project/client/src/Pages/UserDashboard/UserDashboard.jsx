@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Avatar from '../../assets/Avatar.jpg';
+import { RxAvatar } from "react-icons/rx"; 
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -177,14 +177,14 @@ const Dashboard = () => {
   return (
     <div className="bg-gray-50 p-6 max-w-4xl mx-auto">
       <div className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-center gap-6">
-        <img src={Avatar} alt="Profile" className="w-24 h-24 rounded-full" />
+        <RxAvatar size={97} className="w-24 h-24 text-black" /> {/* Avatar Icon */}
         <div>
-          <h2 className="text-xl font-semibold">{user.name}</h2>
-          <p className="text-sm text-gray-600">{user.email}</p>
-          <p className="text-sm text-gray-600">Username: {user.username}</p>
+          <h2 className="text-2xl font-semibold font-serif">{user.name}</h2>
+          <p className="text-sm text-gray-600 font-serif">{user.email}</p>
+          <p className="text-sm text-gray-600 font-serif">Username: {user.username}</p>
 
           <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 font-serif">
               Location:{' '}
               {isEditingLocation ? (
                 <div className="flex gap-2">
