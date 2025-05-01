@@ -22,28 +22,10 @@ const ViewEvent = () => {
 
     try {
       const accessToken = localStorage.getItem("token");
-      const role= localStorage.getItem("role");
-      //const role = userInfo?.role?.toLowerCase();
-
+      const role = localStorage.getItem("role");
       let apiUrl = "";
-      console.log(role);
-      
       if (role === "Admin") {
-        console.log("entering");
-        
         apiUrl = `http://localhost:8001/api/events/expiringEvents?city=${encodeURIComponent(
-          changedCity
-        )}&filter=${category.toLowerCase()}`;
-      }
-       else {
-
-        // For users: block "Expired" category
-        // if (category === "Expired") {
-        //   setSearchResult([]);
-        //   setLoading(false);
-        //   return;
-        // }
-        apiUrl = `http://localhost:8001/api/events/search?city=${encodeURIComponent(
           changedCity
         )}&filter=${category.toLowerCase()}`;
       }
