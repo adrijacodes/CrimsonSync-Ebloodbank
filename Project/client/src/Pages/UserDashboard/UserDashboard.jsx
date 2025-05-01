@@ -1,4 +1,3 @@
-// Full code from start to end:
 import React, { useEffect, useState } from 'react';
 import Avatar from '../../assets/Avatar.jpg';
 
@@ -118,30 +117,56 @@ const Dashboard = () => {
 
   const handleSaveDonorInfo = async () => {
     setSaveMessage('Saving...');
+    const accessToken = localStorage.getItem('token');
+  
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8001/api/user/donor-settings', {
+      // Update Blood Type
+      const bloodTypeRes = await fetch('http://localhost:8001/api/auth/user/profile/update-blood-type', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({
-          bloodType,
-          availability,
-          isDonor: donorEnabled,
-        }),
+        body: JSON.stringify({ bloodType }),
       });
-
-      if (!res.ok) throw new Error('Failed to save donor settings');
+  
+      if (!bloodTypeRes.ok) throw new Error('Failed to update blood type');
+  
+      // ✅ Normalize day format before sending
+      const formattedDays = availability.map(day => day.toUpperCase());
+      console.log('Sending availability:', formattedDays);
+      
+      const availabilityRes = await fetch('http://localhost:8001/api/auth/user/profile/update-availability', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ days: formattedDays }),
+      });
+  
+      if (!availabilityRes.ok) throw new Error('Failed to update availability');
+  
+      const donorStatusRes = await fetch('http://localhost:8001/api/auth/user/profile/update-donor-status', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ isDonor: donorEnabled }),
+      });
+  
+      if (!donorStatusRes.ok) throw new Error('Failed to update donor status');
+  
       setSaveMessage('Your donor preferences have been saved successfully!');
     } catch (err) {
-      setSaveMessage('Failed to save settings.');
-      console.error('Donor settings save error:', err);
+      console.error('Error saving donor info:', err);
+      setSaveMessage('Failed to save one or more donor settings.');
     }
-
+  
     setTimeout(() => setSaveMessage(''), 3000);
   };
+  
 
   const handleDeleteAccount = () => {
     alert('Your account has been deleted.');
@@ -158,7 +183,6 @@ const Dashboard = () => {
           <p className="text-sm text-gray-600">{user.email}</p>
           <p className="text-sm text-gray-600">Username: {user.username}</p>
 
-          {/* Location */}
           <div className="flex items-center gap-2">
             <p className="text-sm text-gray-600">
               Location:{' '}
@@ -194,12 +218,9 @@ const Dashboard = () => {
               {isEditingLocation ? 'Save' : 'Edit'}
             </button>
           </div>
-
-         
         </div>
       </div>
 
-      {/* Donation History */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <h3 className="text-lg font-semibold mb-4">Donation History</h3>
         {user.lastDonationDate ? (
@@ -209,7 +230,6 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Donor Section */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Be a Donor</h3>
@@ -251,14 +271,11 @@ const Dashboard = () => {
                 onChange={(e) => setBloodType(e.target.value)}
                 className="w-full border p-2 rounded text-sm"
               >
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
+                {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -274,7 +291,6 @@ const Dashboard = () => {
 
       {saveMessage && <p className="text-center text-green-600">{saveMessage}</p>}
 
-      {/* Account Deletion */}
       <div className="text-center mt-8">
         <button
           onClick={handleDeleteAccount}
