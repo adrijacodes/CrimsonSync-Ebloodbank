@@ -18,6 +18,8 @@ import HowItWorks from "./Pages/HowItWorks";
 import EventsCityYearChart from "./Pages/EventsByCityYear";
 import UserList from "./Pages/UserList";
 import UserSearch from "./Pages/UserSearch";
+import AdminList from "./Pages/AdminList";
+import AdminSearch from "./Pages/AdminSearch";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -50,6 +52,8 @@ const AppWrapper = () => {
           <Route path="/event-by-city-year" element={<EventsCityYearChart/>} />
           <Route path="/user-list" element={<UserList/>} />
           <Route path="/search-user" element={<UserSearch/>} />
+          <Route path="/admin-list" element={<AdminList/>} />
+          <Route path="/search-admin" element={<AdminSearch/>} />
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
 

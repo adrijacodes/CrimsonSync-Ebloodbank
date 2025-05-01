@@ -69,7 +69,7 @@ const AdminDashboard = () => {
             toggle: showAdminOptions,
             setToggle: setShowAdminOptions,
             buttons: [
-              { text: '🛡️ View Admins', route: '/View-admin' },
+              { text: '🛡️ View Admins', route: '/admin-list' },
               { text: '🔍 Search Admin', route: '/Search-admin' },
             ]
           }

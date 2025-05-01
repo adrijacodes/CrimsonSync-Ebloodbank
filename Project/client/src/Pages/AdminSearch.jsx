@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
-const UserSearch = () => {
+const AdminSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
@@ -21,7 +21,7 @@ const UserSearch = () => {
 
     try {
       const accessToken = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8001/api/auth/user/search-users?searchTerm=${encodeURIComponent(searchTerm)}`, {
+      const response = await fetch(`htpp://localhost:8001/api/auth/admin/search-admins?searchTerm=${encodeURIComponent(searchTerm)}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -107,16 +107,16 @@ const UserSearch = () => {
                 transition={{ delay: index * 0.05 }}
               >
                 <h3 className="text-lg font-semibold text-red-700">
-                  {user.name}
+                  {admin.name}
                 </h3>
-                <p>Email: {user.email}</p>
-                <p>Username: {user.username}</p>
+                <p>Email: {admin.email}</p>
+                <p>Username: {admin.username}</p>
                 <p>
                   Role:{" "}
                   <span className="font-medium text-red-600">
                     {user.isDonor
                       ? "Donor"
-                      : user.isRecipient
+                      : admin.isRecipient
                       ? "Recipient"
                       : "User"}
                   </span>
@@ -130,4 +130,4 @@ const UserSearch = () => {
   );
 };
 
-export default UserSearch;
+export default AdminSearch;
