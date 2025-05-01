@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-//import { useNavigate } from "react-router-dom";
 import EventCard from "../Components/Event Card/EventCard";
 
 const ViewEvent = () => {
@@ -8,55 +7,68 @@ const ViewEvent = () => {
   const [searchResult, setSearchResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("All");
- // const navigate = useNavigate();
-
-
 
   const handleSearch = async () => {
-    if (city.trim()) {
-      const changedCity = city.toLowerCase().trim(); 
-      setSearchedCity(changedCity);
-  
-      try {
-        setLoading(true);
-        setSearchResult(null);
-        const accessToken = localStorage.getItem("token");
-        // user api http://localhost:8001/api/events/search?city=Mumbai
-        const res = await fetch(
-          `http://localhost:8001/api/events/expiringEvents?city=${encodeURIComponent(
-            changedCity
-          )}&filter=${category.toLowerCase()}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-            },
-          }
-        );
-  
-        const data = await res.json();
-  
-        if (res.ok && data.success) {
-          setSearchResult(data.data.eventsList || []);
-        } else {
-          console.error("Server responded with an error:", data.message);
-          setSearchResult([]);
-        }
-      } catch (error) {
-        console.error("Error fetching search results:", error);
-        setSearchResult([]);
-      } finally {
-        setLoading(false);
-      }
-  
-      setCity("");
-    } else {
+    if (!city.trim()) {
       setSearchResult(null);
       setSearchedCity("");
+      return;
+    }
+
+    const changedCity = city.toLowerCase().trim();
+    setSearchedCity(changedCity);
+    setLoading(true);
+    setSearchResult(null);
+
+    try {
+      const accessToken = localStorage.getItem("token");
+      const userInfo = JSON.parse(localStorage.getItem("user"));
+      const role = userInfo?.role?.toLowerCase();
+
+      let apiUrl = "";
+
+      if (role === "Admin") {
+        apiUrl = `http://localhost:8001/api/events/expiringEvents?city=${encodeURIComponent(
+          changedCity
+        )}&filter=${category.toLowerCase()}`;
+      }
+       else {
+
+        // For users: block "Expired" category
+        // if (category === "Expired") {
+        //   setSearchResult([]);
+        //   setLoading(false);
+        //   return;
+        // }
+        apiUrl = `http://localhost:8001/api/events/search?city=${encodeURIComponent(
+          changedCity
+        )}&filter=${category.toLowerCase()}`;
+      }
+
+      const res = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setSearchResult(data.data.eventsList || []);
+      } else {
+        console.error("Server responded with an error:", data.message);
+        setSearchResult([]);
+      }
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+      setSearchResult([]);
+    } finally {
+      setLoading(false);
+      setCity("");
     }
   };
-  
 
   return (
     <div className="min-h-screen bg-white py-10 px-4">
@@ -115,7 +127,7 @@ const ViewEvent = () => {
               </>
             ) : (
               <p className="text-red-600 font-medium font-serif">
-               ❌ No events found in &quot;{searchedCity}&quot;
+                ❌ No events found in &quot;{searchedCity}&quot;
               </p>
             )}
           </div>
