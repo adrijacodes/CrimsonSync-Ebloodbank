@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import EventCard from "../Components/Event Card/EventCard";
 
 const ViewEvent = () => {
@@ -8,25 +8,23 @@ const ViewEvent = () => {
   const [searchResult, setSearchResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("All");
-  const navigate = useNavigate();
+ // const navigate = useNavigate();
 
-  const capitalizeFirstLetter = (str) =>
-    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
 
   const handleSearch = async () => {
     if (city.trim()) {
-      const capitalizedCity = capitalizeFirstLetter(city.trim());
-      setSearchedCity(capitalizedCity);
-      console.log(capitalizedCity);
+      const changedCity = city.toLowerCase().trim(); 
+      setSearchedCity(changedCity);
+  
       try {
         setLoading(true);
         setSearchResult(null);
-
         const accessToken = localStorage.getItem("token");
-
+        // user api http://localhost:8001/api/events/search?city=Mumbai
         const res = await fetch(
-          `http://localhost:8001/api/events/search?city=${encodeURIComponent(
-            capitalizedCity
+          `http://localhost:8001/api/events/expiringEvents?city=${encodeURIComponent(
+            changedCity
           )}&filter=${category.toLowerCase()}`,
           {
             method: "GET",
@@ -36,9 +34,9 @@ const ViewEvent = () => {
             },
           }
         );
-
+  
         const data = await res.json();
-
+  
         if (res.ok && data.success) {
           setSearchResult(data.data.eventsList || []);
         } else {
@@ -51,13 +49,14 @@ const ViewEvent = () => {
       } finally {
         setLoading(false);
       }
-
+  
       setCity("");
     } else {
       setSearchResult(null);
       setSearchedCity("");
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-white py-10 px-4">
@@ -116,7 +115,7 @@ const ViewEvent = () => {
               </>
             ) : (
               <p className="text-red-600 font-medium font-serif">
-                ❌ No events found in "{searchedCity}"
+               ❌ No events found in &quot;{searchedCity}&quot;
               </p>
             )}
           </div>

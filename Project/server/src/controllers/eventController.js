@@ -37,7 +37,8 @@ export const registerEvents = AsyncHandler(async (req, res) => {
 export const getEvents = AsyncHandler(async (req, res) => {
   const { city, filter } = req.query;
   const isAdmin = req.user?.role === "admin";
-
+  console.log(req.user);
+  
   const query = { "location.city": city };
 
   const nowIST = moment.tz("Asia/Kolkata");
