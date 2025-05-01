@@ -146,7 +146,7 @@ export const searchUsers = AsyncHandler(async (req, res) => {
 
   let searchConditions = [];
 
-  // Special boolean checks
+
   if (searchTerm.toLowerCase() === "donor") {
     searchConditions.push({ isDonor: true });
   } else if (searchTerm.toLowerCase() === "recipient") {
@@ -339,6 +339,49 @@ export const updateAvailability = AsyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(user, "Availability updated successfully", true));
 });
+
+// update blood type
+export const updateBloodType = AsyncHandler(async (req, res) => {
+  const { bloodType } = req.body;
+
+  const validBloodTypes = [
+    "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
+  ];
+
+  if (!validBloodTypes.includes(bloodType)) {
+    throw new ApiError(400, "Invalid blood type provided.");
+  }
+
+  const userEmail = req.user.email;
+
+  const user = await User.findOne({ email: userEmail });
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  user.bloodType = bloodType;
+  await user.save();
+
+  const updatedUserInfo = user.toObject();
+  delete updatedUserInfo.password;
+  delete updatedUserInfo._id;
+  delete updatedUserInfo.__v;
+  delete updatedUserInfo.createdAt;
+  delete updatedUserInfo.updatedAt;
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        { UserInfo: updatedUserInfo },
+        "Blood type updated successfully.",
+        true
+      )
+    );
+});
+
+
 
 // Delete User
 export const deleteUser = AsyncHandler(async (req, res, next) => {

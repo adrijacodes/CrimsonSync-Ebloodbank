@@ -1,13 +1,18 @@
+// Full code from start to end:
 import React, { useEffect, useState } from 'react';
 import Avatar from '../../assets/Avatar.jpg';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
+  const [isEditingContact, setIsEditingContact] = useState(false);
   const [donorEnabled, setDonorEnabled] = useState(false);
   const [availability, setAvailability] = useState([]);
-  const [bloodType, setBloodType] = useState('');
+  const [bloodType, setBloodType] = useState('O+');
   const [saveMessage, setSaveMessage] = useState('');
+  const [updatedCity, setUpdatedCity] = useState('');
+  const [updatedState, setUpdatedState] = useState('');
+  const [updatedContact, setUpdatedContact] = useState('');
 
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -15,7 +20,6 @@ const Dashboard = () => {
     const fetchUserProfile = async () => {
       try {
         const accessToken = localStorage.getItem('token');
-        console.log("access token:",accessToken);
         const response = await fetch('http://localhost:8001/api/auth/user/profile', {
           method: 'GET',
           headers: {
@@ -28,10 +32,16 @@ const Dashboard = () => {
 
         const data = await response.json();
         const userData = data.data.UserInfo[0];
+
         setUser(userData);
         setBloodType(userData.bloodType || 'O+');
+        setUpdatedCity(userData.location?.city || '');
+        setUpdatedState(userData.location?.state || '');
+        setUpdatedContact(userData.contact || '');
+        setDonorEnabled(userData.isDonor || false);
+        setAvailability(userData.availability || []);
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching profile:', error);
       }
     };
 
@@ -45,20 +55,72 @@ const Dashboard = () => {
   };
 
   const handleLocationChange = (e) => {
-    setUser({ ...user, city: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'city') setUpdatedCity(value);
+    else if (name === 'state') setUpdatedState(value);
   };
 
-  const handleSaveLocation = () => {
+  const handleSaveLocation = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:8001/api/user/update-location', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          city: updatedCity,
+          state: updatedState,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update location');
+
+      setUser({
+        ...user,
+        location: { city: updatedCity, state: updatedState },
+      });
+      setSaveMessage('Location updated successfully!');
+    } catch (error) {
+      setSaveMessage('Failed to update location.');
+      console.error('Location update error:', error);
+    }
+
+    setTimeout(() => setSaveMessage(''), 3000);
     setIsEditingLocation(false);
-    // Optionally: add fetch PUT request to update city
+  };
+
+  const handleContactSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:8001/api/user/update-contact', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ contact: updatedContact }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update contact');
+
+      setUser({ ...user, contact: updatedContact });
+      setSaveMessage('Contact number updated successfully!');
+    } catch (err) {
+      setSaveMessage('Failed to update contact number.');
+      console.error('Contact update error:', err);
+    }
+
+    setTimeout(() => setSaveMessage(''), 3000);
+    setIsEditingContact(false);
   };
 
   const handleSaveDonorInfo = async () => {
     setSaveMessage('Saving...');
-
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/user/donor-settings', {
+      const res = await fetch('http://localhost:8001/api/user/donor-settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -67,15 +129,15 @@ const Dashboard = () => {
         body: JSON.stringify({
           bloodType,
           availability,
+          isDonor: donorEnabled,
         }),
       });
 
       if (!res.ok) throw new Error('Failed to save donor settings');
-
       setSaveMessage('Your donor preferences have been saved successfully!');
     } catch (err) {
       setSaveMessage('Failed to save settings.');
-      console.error(err);
+      console.error('Donor settings save error:', err);
     }
 
     setTimeout(() => setSaveMessage(''), 3000);
@@ -83,31 +145,44 @@ const Dashboard = () => {
 
   const handleDeleteAccount = () => {
     alert('Your account has been deleted.');
-    // Optionally: Add fetch DELETE call to delete the user
   };
 
   if (!user) return <p className="p-6 text-center">Loading user profile...</p>;
 
   return (
     <div className="bg-gray-50 p-6 max-w-4xl mx-auto">
-      {/* User Info */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-center gap-6">
         <img src={Avatar} alt="Profile" className="w-24 h-24 rounded-full" />
         <div>
           <h2 className="text-xl font-semibold">{user.name}</h2>
           <p className="text-sm text-gray-600">{user.email}</p>
+          <p className="text-sm text-gray-600">Username: {user.username}</p>
+
+          {/* Location */}
           <div className="flex items-center gap-2">
             <p className="text-sm text-gray-600">
               Location:{' '}
               {isEditingLocation ? (
-                <input
-                  type="text"
-                  value={user.city}
-                  onChange={handleLocationChange}
-                  className="border p-1 text-sm rounded"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    name="city"
+                    value={updatedCity}
+                    onChange={handleLocationChange}
+                    placeholder="City"
+                    className="border p-1 rounded text-sm"
+                  />
+                  <input
+                    type="text"
+                    name="state"
+                    value={updatedState}
+                    onChange={handleLocationChange}
+                    placeholder="State"
+                    className="border p-1 rounded text-sm"
+                  />
+                </div>
               ) : (
-                user.city
+                `${updatedCity.toUpperCase()}, ${updatedState.toUpperCase()}`
               )}
             </p>
             <button
@@ -119,16 +194,22 @@ const Dashboard = () => {
               {isEditingLocation ? 'Save' : 'Edit'}
             </button>
           </div>
+
+         
         </div>
       </div>
 
       {/* Donation History */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <h3 className="text-lg font-semibold mb-4">Donation History</h3>
-        <p>No donations yet. Start donating today!</p>
+        {user.lastDonationDate ? (
+          <p>Last donated on: {new Date(user.lastDonationDate).toDateString()}</p>
+        ) : (
+          <p>No donations yet. Start donating today!</p>
+        )}
       </div>
 
-      {/* Donor Toggle */}
+      {/* Donor Section */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Be a Donor</h3>
@@ -146,7 +227,6 @@ const Dashboard = () => {
 
         {donorEnabled && (
           <div className="space-y-4">
-            {/* Availability */}
             <div>
               <label className="block text-sm font-medium mb-1">Availability</label>
               <div className="flex flex-wrap gap-2">
@@ -164,7 +244,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Blood Type */}
             <div>
               <label className="block text-sm font-medium mb-1">Blood Type</label>
               <select
@@ -178,32 +257,28 @@ const Dashboard = () => {
                 <option value="B-">B-</option>
                 <option value="O+">O+</option>
                 <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
               </select>
             </div>
 
             <button
               onClick={handleSaveDonorInfo}
-              className="bg-green-600 text-white px-4 py-2 rounded-md"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
-              Save
+              Save Donor Settings
             </button>
-            {saveMessage && <p className="text-green-600 text-sm">{saveMessage}</p>}
           </div>
         )}
       </div>
 
-      {/* Notifications */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h3 className="text-lg font-semibold mb-4">Notifications</h3>
-        <p>No new notifications.</p>
-      </div>
+      {saveMessage && <p className="text-center text-green-600">{saveMessage}</p>}
 
-      {/* Delete Account */}
-      <div className="bg-white p-6 rounded-lg shadow-md text-center">
-        <h3 className="text-lg font-semibold mb-4 text-red-600">Account Settings</h3>
+      {/* Account Deletion */}
+      <div className="text-center mt-8">
         <button
           onClick={handleDeleteAccount}
-          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md"
+          className="text-red-500 text-sm hover:underline"
         >
           Delete Account
         </button>

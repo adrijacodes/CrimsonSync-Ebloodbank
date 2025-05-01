@@ -11,6 +11,7 @@ import {
   updatePassword,
   updateAvailability,
   deleteUser,
+  updateBloodType,
 } from "../controllers/authcontroller.js";
 import verifyUserToken from "../middlewares/auth.middleware.js";
 import verifyUserToken1 from "../middlewares/userAuth.middlewares.js";
@@ -49,6 +50,8 @@ router.patch(
   verifyUserToken1,
   updateAvailability
 );
+router.put("/profile/update-blood-type", verifyUserToken1, updateBloodType);
+
 // DELETE user route
 router.delete("/profile/delete", verifyUserToken1, deleteUser);
 
