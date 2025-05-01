@@ -5,7 +5,7 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [donorEnabled, setDonorEnabled] = useState(false);
-  const [availability, setAvailability] = useState([]);
+  const [availability, setAvailability] = useState([]);  // This will store the selected availability days
   const [bloodType, setBloodType] = useState('O+');
   const [saveMessage, setSaveMessage] = useState('');
   const [updatedCity, setUpdatedCity] = useState('');
@@ -35,7 +35,7 @@ const Dashboard = () => {
         setUpdatedCity(userData.location?.city || '');
         setUpdatedState(userData.location?.state || '');
         setDonorEnabled(userData.isDonor || false);
-        setAvailability(userData.availability || []);
+        setAvailability(userData.availability || []); // Set availability when user profile is fetched
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -120,7 +120,9 @@ const Dashboard = () => {
     const accessToken = localStorage.getItem('token');
 
     try {
-      const formattedDays = availability.map((day) => day.toUpperCase());
+      // Ensure availability days are in uppercase format
+      const availabilityUppercase = availability.map((day) => day.toUpperCase());
+
       const res = await fetch(
         'http://localhost:8001/api/auth/user/profile/update-availability',
         {
@@ -129,7 +131,7 @@ const Dashboard = () => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${accessToken}`,
           },
-          body: JSON.stringify({ days: formattedDays }),
+          body: JSON.stringify({ availability: availabilityUppercase }),
         }
       );
 
@@ -238,9 +240,7 @@ const Dashboard = () => {
           {['donor', 'availability', 'blood'].map((tab) => (
             <button
               key={tab}
-              className={`pb-2 text-sm font-medium ${
-                activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'
-              }`}
+              className={`pb-2 text-sm font-medium ${activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}
               onClick={() => setActiveTab(tab)}
             >
               {tab === 'donor' && 'Donor Status'}
@@ -275,14 +275,14 @@ const Dashboard = () => {
             <label className="block text-sm font-medium mb-2">Select Available Days</label>
             <div className="flex flex-wrap gap-2 mb-3">
               {days.map((day) => (
-                <label key={day} className="text-sm flex items-center gap-1">
+                <label key={day} className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={availability.includes(day)}
                     onChange={() => toggleDay(day)}
-                    className="form-checkbox text-blue-600"
+                    className="form-checkbox"
                   />
-                  {day}
+                  <span>{day}</span>
                 </label>
               ))}
             </div>
@@ -297,30 +297,33 @@ const Dashboard = () => {
 
         {activeTab === 'blood' && (
           <div>
-            <label className="block text-sm font-medium mb-2">Select Blood Type</label>
+            <label className="block text-sm font-medium mb-2">Select Blood Group</label>
             <select
               value={bloodType}
               onChange={(e) => setBloodType(e.target.value)}
-              className="border px-2 py-1 rounded text-sm mb-3"
+              className="border p-1 rounded text-sm"
             >
-              {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
             </select>
             <button
               onClick={handleSaveBloodType}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
             >
-              Save Blood Type
+              Save Blood Group
             </button>
           </div>
         )}
       </div>
 
       {saveMessage && (
-        <div className="text-center mt-4 text-sm text-green-600">{saveMessage}</div>
+        <p className="mt-4 text-sm text-center text-green-500">{saveMessage}</p>
       )}
     </div>
   );
