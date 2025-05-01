@@ -22,12 +22,15 @@ const ViewEvent = () => {
 
     try {
       const accessToken = localStorage.getItem("token");
-      const userInfo = JSON.parse(localStorage.getItem("user"));
-      const role = userInfo?.role?.toLowerCase();
+      const role= localStorage.getItem("role");
+      //const role = userInfo?.role?.toLowerCase();
 
       let apiUrl = "";
-
+      console.log(role);
+      
       if (role === "Admin") {
+        console.log("entering");
+        
         apiUrl = `http://localhost:8001/api/events/expiringEvents?city=${encodeURIComponent(
           changedCity
         )}&filter=${category.toLowerCase()}`;
