@@ -1,6 +1,7 @@
 import Event from "../models/eventModel.js";
 import AsyncHandler from "express-async-handler";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import moment from "moment-timezone";
 import ApiError from "../utils/ApiError.js";
 
 // Register a new event
@@ -19,11 +20,9 @@ export const registerEvents = AsyncHandler(async (req, res) => {
     date,
     location: {
       venue: venue,
-      city: city,
+      city: city.toLowerCase(),
     },
   };
-
-
 
   const newEvent = await Event.create(eventDetails);
   if (!newEvent) throw new ApiError(500, "Error saving event to the database");
@@ -37,21 +36,25 @@ export const registerEvents = AsyncHandler(async (req, res) => {
 
 export const getEvents = AsyncHandler(async (req, res) => {
   const { city, filter } = req.query;
-  const now = new Date();
   const isAdmin = req.user?.role === "admin";
 
   const query = { "location.city": city };
 
-  if (filter === "upcoming") {
-    const tomorrow = new Date();
-    tomorrow.setDate(now.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
+  const nowIST = moment.tz("Asia/Kolkata");
 
-    query.date = { $gte: tomorrow };
-  } else if (filter === "today") {
+  if (filter === "today") {
+    const istStart = nowIST.clone().startOf("day").toDate(); // Today 12:00 AM IST
+    const istEnd = nowIST.clone().endOf("day").toDate();     // Today 11:59:59 PM IST
+
     query.date = {
-      $gte: new Date("2025-04-17T00:00:00.000Z"),
-      $lt: new Date("2025-04-18T00:00:00.000Z"),
+      $gte: istStart,
+      $lt: istEnd,
+    };
+  } else if (filter === "upcoming") {
+    const tomorrowIST = nowIST.clone().add(1, "day").startOf("day").toDate(); // Tomorrow 12:00 AM IST
+
+    query.date = {
+      $gte: tomorrowIST,
     };
   } else if (filter === "expired") {
     if (!isAdmin) {
@@ -65,15 +68,21 @@ export const getEvents = AsyncHandler(async (req, res) => {
           )
         );
     }
-    const expiredEvents = new Date(now);
-    expiredEvents.setDate(now.getDate() - 1);
-    expiredEvents.setHours(0, 0, 0, 0);
-    query.date = { $lte: expiredEvents };
-  } else {
+
+    const endOfYesterdayIST = nowIST.clone().subtract(1, "day").endOf("day").toDate(); // Yesterday 11:59:59 PM IST
+
     query.date = {
-      $gte: new Date("2025-04-17T00:00:00.000Z"),
+      $lte: endOfYesterdayIST,
+    };
+  } else {
+    // Default: show events from current moment onward
+    const currentIST = nowIST.toDate();
+
+    query.date = {
+      $gte: currentIST,
     };
   }
+
   console.log("Query being used:", query);
 
   const [count, eventsList] = await Promise.all([
