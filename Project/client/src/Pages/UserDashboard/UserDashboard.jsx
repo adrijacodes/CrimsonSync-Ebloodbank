@@ -62,7 +62,7 @@ const Dashboard = () => {
   const handleSaveLocation = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8001/api/user/update-location', {
+      const res = await fetch('http://localhost:8001/api/auth/user/profile/update-location', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ const Dashboard = () => {
       // ✅ Normalize day format before sending
       const formattedDays = availability.map(day => day.toUpperCase());
       console.log('Sending availability:', formattedDays);
-      
+
       const availabilityRes = await fetch('http://localhost:8001/api/auth/user/profile/update-availability', {
         method: 'PATCH',
         headers: {
