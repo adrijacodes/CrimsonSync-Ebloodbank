@@ -139,34 +139,40 @@ export const viewUsers = AsyncHandler(async (req, res) => {
 
 export const searchUsers = AsyncHandler(async (req, res) => {
   const { searchTerm } = req.query;
- 
-  
+
   if (!searchTerm) {
     return res.status(400).json({ message: "Search term is required" });
   }
 
-const searchConditions = [
-  { name: { $regex: searchTerm, $options: "i" } },
-  { email: { $regex: searchTerm, $options: "i" } },
-  { username: { $regex: searchTerm, $options: "i" } },
-  { role: { $regex: searchTerm, $options: "i" } },
-];
+  let searchConditions = [];
 
-if (mongoose.Types.ObjectId.isValid(searchTerm)) {
-  searchConditions.push({ _id: searchTerm });
-}
+  // Special boolean checks
+  if (searchTerm.toLowerCase() === "donor") {
+    searchConditions.push({ isDonor: true });
+  } else if (searchTerm.toLowerCase() === "recipient") {
+    searchConditions.push({ isRecipient: true });
+  } else {
+    // Fuzzy search
+    searchConditions = [
+      { name: { $regex: searchTerm, $options: "i" } },
+      { email: { $regex: searchTerm, $options: "i" } },
+      { username: { $regex: searchTerm, $options: "i" } },
+    ];
 
+    // Also search by ObjectId if valid
+    if (mongoose.Types.ObjectId.isValid(searchTerm)) {
+      searchConditions.push({ _id: searchTerm });
+    }
+  }
 
-const users = await User.find({ $or: searchConditions }).select(
-  "-password -createdAt -updatedAt -__v"
-);
+  const users = await User.find({ $or: searchConditions }).select(
+    "-password -createdAt -updatedAt -__v"
+  );
 
   const Total_Users = users.length;
 
   if (Total_Users === 0) {
-    return res
-      .status(404)
-      .json(new ApiResponse({}, "No users found!!", true));
+    return res.status(404).json(new ApiResponse({}, "No users found!!", true));
   }
 
   return res.status(200).json(
@@ -197,7 +203,7 @@ export const getUserProfile = AsyncHandler(async (req, res) => {
       )
     );
 });
-
+ 
 /*--------------------------- user profile update ----------------------------*/
 // update user location
 
