@@ -60,7 +60,7 @@ const AdminDashboard = () => {
             toggle: showUserOptions,
             setToggle: setShowUserOptions,
             buttons: [
-              { text: '👥 View Users', route: '/View-user' },
+              { text: '👥 View Users', route: '/user-list' },
               { text: '🔍 Search User', route: '/Search-user' },
             ]
           },

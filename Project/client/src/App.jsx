@@ -11,12 +11,13 @@ import NewEvent from "./Pages/NewEvent";
 import EventDetails from "./Pages/EventDetails";
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
-
 import { ToastContainer } from "react-toastify";
 import ViewEvent from "./Pages/ViewEvent";
 import Faq from "./Pages/Faq";
 import HowItWorks from "./Pages/HowItWorks";
 import EventsCityYearChart from "./Pages/EventsByCityYear";
+import UserList from "./Pages/UserList";
+import UserSearch from "./Pages/UserSearch";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -47,6 +48,8 @@ const AppWrapper = () => {
           <Route path="/user-dashboard" element={<UserDashboard/>} />
           <Route path="/view-event" element={<ViewEvent/>} />
           <Route path="/event-by-city-year" element={<EventsCityYearChart/>} />
+          <Route path="/user-list" element={<UserList/>} />
+          <Route path="/search-user" element={<UserSearch/>} />
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
 
