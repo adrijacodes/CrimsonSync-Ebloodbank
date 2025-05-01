@@ -43,7 +43,7 @@ const NewEvent = () => {
       const result = await response.json();
       console.log('Event added:', result);
 
-      toast.success(' 🤗Event added successfully!');
+      toast.success('🤗Event added successfully!');
 
       setFormData({
         eventName: '',

@@ -10,6 +10,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const accessToken = JSON.parse(localStorage.getItem("token"));
+  const role = localStorage.getItem("role");
+
   useEffect(() => {
     const registered = localStorage.getItem("registered");
     const loggedIn = localStorage.getItem("loggedIn");
@@ -18,10 +21,7 @@ const Navbar = () => {
   }, [location]);
 
   const handleLogout = async () => {
-    const token = JSON.parse(localStorage.getItem("token"));
-    const role = localStorage.getItem("role");
-
-    if (!token || !role) {
+    if (!accessToken || !role) {
       localStorage.clear();
       toast.success("Logged out successfully!");
       navigate("/");
@@ -39,7 +39,7 @@ const Navbar = () => {
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -69,16 +69,19 @@ const Navbar = () => {
             <Link to="/faq"><li className="hover:underline">FAQ's</li></Link>
             <Link to="/how-it-works"><li className="hover:underline">How It Works</li></Link>
 
-            {!isRegistered && !isLoggedIn && (
-              <Link to="/register"><li className="hover:underline">Register</li></Link>
+            {!accessToken && (
+              <Link to="/register"><li className="hover:underline">Register/Login</li></Link>
             )}
-            {isRegistered && !isLoggedIn && (
-              <Link to="/login"><li className="hover:underline">Login</li></Link>
-            )}
-            {isLoggedIn && (
+
+            {accessToken && role === 'Admin' && (
               <>
                 <Link to="/admin-dashboard"><li className="hover:underline">Admin Dashboard</li></Link>
-                <Link to="/user-dashboard"><li className="hover:underline">User Dashboard</li></Link>
+                <Link to="/user-dashboard"><li className="hover:underline">Profile</li></Link>
+              </>
+            )}
+            {accessToken && role === 'User' && (
+              <>
+                <Link to="/user-dashboard"><li className="hover:underline">Profile</li></Link>
               </>
             )}
           </ul>
