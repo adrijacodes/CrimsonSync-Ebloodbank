@@ -134,7 +134,7 @@ export const searchAdmins = AsyncHandler(async (req, res) => {
 
   const admins = await Admin.find({
     $or: [
-      { adminName: { $regex: searchTerm, $options: "i" } }, // Search by name
+      { name: { $regex: searchTerm, $options: "i" } }, // Search by name
       { email: { $regex: searchTerm, $options: "i" } }, // Search by email
     ],
   }).select("-password -createdAt -updatedAt -__v ");
