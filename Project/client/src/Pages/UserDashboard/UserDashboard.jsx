@@ -4,15 +4,13 @@ import { RxAvatar } from "react-icons/rx";
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
-  const [isEditingContact, setIsEditingContact] = useState(false);
   const [donorEnabled, setDonorEnabled] = useState(false);
-  const [availability, setAvailability] = useState([]);
+  const [availability, setAvailability] = useState([]);  // This will store the selected availability days
   const [bloodType, setBloodType] = useState('O+');
   const [saveMessage, setSaveMessage] = useState('');
   const [updatedCity, setUpdatedCity] = useState('');
   const [updatedState, setUpdatedState] = useState('');
-  const [updatedContact, setUpdatedContact] = useState('');
-
+  const [activeTab, setActiveTab] = useState('donor');
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   useEffect(() => {
@@ -36,9 +34,8 @@ const Dashboard = () => {
         setBloodType(userData.bloodType || 'O+');
         setUpdatedCity(userData.location?.city || '');
         setUpdatedState(userData.location?.state || '');
-        setUpdatedContact(userData.contact || '');
         setDonorEnabled(userData.isDonor || false);
-        setAvailability(userData.availability || []);
+        setAvailability(userData.availability || []); // Set availability when user profile is fetched
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -90,92 +87,98 @@ const Dashboard = () => {
     setIsEditingLocation(false);
   };
 
-  const handleContactSave = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8001/api/user/update-contact', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ contact: updatedContact }),
-      });
-
-      if (!res.ok) throw new Error('Failed to update contact');
-
-      setUser({ ...user, contact: updatedContact });
-      setSaveMessage('Contact number updated successfully!');
-    } catch (err) {
-      setSaveMessage('Failed to update contact number.');
-      console.error('Contact update error:', err);
-    }
-
-    setTimeout(() => setSaveMessage(''), 3000);
-    setIsEditingContact(false);
-  };
-
-  const handleSaveDonorInfo = async () => {
+  const handleSaveDonorSettings = async () => {
     setSaveMessage('Saving...');
     const accessToken = localStorage.getItem('token');
-  
-    try {
-      // Update Blood Type
-      const bloodTypeRes = await fetch('http://localhost:8001/api/auth/user/profile/update-blood-type', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ bloodType }),
-      });
-  
-      if (!bloodTypeRes.ok) throw new Error('Failed to update blood type');
-  
-      // ✅ Normalize day format before sending
-      const formattedDays = availability.map(day => day.toUpperCase());
-      console.log('Sending availability:', formattedDays);
 
-      const availabilityRes = await fetch('http://localhost:8001/api/auth/user/profile/update-availability', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ days: formattedDays }),
-      });
-  
-      if (!availabilityRes.ok) throw new Error('Failed to update availability');
-  
-      const donorStatusRes = await fetch('http://localhost:8001/api/auth/user/profile/update-donor-status', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ isDonor: donorEnabled }),
-      });
-  
+    try {
+      const donorStatusRes = await fetch(
+        'http://localhost:8001/api/auth/user/profile/update-donor-status',
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ isDonor: donorEnabled }),
+        }
+      );
+
       if (!donorStatusRes.ok) throw new Error('Failed to update donor status');
-  
-      setSaveMessage('Your donor preferences have been saved successfully!');
+
+      setSaveMessage('Donor status saved successfully!');
     } catch (err) {
-      console.error('Error saving donor info:', err);
-      setSaveMessage('Failed to save one or more donor settings.');
+      console.error('Error saving donor status:', err);
+      setSaveMessage('Failed to save donor status.');
     }
-  
+
     setTimeout(() => setSaveMessage(''), 3000);
   };
-  
 
-  const handleDeleteAccount = () => {
-    alert('Your account has been deleted.');
+  const handleSaveAvailability = async () => {
+    setSaveMessage('Saving...');
+    const accessToken = localStorage.getItem('token');
+
+    try {
+      // Ensure availability days are in uppercase format
+      const availabilityUppercase = availability.map((day) => day.toUpperCase());
+
+      const res = await fetch(
+        'http://localhost:8001/api/auth/user/profile/update-availability',
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ availability: availabilityUppercase }),
+        }
+      );
+
+      if (!res.ok) throw new Error('Failed to update availability');
+
+      setSaveMessage('Availability saved successfully!');
+    } catch (err) {
+      console.error('Error saving availability:', err);
+      setSaveMessage('Failed to save availability.');
+    }
+
+    setTimeout(() => setSaveMessage(''), 3000);
+  };
+
+  const handleSaveBloodType = async () => {
+    setSaveMessage('Saving...');
+    const accessToken = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(
+        'http://localhost:8001/api/auth/user/profile/update-blood-type',
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ bloodType }),
+        }
+      );
+
+      if (!res.ok) throw new Error('Failed to update blood type');
+
+      setSaveMessage('Blood type saved successfully!');
+    } catch (err) {
+      console.error('Error saving blood type:', err);
+      setSaveMessage('Failed to save blood type.');
+    }
+
+    setTimeout(() => setSaveMessage(''), 3000);
   };
 
   if (!user) return <p className="p-6 text-center">Loading user profile...</p>;
 
   return (
     <div className="bg-gray-50 p-6 max-w-4xl mx-auto">
+      {/* Profile Section */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-center gap-6">
         <RxAvatar size={97} className="w-24 h-24 text-black" /> {/* Avatar Icon */}
         <div>
@@ -221,6 +224,7 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Donation History */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <h3 className="text-lg font-semibold mb-4">Donation History</h3>
         {user.lastDonationDate ? (
@@ -230,75 +234,97 @@ const Dashboard = () => {
         )}
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Be a Donor</h3>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              className="sr-only peer"
-              checked={donorEnabled}
-              onChange={(e) => setDonorEnabled(e.target.checked)}
-            />
-            <div className="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-600 transition-all"></div>
-            <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all peer-checked:translate-x-full"></div>
-          </label>
+      {/* Donor Info Tabs */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="flex gap-4 mb-4 border-b">
+          {['donor', 'availability', 'blood'].map((tab) => (
+            <button
+              key={tab}
+              className={`pb-2 text-sm font-medium ${activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === 'donor' && 'Donor Status'}
+              {tab === 'availability' && 'Availability'}
+              {tab === 'blood' && 'Blood Group'}
+            </button>
+          ))}
         </div>
 
-        {donorEnabled && (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Availability</label>
-              <div className="flex flex-wrap gap-2">
-                {days.map((day) => (
-                  <label key={day} className="text-sm flex items-center gap-1">
-                    <input
-                      type="checkbox"
-                      checked={availability.includes(day)}
-                      onChange={() => toggleDay(day)}
-                      className="form-checkbox text-blue-600"
-                    />
-                    {day}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Blood Type</label>
-              <select
-                value={bloodType}
-                onChange={(e) => setBloodType(e.target.value)}
-                className="w-full border p-2 rounded text-sm"
-              >
-                {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
-
+        {activeTab === 'donor' && (
+          <div>
+            <label className="flex items-center gap-2">
+              <span className="text-sm">Enable Donor Status</span>
+              <input
+                type="checkbox"
+                checked={donorEnabled}
+                onChange={(e) => setDonorEnabled(e.target.checked)}
+                className="form-checkbox"
+              />
+            </label>
             <button
-              onClick={handleSaveDonorInfo}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={handleSaveDonorSettings}
+              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
             >
-              Save Donor Settings
+              Save Donor Status
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'availability' && (
+          <div>
+            <label className="block text-sm font-medium mb-2">Select Available Days</label>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {days.map((day) => (
+                <label key={day} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={availability.includes(day)}
+                    onChange={() => toggleDay(day)}
+                    className="form-checkbox"
+                  />
+                  <span>{day}</span>
+                </label>
+              ))}
+            </div>
+            <button
+              onClick={handleSaveAvailability}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+            >
+              Save Availability
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'blood' && (
+          <div>
+            <label className="block text-sm font-medium mb-2">Select Blood Group</label>
+            <select
+              value={bloodType}
+              onChange={(e) => setBloodType(e.target.value)}
+              className="border p-1 rounded text-sm"
+            >
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+            <button
+              onClick={handleSaveBloodType}
+              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+            >
+              Save Blood Group
             </button>
           </div>
         )}
       </div>
 
-      {saveMessage && <p className="text-center text-green-600">{saveMessage}</p>}
-
-      <div className="text-center mt-8">
-        <button
-          onClick={handleDeleteAccount}
-          className="text-red-500 text-sm hover:underline"
-        >
-          Delete Account
-        </button>
-      </div>
+      {saveMessage && (
+        <p className="mt-4 text-sm text-center text-green-500">{saveMessage}</p>
+      )}
     </div>
   );
 };
