@@ -59,6 +59,7 @@ _Add screenshots or a deployment link / video demo here._
 
  🔐 Environment Variables
 ## 🗂 Folder Structure
+```bash
 e-blood-bank/
 │
 ├── client/            # React frontend
@@ -72,3 +73,4 @@ e-blood-bank/
 │
 ├── .env
 └── README.md
+ ```
