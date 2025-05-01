@@ -7,7 +7,7 @@ const ViewEvent = () => {
   const [searchedCity, setSearchedCity] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [category, setCategory] = useState("Fresh");
+  const [category, setCategory] = useState("All");
   const navigate = useNavigate();
 
   const capitalizeFirstLetter = (str) =>
@@ -17,20 +17,32 @@ const ViewEvent = () => {
     if (city.trim()) {
       const capitalizedCity = capitalizeFirstLetter(city.trim());
       setSearchedCity(capitalizedCity);
-
+      console.log(capitalizedCity);
       try {
         setLoading(true);
         setSearchResult(null);
+
+        const accessToken = localStorage.getItem("token");
+
         const res = await fetch(
           `http://localhost:8001/api/events/search?city=${encodeURIComponent(
             capitalizedCity
-          )}`
+          )}&filter=${category.toLowerCase()}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+            },
+          }
         );
+
         const data = await res.json();
-        if (data.success) {
+
+        if (res.ok && data.success) {
           setSearchResult(data.data.eventsList || []);
         } else {
-          console.error("Error:", data.message);
+          console.error("Server responded with an error:", data.message);
           setSearchResult([]);
         }
       } catch (error) {
@@ -40,7 +52,7 @@ const ViewEvent = () => {
         setLoading(false);
       }
 
-      setCity(""); // Clear input
+      setCity("");
     } else {
       setSearchResult(null);
       setSearchedCity("");
@@ -72,8 +84,10 @@ const ViewEvent = () => {
             onChange={(e) => setCategory(e.target.value)}
             className="p-3 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
-            <option value="Fresh">Fresh</option>
-            <option value="Expiry">Expiry</option>
+            <option value="All">All</option>
+            <option value="Today">Today</option>
+            <option value="Upcoming">Upcoming</option>
+            <option value="Expired">Expired</option>
           </select>
           <button
             onClick={handleSearch}

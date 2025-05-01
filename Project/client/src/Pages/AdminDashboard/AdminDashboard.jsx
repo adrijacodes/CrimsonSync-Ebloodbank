@@ -52,7 +52,7 @@ const AdminDashboard = () => {
             buttons: [
               { text: '➕ Add Event', route: '/NewEvent' },
               { text: '📄 View Events', route: '/view-event' },
-              { text: '🏙️ Events by City & Year', route: '/eventbycityyear' },
+              { text: '🏙️ Events by City & Year', route: '/event-by-city-year' },
             ]
           },
           {
