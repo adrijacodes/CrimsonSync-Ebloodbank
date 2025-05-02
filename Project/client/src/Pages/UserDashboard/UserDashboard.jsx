@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { RxAvatar } from "react-icons/rx";
-import { motion } from "framer-motion"; // Import Framer Motion
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [donorEnabled, setDonorEnabled] = useState(false);
   const [availability, setAvailability] = useState([]);
-  const [bloodType, setBloodType] = useState("O+");
-  const [saveMessage, setSaveMessage] = useState("");
-  const [updatedCity, setUpdatedCity] = useState("");
-  const [updatedState, setUpdatedState] = useState("");
-  const [activeTab, setActiveTab] = useState("donor");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const [bloodType, setBloodType] = useState('O+');
+  const [saveMessage, setSaveMessage] = useState('');
+  const [updatedCity, setUpdatedCity] = useState('');
+  const [updatedState, setUpdatedState] = useState('');
+  const [activeTab, setActiveTab] = useState('donor');
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -51,9 +48,11 @@ const Dashboard = () => {
   }, []);
 
   const toggleDay = (day) => {
-    setAvailability((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    );
+    setAvailability((prev) => {
+      const updatedAvailability = new Set(prev);
+      updatedAvailability.has(day) ? updatedAvailability.delete(day) : updatedAvailability.add(day);
+      return Array.from(updatedAvailability);
+    });
   };
 
   const handleLocationChange = (e) => {
@@ -64,35 +63,25 @@ const Dashboard = () => {
 
   const handleSaveLocation = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-location",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            city: updatedCity,
-            state: updatedState,
-          }),
-        }
-      );
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:8001/api/auth/user/profile/update-location', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ city: updatedCity, state: updatedState }),
+      });
 
       if (!res.ok) throw new Error("Failed to update location");
 
-      setUser({
-        ...user,
-        location: { city: updatedCity, state: updatedState },
-      });
-      setSaveMessage("Location updated successfully!");
+      setUser({ ...user, location: { city: updatedCity, state: updatedState } });
+      setSaveMessage('Location updated successfully!');
     } catch (error) {
       setSaveMessage("Failed to update location.");
       console.error("Location update error:", error);
     }
-
-    setTimeout(() => setSaveMessage(""), 3000);
+    setTimeout(() => setSaveMessage(''), 3000);
     setIsEditingLocation(false);
   };
 
@@ -101,17 +90,14 @@ const Dashboard = () => {
     const accessToken = localStorage.getItem("token");
 
     try {
-      const donorStatusRes = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-donor-status",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ isDonor: donorEnabled }),
-        }
-      );
+      const donorStatusRes = await fetch('http://localhost:8001/api/auth/user/profile/update-donor-status', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ isDonor: donorEnabled }),
+      });
 
       if (!donorStatusRes.ok) throw new Error("Failed to update donor status");
 
@@ -129,21 +115,15 @@ const Dashboard = () => {
     const accessToken = localStorage.getItem("token");
 
     try {
-      const availabilityUppercase = availability.map((day) =>
-        day.toUpperCase()
-      );
-
-      const res = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-availability",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ availability: availabilityUppercase }),
-        }
-      );
+      const availabilityUppercase = availability.map((day) => day.toUpperCase());
+      const res = await fetch('http://localhost:8001/api/auth/user/profile/update-availability', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ availability: availabilityUppercase }),
+      });
 
       if (!res.ok) throw new Error("Failed to update availability");
 
@@ -161,17 +141,14 @@ const Dashboard = () => {
     const accessToken = localStorage.getItem("token");
 
     try {
-      const res = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-blood-type",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ bloodType }),
-        }
-      );
+      const res = await fetch('http://localhost:8001/api/auth/user/profile/update-blood-type', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ bloodType }),
+      });
 
       if (!res.ok) throw new Error("Failed to update blood type");
 
@@ -184,291 +161,154 @@ const Dashboard = () => {
     setTimeout(() => setSaveMessage(""), 3000);
   };
 
-  const handlePasswordChange = async () => {
-    if (!currentPassword || !newPassword) {
-      setSaveMessage("Please fill in both fields.");
-      setTimeout(() => setSaveMessage(""), 3000);
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-password",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            currentPassword,
-            newPassword,
-          }),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to update password");
-
-      setSaveMessage("Password updated successfully!");
-      setCurrentPassword(""); // Reset current password field
-      setNewPassword(""); // Reset new password field
-    } catch (err) {
-      console.error("Error updating password:", err);
-      setSaveMessage("Failed to update password.");
-    }
-
-    setTimeout(() => setSaveMessage(""), 3000);
-  };
-  const handleDeleteAccount = async () => {
-    const confirmation = window.confirm(
-      "Are you sure you want to delete your account? This action is irreversible."
-    );
-
-    if (confirmation) {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(
-          "http://localhost:8001/api/auth/user/delete-account",
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) throw new Error("Failed to delete account");
-
-        localStorage.removeItem("token"); // Remove token from local storage
-        setUser(null); // Reset user data
-        alert("Your account has been deleted.");
-      } catch (err) {
-        console.error("Error deleting account:", err);
-        alert("Failed to delete account.");
-      }
-    }
-  };
-  if (!user) return <p className="p-6 text-center">Loading user profile...</p>;
+  if (!user) return <p className="p-6 text-center text-lg text-gray-600">Loading user profile...</p>;
 
   return (
-    <div className="bg-gray-50 p-6 max-w-4xl mx-auto">
-      {/* Profile Section */}
-      <motion.div
-        className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-center gap-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <RxAvatar size={97} className="w-24 h-24 text-black" />
-        <div>
-          <h2 className="text-2xl font-semibold font-serif text-red-600">
-            {user.name}
-          </h2>
-          <p className="text-sm text-gray-600 font-serif">{user.email}</p>
-          <p className="text-sm text-gray-600 font-serif">
-            Username: {user.username}
+    <div className="bg-gray-100 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Profile Card */}
+        <div className="bg-white p-6 rounded-2xl shadow-md flex items-center gap-6">
+          <RxAvatar size={97} className="text-gray-800" />
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold font-serif text-gray-800">{user.name}</h2>
+            <p className="text-gray-600 text-sm font-serif">📧 {user.email}</p>
+            <p className="text-gray-600 text-sm font-serif">Username: {user.username}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-gray-600 text-sm font-serif">
+              📍 Location:{' '}
+                {isEditingLocation ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      name="city"
+                      value={updatedCity}
+                      onChange={handleLocationChange}
+                      placeholder="City"
+                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring focus:border-blue-400"
+                    />
+                    <input
+                      type="text"
+                      name="state"
+                      value={updatedState}
+                      onChange={handleLocationChange}
+                      placeholder="State"
+                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring focus:border-blue-400"
+                    />
+                  </div>
+                ) : (
+                  `${updatedCity.toUpperCase()}, ${updatedState.toUpperCase()}`
+                )}
+              </p>
+              <button
+                onClick={() => (isEditingLocation ? handleSaveLocation() : setIsEditingLocation(true))}
+                className="text-blue-600 text-sm underline hover:text-blue-800"
+              >
+                {isEditingLocation ? 'Save' : 'Edit'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Donation History */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+          <h3 className="text-lg font-semibold mb-2 font-serif text-gray-700">Donation History</h3>
+          <p className="text-sm text-gray-600">
+            {user.lastDonationDate
+              ? `Last donated on: ${new Date(user.lastDonationDate).toDateString()}`
+              : 'No donations yet. Start donating today!'}
           </p>
-
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-600 font-serif">
-              Location:{" "}
-              {isEditingLocation ? (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    name="city"
-                    value={updatedCity}
-                    onChange={handleLocationChange}
-                    placeholder="City"
-                    className="border p-1 rounded text-sm"
-                  />
-                  <input
-                    type="text"
-                    name="state"
-                    value={updatedState}
-                    onChange={handleLocationChange}
-                    placeholder="State"
-                    className="border p-1 rounded text-sm"
-                  />
-                </div>
-              ) : (
-                `${updatedCity.toUpperCase()}, ${updatedState.toUpperCase()}`
-              )}
-            </p>
-            <button
-              onClick={() =>
-                isEditingLocation
-                  ? handleSaveLocation()
-                  : setIsEditingLocation(true)
-              }
-              className="text-red-900 text-sm"
-            >
-              {isEditingLocation ? "Save" : "Edit"}
-            </button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Settings Tabs */}
-      <motion.div
-        className="bg-white p-6 rounded-lg shadow-md"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="tabs mb-4 flex gap-2">
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "donor" ? "bg-red-500 text-white" : "bg-gray-200"
-            }`}
-            onClick={() => setActiveTab("donor")}
-          >
-            Donor Settings
-          </button>
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "availability"
-                ? "bg-red-500 text-white"
-                : "bg-gray-200"
-            }`}
-            onClick={() => setActiveTab("availability")}
-          >
-            Availability
-          </button>
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "bloodType"
-                ? "bg-red-500 text-white"
-                : "bg-gray-200"
-            }`}
-            onClick={() => setActiveTab("bloodType")}
-          >
-            Blood Type
-          </button>
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "password" ? "bg-red-500 text-white" : "bg-gray-200"
-            }`}
-            onClick={() => setActiveTab("password")}
-          >
-            Change Password
-          </button>
         </div>
 
-        {activeTab === "donor" && (
-          <div>
-            <p className="mb-2">Are you a blood donor?</p>
-            <button
-              onClick={() => setDonorEnabled(!donorEnabled)}
-              className={`py-2 px-4 rounded ${
-                donorEnabled ? "bg-red-600" : "bg-gray-300"
-              }`}
-            >
-              {donorEnabled ? "Enabled" : "Disabled"}
-            </button>
-            <button
-              onClick={handleSaveDonorSettings}
-              className="bg-red-500 py-2 px-4 rounded text-white mt-4 ml-3"
-            >
-              Save Donor Status
-            </button>
+        {/* Tabs */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+          <div className="flex gap-4 border-b mb-4">
+            {['donor', 'availability', 'blood'].map((tab) => (
+              <button
+                key={tab}
+                className={`pb-2 text-sm font-medium capitalize ${
+                  activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                }`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab === 'donor' && 'Donor Status'}
+                {tab === 'availability' && 'Availability'}
+                {tab === 'blood' && 'Blood Group'}
+              </button>
+            ))}
           </div>
-        )}
 
-        {activeTab === "availability" && (
-          <div>
-            <p className="mb-2">Set your availability:</p>
-            <div className="flex gap-2 mb-4">
-              {days.map((day) => (
-                <button
-                  key={day}
-                  onClick={() => toggleDay(day)}
-                  className={`py-2 px-4 rounded ${
-                    availability.includes(day) ? "bg-red-600" : "bg-gray-300"
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
+          {activeTab === 'donor' && (
+            <div className="space-y-4">
+              <label className="flex items-center gap-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={donorEnabled}
+                  onChange={(e) => setDonorEnabled(e.target.checked)}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                Enable Donor Status
+              </label>
+              <button
+                onClick={handleSaveDonorSettings}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+              >
+                Save Donor Status
+              </button>
             </div>
-            <button
-              onClick={handleSaveAvailability}
-              className="bg-red-500 py-2 px-4 rounded text-white"
-            >
-              Save Availability
-            </button>
-          </div>
-        )}
+          )}
 
-        {activeTab === "bloodType" && (
-          <div>
-            <p className="mb-2">Select your blood type:</p>
-            <select
-              value={bloodType}
-              onChange={(e) => setBloodType(e.target.value)}
-              className="border p-2 rounded mb-4"
-            >
-              <option value="O+">O+</option>
-              <option value="A+">A+</option>
-              <option value="B+">B+</option>
-              <option value="AB+">AB+</option>
-              <option value="O-">O-</option>
-              <option value="A-">A-</option>
-              <option value="B-">B-</option>
-              <option value="AB-">AB-</option>
-            </select>
-            <button
-              onClick={handleSaveBloodType}
-              className="bg-red-500 py-2 px-4 rounded text-white ml-3"
-            >
-              Save Blood Type
-            </button>
-          </div>
-        )}
+          {activeTab === 'availability' && (
+            <div className="space-y-4">
+              <p className="text-sm font-medium text-gray-700">Select Available Days</p>
+              <div className="flex flex-wrap gap-4">
+                {days.map((day) => (
+                  <label key={day} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={availability.includes(day)}
+                      onChange={() => toggleDay(day)}
+                      className="form-checkbox h-4 w-4 text-blue-600"
+                    />
+                    {day}
+                  </label>
+                ))}
+              </div>
+              <button
+                onClick={handleSaveAvailability}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+              >
+                Save Availability
+              </button>
+            </div>
+          )}
 
-        {activeTab === "password" && (
-          <div>
-            <div className="mb-2">
-              <input
-                type="password"
-                placeholder="Current Password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="border p-2 rounded mb-4 w-full"
-              />
+          {activeTab === 'blood' && (
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">Select Blood Group</label>
+              <select
+                value={bloodType}
+                onChange={(e) => setBloodType(e.target.value)}
+                className="border rounded px-3 py-1 text-sm focus:outline-none focus:ring focus:border-blue-400"
+              >
+                {['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'].map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleSaveBloodType}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+              >
+                Save Blood Group
+              </button>
             </div>
-            <div className="mb-4">
-              <input
-                type="password"
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="border p-2 rounded mb-4 w-full"
-              />
-            </div>
-            <button
-              onClick={handlePasswordChange}
-              className="bg-red-500 py-2 px-4 rounded text-white"
-            >
-              Save Password
-            </button>
-          </div>
-        )}
-      </motion.div>
-      {/* Delete Account Button */}
-      <button
-        onClick={handleDeleteAccount}
-        className="bg-red-500 text-white py-2 px-4 rounded mt-6"
-      >
-        Delete Account
-      </button>
-      {saveMessage && (
-        <div className="text-center text-sm text-green-600 mt-4">
-          {saveMessage}
+          )}
         </div>
-      )}
+
+        {/* Save Message */}
+        {saveMessage && <p className="text-center text-green-600 text-sm">{saveMessage}</p>}
+      </div>
     </div>
   );
 };

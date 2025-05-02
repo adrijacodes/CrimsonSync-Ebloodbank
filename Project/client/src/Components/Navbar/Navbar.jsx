@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FiLogOut } from "react-icons/fi";
+import { BiSolidUserCircle } from "react-icons/bi";
 
 const Navbar = () => {
   const [isRegistered, setIsRegistered] = useState(false);
@@ -24,7 +25,7 @@ const Navbar = () => {
     if (!accessToken || !role) {
       localStorage.clear();
       toast.success("Logged out successfully!");
-      navigate("/");
+      navigate("/login");
       return;
     }
 
@@ -44,12 +45,22 @@ const Navbar = () => {
         }
       );
 
-      localStorage.clear();
       toast.success("Logged out successfully!");
-      navigate("/");
     } catch (error) {
-      console.error("Logout failed:", error);
-      toast.error("Logout failed.");
+      const errorMsg = error.response?.data?.message || "Logout failed.";
+    
+    // Handle expired JWT and navigate to login
+      if (errorMsg.toLowerCase().includes("jwt expired")) {
+        toast.info("Session expired. Please login again.");
+        navigate("/login");
+      } else {
+        toast.error(errorMsg);
+        console.error("Logout error:", error);
+        return;
+      }
+    } finally {
+      localStorage.clear();
+      navigate("/login");
     }
   };
 
@@ -76,18 +87,21 @@ const Navbar = () => {
             {accessToken && role === 'Admin' && (
               <>
                 <Link to="/admin-dashboard"><li className="hover:underline">Admin Dashboard</li></Link>
-                <Link to="/user-dashboard"><li className="hover:underline">Profile</li></Link>
+                <Link to="/user-dashboard"><li className="hover:underline"><BiSolidUserCircle /></li></Link>
               </>
             )}
             {accessToken && role === 'User' && (
-              <>
-                <Link to="/user-dashboard"><li className="hover:underline">Profile</li></Link>
-              </>
+              <Link to="/user-dashboard">
+              <li>
+              <BiSolidUserCircle className="text-3xl"/>
+              </li>
+            </Link>
+            
             )}
           </ul>
         </nav>
 
-        {/* Right-aligned Logout Button */}
+        {/* Logout Button */}
         {(isLoggedIn || isRegistered) && (
           <button
             onClick={handleLogout}
