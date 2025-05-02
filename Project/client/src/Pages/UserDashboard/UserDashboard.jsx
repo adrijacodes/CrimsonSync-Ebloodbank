@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { RxAvatar } from "react-icons/rx";
-import { motion } from "framer-motion"; // Import Framer Motion
+import { motion } from "framer-motion";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -14,298 +14,198 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("donor");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const accessToken = localStorage.getItem("token");
-        const response = await fetch(
-          "http://localhost:8001/api/auth/user/profile",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
+        const res = await fetch("http://localhost:8001/api/auth/user/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        if (!response.ok) throw new Error("Failed to fetch profile");
+        if (!res.ok) throw new Error("Failed to fetch profile");
 
-        const data = await response.json();
-        const userData = data.data.UserInfo[0];
-
+        const { data } = await res.json();
+        const userData = data.UserInfo[0];
         setUser(userData);
         setBloodType(userData.bloodType || "O+");
         setUpdatedCity(userData.location?.city || "");
         setUpdatedState(userData.location?.state || "");
         setDonorEnabled(userData.isDonor || false);
         setAvailability(userData.availability || []);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
+      } catch (err) {
+        console.error(err);
       }
     };
 
     fetchUserProfile();
-  }, []);
+  }, [token]);
 
-  const toggleDay = (day) => {
-    setAvailability((prev) => {
-      const updatedAvailability = new Set(prev);
-      updatedAvailability.has(day) ? updatedAvailability.delete(day) : updatedAvailability.add(day);
-      return Array.from(updatedAvailability);
-    });
+  const showMessage = (msg, duration = 3000) => {
+    setSaveMessage(msg);
+    setTimeout(() => setSaveMessage(""), duration);
   };
 
-  const handleLocationChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "city") setUpdatedCity(value);
-    else if (name === "state") setUpdatedState(value);
+  const updateProfile = async (url, method, body) => {
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) throw new Error();
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const handleSaveLocation = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-location",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            city: updatedCity,
-            state: updatedState,
-          }),
-        }
-      );
+    const success = await updateProfile(
+      "http://localhost:8001/api/auth/user/profile/update-location",
+      "PUT",
+      { city: updatedCity, state: updatedState }
+    );
 
-      if (!res.ok) throw new Error("Failed to update location");
-
-      setUser({
-        ...user,
-        location: { city: updatedCity, state: updatedState },
-      });
-      setSaveMessage("Location updated successfully!");
-    } catch (error) {
-      setSaveMessage("Failed to update location.");
-      console.error("Location update error:", error);
+    if (success) {
+      setUser({ ...user, location: { city: updatedCity, state: updatedState } });
+      showMessage("Location updated successfully!");
+    } else {
+      showMessage("Failed to update location.");
     }
 
-    setTimeout(() => setSaveMessage(""), 3000);
     setIsEditingLocation(false);
   };
 
   const handleSaveDonorSettings = async () => {
-    setSaveMessage("Saving...");
-    const accessToken = localStorage.getItem("token");
+    const success = await updateProfile(
+      "http://localhost:8001/api/auth/user/profile/update-donor-status",
+      "PATCH",
+      { isDonor: donorEnabled }
+    );
 
-    try {
-      const donorStatusRes = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-donor-status",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ isDonor: donorEnabled }),
-        }
-      );
-
-      if (!donorStatusRes.ok) throw new Error("Failed to update donor status");
-
-      setSaveMessage("Donor status saved successfully!");
-    } catch (err) {
-      console.error("Error saving donor status:", err);
-      setSaveMessage("Failed to save donor status.");
-    }
-
-    setTimeout(() => setSaveMessage(""), 3000);
+    showMessage(success ? "Donor status updated!" : "Failed to update donor status");
   };
 
   const handleSaveAvailability = async () => {
-    setSaveMessage("Saving...");
-    const accessToken = localStorage.getItem("token");
+    const success = await updateProfile(
+      "http://localhost:8001/api/auth/user/profile/update-availability",
+      "PATCH",
+      { availability: availability.map((d) => d.toUpperCase()) }
+    );
 
-    try {
-      const availabilityUppercase = availability.map((day) =>
-        day.toUpperCase()
-      );
-
-      const res = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-availability",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ availability: availabilityUppercase }),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to update availability");
-
-      setSaveMessage("Availability saved successfully!");
-    } catch (err) {
-      console.error("Error saving availability:", err);
-      setSaveMessage("Failed to save availability.");
-    }
-
-    setTimeout(() => setSaveMessage(""), 3000);
+    showMessage(success ? "Availability updated!" : "Failed to update availability");
   };
 
   const handleSaveBloodType = async () => {
-    setSaveMessage("Saving...");
-    const accessToken = localStorage.getItem("token");
+    const success = await updateProfile(
+      "http://localhost:8001/api/auth/user/profile/update-blood-type",
+      "PUT",
+      { bloodType }
+    );
 
-    try {
-      const res = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-blood-type",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ bloodType }),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to update blood type");
-
-      setSaveMessage("Blood type saved successfully!");
-    } catch (err) {
-      console.error("Error saving blood type:", err);
-      setSaveMessage("Failed to save blood type.");
-    }
-
-    setTimeout(() => setSaveMessage(""), 3000);
+    showMessage(success ? "Blood type updated!" : "Failed to update blood type");
   };
 
   const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword) {
-      setSaveMessage("Please fill in both fields.");
-      setTimeout(() => setSaveMessage(""), 3000);
-      return;
+      return showMessage("Fill in both fields.");
     }
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-password",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            currentPassword,
-            newPassword,
-          }),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to update password");
-
-      setSaveMessage("Password updated successfully!");
-      setCurrentPassword(""); // Reset current password field
-      setNewPassword(""); // Reset new password field
-    } catch (err) {
-      console.error("Error updating password:", err);
-      setSaveMessage("Failed to update password.");
-    }
-
-    setTimeout(() => setSaveMessage(""), 3000);
-  };
-  const handleDeleteAccount = async () => {
-    const confirmation = window.confirm(
-      "Are you sure you want to delete your account? This action is irreversible."
+    const success = await updateProfile(
+      "http://localhost:8001/api/auth/user/profile/update-password",
+      "PATCH",
+      { currentPassword, newPassword }
     );
 
-    if (confirmation) {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(
-          "http://localhost:8001/api/auth/user/delete-account",
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) throw new Error("Failed to delete account");
-
-        localStorage.removeItem("token"); // Remove token from local storage
-        setUser(null); // Reset user data
-        alert("Your account has been deleted.");
-      } catch (err) {
-        console.error("Error deleting account:", err);
-        alert("Failed to delete account.");
-      }
+    if (success) {
+      showMessage("Password updated!");
+      setCurrentPassword("");
+      setNewPassword("");
+    } else {
+      showMessage("Failed to update password.");
     }
   };
-  if (!user) return <p className="p-6 text-center">Loading user profile...</p>;
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("Are you sure you want to delete your account?")) return;
+
+    try {
+      const res = await fetch("http://localhost:8001/api/auth/user/delete-account", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error();
+
+      localStorage.removeItem("token");
+      setUser(null);
+      alert("Account deleted.");
+    } catch {
+      alert("Failed to delete account.");
+    }
+  };
+
+  const toggleDay = (day) => {
+    setAvailability((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
+
+  if (!user) return <p className="text-center p-6">Loading user profile...</p>;
 
   return (
     <div className="bg-gray-50 p-6 max-w-4xl mx-auto">
-      {/* Profile Section */}
+      {/* Profile */}
       <motion.div
         className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-center gap-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
       >
-        <RxAvatar size={97} className="w-24 h-24 text-black" />
+        <RxAvatar size={97} className="text-black" />
         <div>
-          <h2 className="text-2xl font-semibold font-serif text-red-600">
-            {user.name}
-          </h2>
-          <p className="text-sm text-gray-600 font-serif">{user.email}</p>
-          <p className="text-sm text-gray-600 font-serif">
-            Username: {user.username}
-          </p>
-
+          <h2 className="text-2xl font-semibold text-red-600">{user.name}</h2>
+          <p className="text-sm text-gray-600">{user.email}</p>
+          <p className="text-sm text-gray-600">Username: {user.username}</p>
           <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-600 font-serif">
+            <p className="text-sm text-gray-600">
               Location:{" "}
               {isEditingLocation ? (
-                <div className="flex gap-2">
+                <>
                   <input
-                    type="text"
                     name="city"
                     value={updatedCity}
-                    onChange={handleLocationChange}
-                    placeholder="City"
+                    onChange={(e) => setUpdatedCity(e.target.value)}
                     className="border p-1 rounded text-sm"
+                    placeholder="City"
                   />
                   <input
-                    type="text"
                     name="state"
                     value={updatedState}
-                    onChange={handleLocationChange}
-                    placeholder="State"
+                    onChange={(e) => setUpdatedState(e.target.value)}
                     className="border p-1 rounded text-sm"
+                    placeholder="State"
                   />
-                </div>
+                </>
               ) : (
                 `${updatedCity.toUpperCase()}, ${updatedState.toUpperCase()}`
               )}
             </p>
             <button
               onClick={() =>
-                isEditingLocation
-                  ? handleSaveLocation()
-                  : setIsEditingLocation(true)
+                isEditingLocation ? handleSaveLocation() : setIsEditingLocation(true)
               }
-              className="text-red-900 text-sm"
+              className="text-sm text-red-900"
             >
               {isEditingLocation ? "Save" : "Edit"}
             </button>
@@ -318,77 +218,58 @@ const Dashboard = () => {
         className="bg-white p-6 rounded-lg shadow-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
       >
-        <div className="tabs mb-4 flex gap-2">
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "donor" ? "bg-red-500 text-white" : "bg-gray-200"
-            }`}
-            onClick={() => setActiveTab("donor")}
-          >
-            Donor Settings
-          </button>
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "availability"
-                ? "bg-red-500 text-white"
-                : "bg-gray-200"
-            }`}
-            onClick={() => setActiveTab("availability")}
-          >
-            Availability
-          </button>
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "bloodType"
-                ? "bg-red-500 text-white"
-                : "bg-gray-200"
-            }`}
-            onClick={() => setActiveTab("bloodType")}
-          >
-            Blood Type
-          </button>
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "password" ? "bg-red-500 text-white" : "bg-gray-200"
-            }`}
-            onClick={() => setActiveTab("password")}
-          >
-            Change Password
-          </button>
+        <div className="mb-4 flex gap-2">
+          {["donor", "availability", "bloodType", "password"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-2 px-4 rounded ${
+                activeTab === tab ? "bg-red-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {tab === "donor"
+                ? "Donor Settings"
+                : tab === "availability"
+                ? "Availability"
+                : tab === "bloodType"
+                ? "Blood Type"
+                : "Change Password"}
+            </button>
+          ))}
         </div>
 
+        {/* Tab Content */}
         {activeTab === "donor" && (
           <div>
-            <p className="mb-2">Are you a blood donor?</p>
+            <p>Are you a blood donor?</p>
             <button
               onClick={() => setDonorEnabled(!donorEnabled)}
               className={`py-2 px-4 rounded ${
-                donorEnabled ? "bg-red-600" : "bg-gray-300"
+                donorEnabled ? "bg-red-600 text-white" : "bg-gray-300"
               }`}
             >
               {donorEnabled ? "Enabled" : "Disabled"}
             </button>
             <button
               onClick={handleSaveDonorSettings}
-              className="bg-red-500 py-2 px-4 rounded text-white mt-4 ml-3"
+              className="ml-3 bg-red-500 py-2 px-4 rounded text-white"
             >
-              Save Donor Status
+              Save
             </button>
           </div>
         )}
 
         {activeTab === "availability" && (
           <div>
-            <p className="mb-2">Set your availability:</p>
+            <p className="mb-2">Select your availability:</p>
             <div className="flex gap-2 mb-4">
               {days.map((day) => (
                 <button
                   key={day}
                   onClick={() => toggleDay(day)}
                   className={`py-2 px-4 rounded ${
-                    availability.includes(day) ? "bg-red-600" : "bg-gray-300"
+                    availability.includes(day) ? "bg-red-600 text-white" : "bg-gray-300"
                   }`}
                 >
                   {day}
@@ -399,10 +280,10 @@ const Dashboard = () => {
               onClick={handleSaveAvailability}
               className="bg-red-500 py-2 px-4 rounded text-white"
             >
-              Save Availability
+              Save
             </button>
           </div>
-        </div>
+        )}
 
         {activeTab === "bloodType" && (
           <div>
@@ -410,46 +291,39 @@ const Dashboard = () => {
             <select
               value={bloodType}
               onChange={(e) => setBloodType(e.target.value)}
-              className="border p-2 rounded mb-4"
+              className="border p-2 rounded"
             >
-              <option value="O+">O+</option>
-              <option value="A+">A+</option>
-              <option value="B+">B+</option>
-              <option value="AB+">AB+</option>
-              <option value="O-">O-</option>
-              <option value="A-">A-</option>
-              <option value="B-">B-</option>
-              <option value="AB-">AB-</option>
+              {["O+", "A+", "B+", "AB+", "O-", "A-", "B-", "AB-"].map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
             </select>
             <button
               onClick={handleSaveBloodType}
-              className="bg-red-500 py-2 px-4 rounded text-white ml-3"
+              className="ml-3 bg-red-500 py-2 px-4 rounded text-white"
             >
-              Save Blood Type
+              Save
             </button>
           </div>
         )}
 
         {activeTab === "password" && (
           <div>
-            <div className="mb-2">
-              <input
-                type="password"
-                placeholder="Current Password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="border p-2 rounded mb-4 w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <input
-                type="password"
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="border p-2 rounded mb-4 w-full"
-              />
-            </div>
+            <input
+              type="password"
+              placeholder="Current Password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="border p-2 rounded mb-4 w-full"
+            />
+            <input
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="border p-2 rounded mb-4 w-full"
+            />
             <button
               onClick={handlePasswordChange}
               className="bg-red-500 py-2 px-4 rounded text-white"
@@ -459,17 +333,18 @@ const Dashboard = () => {
           </div>
         )}
       </motion.div>
-      {/* Delete Account Button */}
+
+      {/* Delete Account */}
       <button
         onClick={handleDeleteAccount}
-        className="bg-red-500 text-white py-2 px-4 rounded mt-6"
+        className="mt-6 bg-red-500 text-white py-2 px-4 rounded"
       >
         Delete Account
       </button>
+
+      {/* Save Message */}
       {saveMessage && (
-        <div className="text-center text-sm text-green-600 mt-4">
-          {saveMessage}
-        </div>
+        <div className="mt-4 text-sm text-center text-green-600">{saveMessage}</div>
       )}
     </div>
   );
