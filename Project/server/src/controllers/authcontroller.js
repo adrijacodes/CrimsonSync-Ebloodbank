@@ -1,5 +1,5 @@
 // @ts-nocheck
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 import { generateUsername } from "../utils/usernamegenerate.js";
 import bcrypt from "bcryptjs";
 import ApiError from "../utils/ApiError.js";
@@ -146,7 +146,6 @@ export const searchUsers = AsyncHandler(async (req, res) => {
 
   let searchConditions = [];
 
-
   if (searchTerm.toLowerCase() === "donor") {
     searchConditions.push({ isDonor: true });
   } else if (searchTerm.toLowerCase() === "recipient") {
@@ -175,13 +174,15 @@ export const searchUsers = AsyncHandler(async (req, res) => {
     return res.status(404).json(new ApiResponse({}, "No users found!!", true));
   }
 
-  return res.status(200).json(
-    new ApiResponse(
-      { UserList: users, "Total Users": Total_Users },
-      "Showing Search results.......",
-      true
-    )
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        { UserList: users, "Total Users": Total_Users },
+        "Showing Search results.......",
+        true
+      )
+    );
 });
 
 // get user Profile
@@ -203,7 +204,7 @@ export const getUserProfile = AsyncHandler(async (req, res) => {
       )
     );
 });
- 
+
 /*--------------------------- user profile update ----------------------------*/
 // update user location
 
@@ -344,9 +345,7 @@ console.log( availability);
 export const updateBloodType = AsyncHandler(async (req, res) => {
   const { bloodType } = req.body;
 
-  const validBloodTypes = [
-    "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
-  ];
+  const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   if (!validBloodTypes.includes(bloodType)) {
     throw new ApiError(400, "Invalid blood type provided.");
@@ -381,13 +380,10 @@ export const updateBloodType = AsyncHandler(async (req, res) => {
     );
 });
 
-
-
 // Delete User
 export const deleteUser = AsyncHandler(async (req, res, next) => {
   const userEmail = req.user.email;
 
-  
   const user = await User.findOneAndDelete({ email: userEmail });
 
   if (!user) {
@@ -397,9 +393,5 @@ export const deleteUser = AsyncHandler(async (req, res, next) => {
   // Return a success response
   return res
     .status(200)
-    .json(
-      new ApiResponse({}, "User deleted successfully.", true)
-    );
+    .json(new ApiResponse({}, "User deleted successfully.", true));
 });
-
-
