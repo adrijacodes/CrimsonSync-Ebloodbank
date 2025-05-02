@@ -316,7 +316,7 @@ export const updatePassword = AsyncHandler(async (req, res) => {
 
 export const updateAvailability = AsyncHandler(async (req, res) => {
   const { availability } = req.body;
-
+console.log( availability);
   const validDays = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
 
   if (

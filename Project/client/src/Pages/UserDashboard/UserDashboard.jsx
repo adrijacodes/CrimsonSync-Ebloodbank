@@ -5,7 +5,7 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [donorEnabled, setDonorEnabled] = useState(false);
-  const [availability, setAvailability] = useState([]);  // This will store the selected availability days
+  const [availability, setAvailability] = useState([]);  
   const [bloodType, setBloodType] = useState('O+');
   const [saveMessage, setSaveMessage] = useState('');
   const [updatedCity, setUpdatedCity] = useState('');
@@ -13,6 +13,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('donor');
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+  // Fetch user profile on component mount
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -35,7 +36,7 @@ const Dashboard = () => {
         setUpdatedCity(userData.location?.city || '');
         setUpdatedState(userData.location?.state || '');
         setDonorEnabled(userData.isDonor || false);
-        setAvailability(userData.availability || []); // Set availability when user profile is fetched
+        setAvailability(userData.availability || []);
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -44,18 +45,23 @@ const Dashboard = () => {
     fetchUserProfile();
   }, []);
 
+  // Handle toggling availability days
   const toggleDay = (day) => {
-    setAvailability((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    );
+    setAvailability((prev) => {
+      const updatedAvailability = new Set(prev);
+      updatedAvailability.has(day) ? updatedAvailability.delete(day) : updatedAvailability.add(day);
+      return Array.from(updatedAvailability);
+    });
   };
 
+  // Handle location changes
   const handleLocationChange = (e) => {
     const { name, value } = e.target;
     if (name === 'city') setUpdatedCity(value);
     else if (name === 'state') setUpdatedState(value);
   };
 
+  // Save location changes
   const handleSaveLocation = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -65,44 +71,35 @@ const Dashboard = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          city: updatedCity,
-          state: updatedState,
-        }),
+        body: JSON.stringify({ city: updatedCity, state: updatedState }),
       });
 
       if (!res.ok) throw new Error('Failed to update location');
 
-      setUser({
-        ...user,
-        location: { city: updatedCity, state: updatedState },
-      });
+      setUser({ ...user, location: { city: updatedCity, state: updatedState } });
       setSaveMessage('Location updated successfully!');
     } catch (error) {
       setSaveMessage('Failed to update location.');
       console.error('Location update error:', error);
     }
-
     setTimeout(() => setSaveMessage(''), 3000);
     setIsEditingLocation(false);
   };
 
+  // Save donor settings
   const handleSaveDonorSettings = async () => {
     setSaveMessage('Saving...');
     const accessToken = localStorage.getItem('token');
 
     try {
-      const donorStatusRes = await fetch(
-        'http://localhost:8001/api/auth/user/profile/update-donor-status',
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ isDonor: donorEnabled }),
-        }
-      );
+      const donorStatusRes = await fetch('http://localhost:8001/api/auth/user/profile/update-donor-status', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ isDonor: donorEnabled }),
+      });
 
       if (!donorStatusRes.ok) throw new Error('Failed to update donor status');
 
@@ -115,25 +112,22 @@ const Dashboard = () => {
     setTimeout(() => setSaveMessage(''), 3000);
   };
 
+  // Save availability changes
   const handleSaveAvailability = async () => {
     setSaveMessage('Saving...');
     const accessToken = localStorage.getItem('token');
 
     try {
-      // Ensure availability days are in uppercase format
       const availabilityUppercase = availability.map((day) => day.toUpperCase());
-
-      const res = await fetch(
-        'http://localhost:8001/api/auth/user/profile/update-availability',
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ availability: availabilityUppercase }),
-        }
-      );
+      console.log(availabilityUppercase);
+      const res = await fetch('http://localhost:8001/api/auth/user/profile/update-availability', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ availability: availabilityUppercase }),
+      });
 
       if (!res.ok) throw new Error('Failed to update availability');
 
@@ -146,22 +140,20 @@ const Dashboard = () => {
     setTimeout(() => setSaveMessage(''), 3000);
   };
 
+  // Save blood type changes
   const handleSaveBloodType = async () => {
     setSaveMessage('Saving...');
     const accessToken = localStorage.getItem('token');
 
     try {
-      const res = await fetch(
-        'http://localhost:8001/api/auth/user/profile/update-blood-type',
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ bloodType }),
-        }
-      );
+      const res = await fetch('http://localhost:8001/api/auth/user/profile/update-blood-type', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ bloodType }),
+      });
 
       if (!res.ok) throw new Error('Failed to update blood type');
 
@@ -182,12 +174,12 @@ const Dashboard = () => {
       <div className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-center gap-6">
         <RxAvatar size={97} className="w-24 h-24 text-black" /> {/* Avatar Icon */}
         <div>
-          <h2 className="text-2xl font-semibold font-serif">{user.name}</h2>
-          <p className="text-sm text-gray-600 font-serif">{user.email}</p>
-          <p className="text-sm text-gray-600 font-serif">Username: {user.username}</p>
+          <h2 className="text-2xl font-semibold">{user.name}</h2>
+          <p className="text-sm text-gray-600">{user.email}</p>
+          <p className="text-sm text-gray-600">Username: {user.username}</p>
 
           <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-600 font-serif">
+            <p className="text-sm text-gray-600">
               Location:{' '}
               {isEditingLocation ? (
                 <div className="flex gap-2">
@@ -213,9 +205,7 @@ const Dashboard = () => {
               )}
             </p>
             <button
-              onClick={() =>
-                isEditingLocation ? handleSaveLocation() : setIsEditingLocation(true)
-              }
+              onClick={() => (isEditingLocation ? handleSaveLocation() : setIsEditingLocation(true))}
               className="text-blue-500 text-sm"
             >
               {isEditingLocation ? 'Save' : 'Edit'}
@@ -322,6 +312,7 @@ const Dashboard = () => {
         )}
       </div>
 
+      {/* Save message */}
       {saveMessage && (
         <p className="mt-4 text-sm text-center text-green-500">{saveMessage}</p>
       )}
