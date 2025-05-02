@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { RxAvatar } from "react-icons/rx"; 
+import { RxAvatar } from "react-icons/rx";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [donorEnabled, setDonorEnabled] = useState(false);
-  const [availability, setAvailability] = useState([]);  
+  const [availability, setAvailability] = useState([]);
   const [bloodType, setBloodType] = useState('O+');
   const [saveMessage, setSaveMessage] = useState('');
   const [updatedCity, setUpdatedCity] = useState('');
@@ -13,7 +13,6 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('donor');
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-  // Fetch user profile on component mount
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -45,7 +44,6 @@ const Dashboard = () => {
     fetchUserProfile();
   }, []);
 
-  // Handle toggling availability days
   const toggleDay = (day) => {
     setAvailability((prev) => {
       const updatedAvailability = new Set(prev);
@@ -54,14 +52,12 @@ const Dashboard = () => {
     });
   };
 
-  // Handle location changes
   const handleLocationChange = (e) => {
     const { name, value } = e.target;
     if (name === 'city') setUpdatedCity(value);
     else if (name === 'state') setUpdatedState(value);
   };
 
-  // Save location changes
   const handleSaveLocation = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -86,7 +82,6 @@ const Dashboard = () => {
     setIsEditingLocation(false);
   };
 
-  // Save donor settings
   const handleSaveDonorSettings = async () => {
     setSaveMessage('Saving...');
     const accessToken = localStorage.getItem('token');
@@ -112,14 +107,12 @@ const Dashboard = () => {
     setTimeout(() => setSaveMessage(''), 3000);
   };
 
-  // Save availability changes
   const handleSaveAvailability = async () => {
     setSaveMessage('Saving...');
     const accessToken = localStorage.getItem('token');
 
     try {
       const availabilityUppercase = availability.map((day) => day.toUpperCase());
-      console.log(availabilityUppercase);
       const res = await fetch('http://localhost:8001/api/auth/user/profile/update-availability', {
         method: 'PATCH',
         headers: {
@@ -140,7 +133,6 @@ const Dashboard = () => {
     setTimeout(() => setSaveMessage(''), 3000);
   };
 
-  // Save blood type changes
   const handleSaveBloodType = async () => {
     setSaveMessage('Saving...');
     const accessToken = localStorage.getItem('token');
@@ -166,156 +158,154 @@ const Dashboard = () => {
     setTimeout(() => setSaveMessage(''), 3000);
   };
 
-  if (!user) return <p className="p-6 text-center">Loading user profile...</p>;
+  if (!user) return <p className="p-6 text-center text-lg text-gray-600">Loading user profile...</p>;
 
   return (
-    <div className="bg-gray-50 p-6 max-w-4xl mx-auto">
-      {/* Profile Section */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-center gap-6">
-        <RxAvatar size={97} className="w-24 h-24 text-black" /> {/* Avatar Icon */}
-        <div>
-          <h2 className="text-2xl font-semibold">{user.name}</h2>
-          <p className="text-sm text-gray-600">{user.email}</p>
-          <p className="text-sm text-gray-600">Username: {user.username}</p>
-
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-600">
-              Location:{' '}
-              {isEditingLocation ? (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    name="city"
-                    value={updatedCity}
-                    onChange={handleLocationChange}
-                    placeholder="City"
-                    className="border p-1 rounded text-sm"
-                  />
-                  <input
-                    type="text"
-                    name="state"
-                    value={updatedState}
-                    onChange={handleLocationChange}
-                    placeholder="State"
-                    className="border p-1 rounded text-sm"
-                  />
-                </div>
-              ) : (
-                `${updatedCity.toUpperCase()}, ${updatedState.toUpperCase()}`
-              )}
-            </p>
-            <button
-              onClick={() => (isEditingLocation ? handleSaveLocation() : setIsEditingLocation(true))}
-              className="text-blue-500 text-sm"
-            >
-              {isEditingLocation ? 'Save' : 'Edit'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Donation History */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h3 className="text-lg font-semibold mb-4">Donation History</h3>
-        {user.lastDonationDate ? (
-          <p>Last donated on: {new Date(user.lastDonationDate).toDateString()}</p>
-        ) : (
-          <p>No donations yet. Start donating today!</p>
-        )}
-      </div>
-
-      {/* Donor Info Tabs */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex gap-4 mb-4 border-b">
-          {['donor', 'availability', 'blood'].map((tab) => (
-            <button
-              key={tab}
-              className={`pb-2 text-sm font-medium ${activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab === 'donor' && 'Donor Status'}
-              {tab === 'availability' && 'Availability'}
-              {tab === 'blood' && 'Blood Group'}
-            </button>
-          ))}
-        </div>
-
-        {activeTab === 'donor' && (
-          <div>
-            <label className="flex items-center gap-2">
-              <span className="text-sm">Enable Donor Status</span>
-              <input
-                type="checkbox"
-                checked={donorEnabled}
-                onChange={(e) => setDonorEnabled(e.target.checked)}
-                className="form-checkbox"
-              />
-            </label>
-            <button
-              onClick={handleSaveDonorSettings}
-              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-            >
-              Save Donor Status
-            </button>
-          </div>
-        )}
-
-        {activeTab === 'availability' && (
-          <div>
-            <label className="block text-sm font-medium mb-2">Select Available Days</label>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {days.map((day) => (
-                <label key={day} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={availability.includes(day)}
-                    onChange={() => toggleDay(day)}
-                    className="form-checkbox"
-                  />
-                  <span>{day}</span>
-                </label>
-              ))}
+    <div className="bg-gray-100 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Profile Card */}
+        <div className="bg-white p-6 rounded-2xl shadow-md flex items-center gap-6">
+          <RxAvatar size={97} className="text-gray-800" />
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold font-serif text-gray-800">{user.name}</h2>
+            <p className="text-gray-600 text-sm font-serif">📧 {user.email}</p>
+            <p className="text-gray-600 text-sm font-serif">Username: {user.username}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-gray-600 text-sm font-serif">
+              📍 Location:{' '}
+                {isEditingLocation ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      name="city"
+                      value={updatedCity}
+                      onChange={handleLocationChange}
+                      placeholder="City"
+                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring focus:border-blue-400"
+                    />
+                    <input
+                      type="text"
+                      name="state"
+                      value={updatedState}
+                      onChange={handleLocationChange}
+                      placeholder="State"
+                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring focus:border-blue-400"
+                    />
+                  </div>
+                ) : (
+                  `${updatedCity.toUpperCase()}, ${updatedState.toUpperCase()}`
+                )}
+              </p>
+              <button
+                onClick={() => (isEditingLocation ? handleSaveLocation() : setIsEditingLocation(true))}
+                className="text-blue-600 text-sm underline hover:text-blue-800"
+              >
+                {isEditingLocation ? 'Save' : 'Edit'}
+              </button>
             </div>
-            <button
-              onClick={handleSaveAvailability}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-            >
-              Save Availability
-            </button>
           </div>
-        )}
+        </div>
 
-        {activeTab === 'blood' && (
-          <div>
-            <label className="block text-sm font-medium mb-2">Select Blood Group</label>
-            <select
-              value={bloodType}
-              onChange={(e) => setBloodType(e.target.value)}
-              className="border p-1 rounded text-sm"
-            >
-              <option value="O+">O+</option>
-              <option value="O-">O-</option>
-              <option value="A+">A+</option>
-              <option value="A-">A-</option>
-              <option value="B+">B+</option>
-              <option value="B-">B-</option>
-              <option value="AB+">AB+</option>
-              <option value="AB-">AB-</option>
-            </select>
-            <button
-              onClick={handleSaveBloodType}
-              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-            >
-              Save Blood Group
-            </button>
+        {/* Donation History */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+          <h3 className="text-lg font-semibold mb-2 font-serif text-gray-700">Donation History</h3>
+          <p className="text-sm text-gray-600">
+            {user.lastDonationDate
+              ? `Last donated on: ${new Date(user.lastDonationDate).toDateString()}`
+              : 'No donations yet. Start donating today!'}
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+          <div className="flex gap-4 border-b mb-4">
+            {['donor', 'availability', 'blood'].map((tab) => (
+              <button
+                key={tab}
+                className={`pb-2 text-sm font-medium capitalize ${
+                  activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                }`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab === 'donor' && 'Donor Status'}
+                {tab === 'availability' && 'Availability'}
+                {tab === 'blood' && 'Blood Group'}
+              </button>
+            ))}
           </div>
-        )}
+
+          {activeTab === 'donor' && (
+            <div className="space-y-4">
+              <label className="flex items-center gap-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={donorEnabled}
+                  onChange={(e) => setDonorEnabled(e.target.checked)}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                Enable Donor Status
+              </label>
+              <button
+                onClick={handleSaveDonorSettings}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+              >
+                Save Donor Status
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'availability' && (
+            <div className="space-y-4">
+              <p className="text-sm font-medium text-gray-700">Select Available Days</p>
+              <div className="flex flex-wrap gap-4">
+                {days.map((day) => (
+                  <label key={day} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={availability.includes(day)}
+                      onChange={() => toggleDay(day)}
+                      className="form-checkbox h-4 w-4 text-blue-600"
+                    />
+                    {day}
+                  </label>
+                ))}
+              </div>
+              <button
+                onClick={handleSaveAvailability}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+              >
+                Save Availability
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'blood' && (
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">Select Blood Group</label>
+              <select
+                value={bloodType}
+                onChange={(e) => setBloodType(e.target.value)}
+                className="border rounded px-3 py-1 text-sm focus:outline-none focus:ring focus:border-blue-400"
+              >
+                {['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'].map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleSaveBloodType}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+              >
+                Save Blood Group
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Save Message */}
+        {saveMessage && <p className="text-center text-green-600 text-sm">{saveMessage}</p>}
       </div>
-
-      {/* Save message */}
-      {saveMessage && (
-        <p className="mt-4 text-sm text-center text-green-500">{saveMessage}</p>
-      )}
     </div>
   );
 };
