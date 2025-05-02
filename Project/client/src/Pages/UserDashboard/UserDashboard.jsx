@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RxAvatar } from "react-icons/rx";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 // Import Toastify
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,7 +17,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("donor");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
+  const navigate = useNavigate();
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const token = localStorage.getItem("token");
 
@@ -53,6 +54,7 @@ const Dashboard = () => {
 
   const updateProfile = async (url, method, body) => {
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(url, {
         method,
         headers: {
@@ -69,16 +71,27 @@ const Dashboard = () => {
     }
   };
 
-
   const handleSaveLocation = async () => {
-    const success = await updateProfile(
+    const response = await fetch(
       "http://localhost:8001/api/auth/user/profile/update-location",
-      "PUT",
-      { city: updatedCity, state: updatedState }
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          city: updatedCity,
+          state: updatedState,
+        }),
+      }
     );
 
-    if (success) {
-      setUser({ ...user, location: { city: updatedCity, state: updatedState } });
+    if (response) {
+      setUser({
+        ...user,
+        location: { city: updatedCity, state: updatedState },
+      });
       showMessage("Location updated successfully!");
     } else {
       showMessage("Failed to update location.");
@@ -88,75 +101,158 @@ const Dashboard = () => {
   };
 
   const handleSaveDonorSettings = async () => {
-    const success = await updateProfile(
-      "http://localhost:8001/api/auth/user/profile/update-donor-status",
-      "PATCH",
-      { isDonor: donorEnabled }
-    );
-
-    showMessage(success ? "Donor status updated!" : "Failed to update donor status");
+    try {
+      const response = await fetch(
+        "http://localhost:8001/api/auth/user/profile/update-donor-status",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ isDonor: donorEnabled }),
+        }
+      );
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        showMessage("Donor status updated!");
+      } else {
+        showMessage(data.message || "Failed to update donor status");
+      }
+    } catch (error) {
+      console.error("Error updating donor status:", error);
+      showMessage("Something went wrong while updating donor status.");
+    }
   };
+  
 
   const handleSaveAvailability = async () => {
-    const success = await updateProfile(
+    const token = localStorage.getItem("token");
+    
+    const response = await fetch(
       "http://localhost:8001/api/auth/user/profile/update-availability",
-      "PATCH",
-      { availability: availability.map((d) => d.toUpperCase()) }
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          availability: availability.map((d) => d.toUpperCase()),
+        }),
+      }
     );
-
-    showMessage(success ? "Availability updated!" : "Failed to update availability");
+    
+    if (response.ok) {
+      showMessage("Availability updated!");
+    } else {
+      showMessage("Failed to update availability.");
+    }
   };
+  
 
   const handleSaveBloodType = async () => {
-    const success = await updateProfile(
-      "http://localhost:8001/api/auth/user/profile/update-blood-type",
-      "PUT",
-      { bloodType }
-    );
-
-    showMessage(success ? "Blood type updated!" : "Failed to update blood type");
+    try {
+      const response = await fetch(
+        "http://localhost:8001/api/auth/user/profile/update-blood-type",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ bloodType }),
+        }
+      );
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        showMessage("Blood type updated!");
+      } else {
+        showMessage(data.message || "Failed to update blood type");
+      }
+    } catch (error) {
+      console.error("Error updating blood type:", error);
+      showMessage("Something went wrong while updating blood type.");
+    }
   };
+  
 
   const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword) {
       return showMessage("Fill in both fields.");
     }
-
-    const success = await updateProfile(
-      "http://localhost:8001/api/auth/user/profile/update-password",
-      "PATCH",
-      { currentPassword, newPassword }
-    );
-
-    if (success) {
-      showMessage("Password updated!");
-      setCurrentPassword("");
-      setNewPassword("");
-    } else {
-      showMessage("Failed to update password.");
+  
+    try {
+      const response = await fetch(
+        "http://localhost:8001/api/auth/user/profile/update-password",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ currentPassword, newPassword }),
+        }
+      );
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        showMessage("Password updated!");
+        setCurrentPassword("");
+        setNewPassword("");
+      } else {
+        showMessage(data.message || "Failed to update password.");
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+      showMessage("Something went wrong while updating password.");
     }
   };
+  
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("Are you sure you want to delete your account?")) return;
-
+    if (!window.confirm("Are you sure you want to delete your account?")) {
+      return;
+    }
+  
     try {
-      const res = await fetch("http://localhost:8001/api/auth/user/delete-account", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) throw new Error();
-
-      localStorage.removeItem("token");
-      setUser(null);
-      showMessage("Account deleted.");
-    } catch {
-      showMessage("Failed to delete account.");
+      const token = localStorage.getItem("token");
+  
+      const response = await fetch(
+        "http://localhost:8001/api/auth/user/profile/delete",
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.ok) {
+        showMessage("Account deleted.");
+        
+       
+        setTimeout(() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          localStorage.removeItem("loggedIn");
+          setUser(null);
+          navigate("/");
+        }, 2000); 
+      } else {
+        showMessage("Failed to delete account.");
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      showMessage("Something went wrong while deleting account.");
     }
   };
+  
 
   const toggleDay = (day) => {
     setAvailability((prev) =>
@@ -205,7 +301,9 @@ const Dashboard = () => {
             </p>
             <button
               onClick={() =>
-                isEditingLocation ? handleSaveLocation() : setIsEditingLocation(true)
+                isEditingLocation
+                  ? handleSaveLocation()
+                  : setIsEditingLocation(true)
               }
               className="text-sm text-red-900"
             >
@@ -271,7 +369,9 @@ const Dashboard = () => {
                   key={day}
                   onClick={() => toggleDay(day)}
                   className={`py-2 px-4 rounded ${
-                    availability.includes(day) ? "bg-red-600 text-white" : "bg-gray-300"
+                    availability.includes(day)
+                      ? "bg-red-600 text-white"
+                      : "bg-gray-300"
                   }`}
                 >
                   {day}
@@ -295,11 +395,13 @@ const Dashboard = () => {
               onChange={(e) => setBloodType(e.target.value)}
               className="border p-2 rounded"
             >
-              {["O+", "A+", "B+", "AB+", "O-", "A-", "B-", "AB-"].map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
+              {["O+", "A+", "B+", "AB+", "O-", "A-", "B-", "AB-"].map(
+                (type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                )
+              )}
             </select>
             <button
               onClick={handleSaveBloodType}
