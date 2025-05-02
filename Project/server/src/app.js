@@ -20,6 +20,14 @@ app.use("/api/blood-requests", searchBloodRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/auth/admin", adminRoutes);
 
+// for any undefined routes
+app.use((req, res, next) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
 app.use((err, req, res, next) => {
   if (err instanceof ApiError) {
     return res.status(err.status).json({
