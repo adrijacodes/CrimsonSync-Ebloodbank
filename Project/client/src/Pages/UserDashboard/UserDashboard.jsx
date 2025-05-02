@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RxAvatar } from "react-icons/rx";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -17,6 +18,7 @@ const Dashboard = () => {
 
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -150,9 +152,10 @@ const Dashboard = () => {
 
       localStorage.removeItem("token");
       setUser(null);
-      alert("Account deleted.");
+      showMessage("Account deleted.");
+      setTimeout(() => navigate("/"), 2000); // Wait 2 seconds before redirecting
     } catch {
-      alert("Failed to delete account.");
+      showMessage("Failed to delete account.");
     }
   };
 

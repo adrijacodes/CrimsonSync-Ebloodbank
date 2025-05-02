@@ -44,19 +44,15 @@ const Navbar = () => {
           },
         }
       );
-
       toast.success("Logged out successfully!");
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Logout failed.";
-    
-    // Handle expired JWT and navigate to login
+
       if (errorMsg.toLowerCase().includes("jwt expired")) {
         toast.info("Session expired. Please login again.");
-        navigate("/login");
       } else {
         toast.error(errorMsg);
         console.error("Logout error:", error);
-        return;
       }
     } finally {
       localStorage.clear();
@@ -75,34 +71,50 @@ const Navbar = () => {
         {/* Centered Nav */}
         <nav className="flex-1">
           <ul className="flex justify-center items-center space-x-6 text-white font-semibold">
-            <Link to="/"><li className="hover:underline">Home</li></Link>
-            <Link to="/About"><li className="hover:underline">About</li></Link>
-            <Link to="/faq"><li className="hover:underline">FAQ's</li></Link>
-            <Link to="/how-it-works"><li className="hover:underline">How It Works</li></Link>
+            <li className="hover:underline">
+              <Link to="/">Home</Link>
+            </li>
+            <li className="hover:underline">
+              <Link to="/About">About</Link>
+            </li>
+            <li className="hover:underline">
+              <Link to="/faq">FAQ's</Link>
+            </li>
+            <li className="hover:underline">
+              <Link to="/how-it-works">How It Works</Link>
+            </li>
 
             {!accessToken && (
-              <Link to="/register"><li className="hover:underline">Register/Login</li></Link>
+              <li className="hover:underline">
+                <Link to="/register">Register/Login</Link>
+              </li>
             )}
 
-            {accessToken && role === 'Admin' && (
+            {accessToken && role === "Admin" && (
               <>
-                <Link to="/admin-dashboard"><li className="hover:underline">Admin Dashboard</li></Link>
-                <Link to="/user-dashboard"><li className="hover:underline"><BiSolidUserCircle /></li></Link>
+                <li className="hover:underline">
+                  <Link to="/admin-dashboard">Admin Dashboard</Link>
+                </li>
+                <li>
+                  <Link to="/admin-profile">
+                    <BiSolidUserCircle className="text-3xl" />
+                  </Link>
+                </li>
               </>
             )}
-            {accessToken && role === 'User' && (
-              <Link to="/user-dashboard">
+
+            {accessToken && role === "User" && (
               <li>
-              <BiSolidUserCircle className="text-3xl"/>
+                <Link to="/user-dashboard">
+                  <BiSolidUserCircle className="text-3xl" />
+                </Link>
               </li>
-            </Link>
-            
             )}
           </ul>
         </nav>
 
         {/* Logout Button */}
-        {(isLoggedIn || isRegistered) && (
+        {isLoggedIn && (
           <button
             onClick={handleLogout}
             className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition-colors duration-200"
