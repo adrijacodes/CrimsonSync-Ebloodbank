@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { RxAvatar } from "react-icons/rx";
 import { motion } from "framer-motion";
+// Import Toastify
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -8,7 +11,6 @@ const Dashboard = () => {
   const [donorEnabled, setDonorEnabled] = useState(false);
   const [availability, setAvailability] = useState([]);
   const [bloodType, setBloodType] = useState("O+");
-  const [saveMessage, setSaveMessage] = useState("");
   const [updatedCity, setUpdatedCity] = useState("");
   const [updatedState, setUpdatedState] = useState("");
   const [activeTab, setActiveTab] = useState("donor");
@@ -46,8 +48,7 @@ const Dashboard = () => {
   }, [token]);
 
   const showMessage = (msg, duration = 3000) => {
-    setSaveMessage(msg);
-    setTimeout(() => setSaveMessage(""), duration);
+    toast(msg, { autoClose: duration });
   };
 
   const updateProfile = async (url, method, body) => {
@@ -67,6 +68,7 @@ const Dashboard = () => {
       return false;
     }
   };
+
 
   const handleSaveLocation = async () => {
     const success = await updateProfile(
@@ -150,9 +152,9 @@ const Dashboard = () => {
 
       localStorage.removeItem("token");
       setUser(null);
-      alert("Account deleted.");
+      showMessage("Account deleted.");
     } catch {
-      alert("Failed to delete account.");
+      showMessage("Failed to delete account.");
     }
   };
 
@@ -328,24 +330,23 @@ const Dashboard = () => {
               onClick={handlePasswordChange}
               className="bg-red-500 py-2 px-4 rounded text-white"
             >
-              Save Password
+              Change Password
             </button>
           </div>
         )}
+
+        <div className="mt-4">
+          <button
+            onClick={handleDeleteAccount}
+            className="bg-red-700 py-2 px-4 rounded text-white"
+          >
+            Delete Account
+          </button>
+        </div>
       </motion.div>
 
-      {/* Delete Account */}
-      <button
-        onClick={handleDeleteAccount}
-        className="mt-6 bg-red-500 text-white py-2 px-4 rounded"
-      >
-        Delete Account
-      </button>
-
-      {/* Save Message */}
-      {saveMessage && (
-        <div className="mt-4 text-sm text-center text-green-600">{saveMessage}</div>
-      )}
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   );
 };
