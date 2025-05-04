@@ -16,7 +16,7 @@ const EventCard = ({ event }) => {
   return (
     <div
       className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition"
-      onClick={() => navigate("/event/" + event._id)}
+      onClick={() => navigate(`/event/${event._id}`, { state: { event } })} //Passing the event data via navigate
     >
       <img
         src={selectedImage}  // Use the selected image in your img tag
