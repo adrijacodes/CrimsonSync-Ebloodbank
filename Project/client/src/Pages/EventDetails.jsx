@@ -1,13 +1,12 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import randomIndex from '../Helpers/randomIndex.jsx';
+import randomIndexMultiple from '../Helpers/randomIndexMultiple.jsx';
 
 const EventDetails = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
 
- // If no event data is passed (e.g., user visits the URL directly), show a fallback message
   if (!state?.event) {
     return (
       <div className="p-6 text-center">
@@ -24,8 +23,8 @@ const EventDetails = () => {
 
   const { event } = state;
   const { eventName, date, time, description, location } = event;
-  // Get a random image using the randomIndex function This will return a random image from the list
-  const randomEventImage = randomIndex(); 
+
+  const randomEventImages = randomIndexMultiple(3); // Get 3 random images using randomIndexMultiple function
 
   return (
     <motion.div
@@ -34,15 +33,22 @@ const EventDetails = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
     >
-      <motion.img
-        src={randomEventImage}
-        alt="Event Banner"
-        className="w-full h-64 object-cover rounded-xl mb-6"
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.7 }}
-      />
+      {/* Image Gallery */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        {randomEventImages.map((img, index) => (
+          <motion.img
+            key={index}
+            src={img}
+            alt={`Event Image ${index + 1}`}
+            className="w-full h-52 object-cover rounded-xl"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.7, delay: index * 0.2 }}
+          />
+        ))}
+      </div>
 
+      {/* Event Details */}
       <motion.h1
         className="text-4xl font-bold font-serif text-red-700 mb-4"
         initial={{ x: -20, opacity: 0 }}
