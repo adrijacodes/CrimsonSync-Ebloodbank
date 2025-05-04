@@ -40,9 +40,10 @@ const Register = () => {
       }
 
       toast.success("Register Success");
-
+// setting auth details in localStorage
       localStorage.setItem("token", JSON.stringify(res.data.data.accessToken));
       localStorage.setItem("registered", "true");
+      localStorage.setItem("role", role);
       navigate("/");
 
     } catch (err) {

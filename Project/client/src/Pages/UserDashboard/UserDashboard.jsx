@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { RxAvatar } from "react-icons/rx";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-// Import Toastify
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -17,10 +16,9 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("donor");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  
+  const navigate = useNavigate();
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const token = localStorage.getItem("token");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -53,24 +51,24 @@ const Dashboard = () => {
     toast(msg, { autoClose: duration });
   };
 
-  // const updateProfile = async (url, method, body) => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     const res = await fetch(url, {
-  //       method,
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify(body),
-  //     });
+  const updateProfile = async (url, method, body) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
 
-  //     if (!res.ok) throw new Error();
-  //     return true;
-  //   } catch {
-  //     return false;
-  //   }
-  // };
+      if (!res.ok) throw new Error();
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   const handleSaveLocation = async () => {
     const response = await fetch(
@@ -222,20 +220,35 @@ const Dashboard = () => {
     }
   
     try {
-      const res = await fetch("http://localhost:8001/api/auth/user/delete-account", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) throw new Error();
-
-      localStorage.removeItem("token");
-      setUser(null);
-      alert("Account deleted.");
-    } catch {
-      alert("Failed to delete account.");
+      const token = localStorage.getItem("token");
+  
+      const response = await fetch(
+        "http://localhost:8001/api/auth/user/profile/delete",
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.ok) {
+        showMessage("Account deleted.");
+        
+       
+        setTimeout(() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          localStorage.removeItem("loggedIn");
+          setUser(null);
+          navigate("/");
+        }, 2000); 
+      } else {
+        showMessage("Failed to delete account.");
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      showMessage("Something went wrong while deleting account.");
     }
   };
   

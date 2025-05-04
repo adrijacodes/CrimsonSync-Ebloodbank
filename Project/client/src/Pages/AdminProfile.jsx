@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { RxAvatar } from "react-icons/rx";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
 
 const AdminProfile = () => {
   const [admin, setAdmin] = useState(null);
@@ -27,7 +26,7 @@ const AdminProfile = () => {
         const adminData = data.AdminInfo[0];
         setAdmin(adminData);
       } catch (err) {
-        toast.error("Error loading admin profile.");
+        //toast.error("Error loading admin profile.");
         console.error(err);
       }
     };
@@ -74,6 +73,9 @@ const AdminProfile = () => {
       if (!res.ok) throw new Error();
 
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("loggedIn");
+      localStorage.removeItem("registered");
       setAdmin(null);
       toast.success("Admin account deleted.");
       setTimeout(() => navigate("/"), 2000);
@@ -86,8 +88,6 @@ const AdminProfile = () => {
 
   return (
     <div className="bg-gray-50 p-6 max-w-3xl mx-auto">
-      <ToastContainer position="top-center" autoClose={3000} hideProgressBar />
-
       {/* Profile */}
       <motion.div
         className="bg-white p-6 rounded-lg shadow-md mb-6 flex items-center gap-6"

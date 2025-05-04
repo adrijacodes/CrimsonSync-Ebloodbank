@@ -22,11 +22,13 @@ import AdminList from "./Pages/AdminList";
 import AdminSearch from "./Pages/AdminSearch";
 import AdminProfile from "./Pages/AdminProfile";
 
+import "react-toastify/dist/ReactToastify.css";
+
 const AppWrapper = () => {
   const location = useLocation();
 
   const hiddenLayoutRoutes = ["/login", "/register"];
-  const hideLayoutForPattern = /^\/event\/\d+$/; // matches /event/1, /event/99, etc.
+  const hideLayoutForPattern = /^\/event\/\d+$/;
 
   const shouldHideLayout =
     hiddenLayoutRoutes.includes(location.pathname) || hideLayoutForPattern.test(location.pathname);
@@ -35,30 +37,30 @@ const AppWrapper = () => {
     <div className="min-h-screen flex flex-col justify-between">
       {!shouldHideLayout && <Navbar />}
 
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+
       <div className="flex-grow">
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<Faq />} />
-          <Route path="/how-it-works" element={<HowItWorks/>} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/SearchBlood" element={<SearchBlood />} />
           <Route path="/SearchEvent" element={<SearchEvent />} />
           <Route path="/NewEvent" element={<NewEvent />} />
-          <Route path="/event/:id" element={<EventDetails />} /> 
+          <Route path="/event/:id" element={<EventDetails />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/user-dashboard" element={<UserDashboard/>} />
-          <Route path="/view-event" element={<ViewEvent/>} />
-          <Route path="/event-by-city-year" element={<EventsCityYearChart/>} />
-          <Route path="/user-list" element={<UserList/>} />
-          <Route path="/search-user" element={<UserSearch/>} />
-          <Route path="/admin-list" element={<AdminList/>} />
-          <Route path="/search-admin" element={<AdminSearch/>} />
-          <Route path="/admin-profile" element={<AdminProfile/>} />
+          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/view-event" element={<ViewEvent />} />
+          <Route path="/event-by-city-year" element={<EventsCityYearChart />} />
+          <Route path="/user-list" element={<UserList />} />
+          <Route path="/search-user" element={<UserSearch />} />
+          <Route path="/admin-list" element={<AdminList />} />
+          <Route path="/search-admin" element={<AdminSearch />} />
+          <Route path="/admin-profile" element={<AdminProfile />} />
         </Routes>
-        <ToastContainer position="top-right" autoClose={3000} />
-
       </div>
 
       {!shouldHideLayout && <Footer />}
