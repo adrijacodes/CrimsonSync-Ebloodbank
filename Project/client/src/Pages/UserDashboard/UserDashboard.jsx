@@ -17,7 +17,7 @@ const Dashboard = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const navigate = useNavigate();
-  //const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const Dashboard = () => {
       return false;
     }
   };
-// Location section
+  // Location section
   const handleSaveLocation = async () => {
     const response = await fetch(
       "http://localhost:8001/api/auth/user/profile/update-location",
@@ -98,7 +98,7 @@ const Dashboard = () => {
 
     setIsEditingLocation(false);
   };
-// Save Donor Section
+  // SaveDonor Section
   const handleSaveDonorSettings = async () => {
     try {
       const response = await fetch(
@@ -112,9 +112,9 @@ const Dashboard = () => {
           body: JSON.stringify({ isDonor: donorEnabled }),
         }
       );
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         showMessage("Donor status updated!");
       } else {
@@ -125,44 +125,45 @@ const Dashboard = () => {
       showMessage("Something went wrong while updating donor status.");
     }
   };
-  
-// Availability section
-const handleSaveAvailability = async () => {
-  const token = localStorage.getItem("token");
 
-  const validDays = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
-  const normalizedAvailability = [...new Set(availability.map((d) => d.toUpperCase()))];
-  const filteredAvailability = normalizedAvailability.filter(day => validDays.includes(day));
+  // Availability section
+  const handleSaveAvailability = async () => {
+    const token = localStorage.getItem("token");
 
-  console.log("Sending valid availability:", filteredAvailability);
+    const validDays = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
+    const normalizedAvailability = [
+      ...new Set(availability.map((d) => d.toUpperCase())),
+    ];
+    const filteredAvailability = normalizedAvailability.filter((day) =>
+      validDays.includes(day)
+    );
 
-  const response = await fetch(
-    "http://localhost:8001/api/auth/user/profile/update-availability",
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, 
-      },
-      body: JSON.stringify({
-        availability: filteredAvailability,
-      }),
+    console.log("Sending valid availability:", filteredAvailability);
+
+    const response = await fetch(
+      "http://localhost:8001/api/auth/user/profile/update-availability",
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          availability: filteredAvailability,
+        }),
+      }
+    );
+
+    if (response.ok) {
+      showMessage("Availability updated!");
+    } else {
+      const errorData = await response.json();
+      console.error("Error response from backend:", errorData);
+      showMessage("Failed to update availability.");
     }
-  );
+  };
 
-  if (response.ok) {
-    showMessage("Availability updated!");
-  } else {
-    const errorData = await response.json();
-    console.error("Error response from backend:", errorData);
-    showMessage("Failed to update availability.");
-  }
-};
-
-
-
-
-// Save Blood section
+  // SaveBlood section
   const handleSaveBloodType = async () => {
     try {
       const response = await fetch(
@@ -176,9 +177,9 @@ const handleSaveAvailability = async () => {
           body: JSON.stringify({ bloodType }),
         }
       );
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         showMessage("Blood type updated!");
       } else {
@@ -189,13 +190,13 @@ const handleSaveAvailability = async () => {
       showMessage("Something went wrong while updating blood type.");
     }
   };
-  
-// password change section
+
+  // password change section
   const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword) {
       return showMessage("Fill in both fields.");
     }
-  
+
     try {
       const response = await fetch(
         "http://localhost:8001/api/auth/user/profile/update-password",
@@ -208,9 +209,9 @@ const handleSaveAvailability = async () => {
           body: JSON.stringify({ currentPassword, newPassword }),
         }
       );
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         showMessage("Password updated!");
         setCurrentPassword("");
@@ -223,16 +224,16 @@ const handleSaveAvailability = async () => {
       showMessage("Something went wrong while updating password.");
     }
   };
-  
-// Delete account
+
+  // Delete account section
   const handleDeleteAccount = async () => {
     if (!window.confirm("Are you sure you want to delete your account?")) {
       return;
     }
-  
+
     try {
       const token = localStorage.getItem("token");
-  
+
       const response = await fetch(
         "http://localhost:8001/api/auth/user/profile/delete",
         {
@@ -242,18 +243,17 @@ const handleSaveAvailability = async () => {
           },
         }
       );
-  
+
       if (response.ok) {
         showMessage("Account deleted.");
-        
-       
+
         setTimeout(() => {
           localStorage.removeItem("token");
           localStorage.removeItem("role");
           localStorage.removeItem("loggedIn");
           setUser(null);
           navigate("/");
-        }, 2000); 
+        }, 2000);
       } else {
         showMessage("Failed to delete account.");
       }
@@ -262,7 +262,6 @@ const handleSaveAvailability = async () => {
       showMessage("Something went wrong while deleting account.");
     }
   };
-  
 
   const toggleDay = (day) => {
     setAvailability((prev) =>

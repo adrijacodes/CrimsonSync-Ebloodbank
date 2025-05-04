@@ -25,7 +25,7 @@ const Navbar = () => {
     if (!accessToken || !role) {
       localStorage.clear();
       toast.success("Logged out successfully!");
-      navigate("/login");
+      navigate("/");
       return;
     }
 
@@ -52,7 +52,7 @@ const Navbar = () => {
       // Handle expired JWT and navigate to login
       if (errorMsg.toLowerCase().includes("jwt expired")) {
         toast.info("Session expired. Please login again.");
-        navigate("/login");
+        navigate("/");
       } else {
         toast.error(errorMsg);
         console.error("Logout error:", error);
