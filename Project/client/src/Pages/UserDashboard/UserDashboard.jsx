@@ -17,7 +17,7 @@ const Dashboard = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const navigate = useNavigate();
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  //const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const Dashboard = () => {
       return false;
     }
   };
-
+// Location section
   const handleSaveLocation = async () => {
     const response = await fetch(
       "http://localhost:8001/api/auth/user/profile/update-location",
@@ -98,7 +98,7 @@ const Dashboard = () => {
 
     setIsEditingLocation(false);
   };
-
+// Save Donor Section
   const handleSaveDonorSettings = async () => {
     try {
       const response = await fetch(
@@ -126,32 +126,43 @@ const Dashboard = () => {
     }
   };
   
+// Availability section
+const handleSaveAvailability = async () => {
+  const token = localStorage.getItem("token");
 
-  const handleSaveAvailability = async () => {
-    const token = localStorage.getItem("token");
-    
-    const response = await fetch(
-      "http://localhost:8001/api/auth/user/profile/update-availability",
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          availability: availability.map((d) => d.toUpperCase()),
-        }),
-      }
-    );
-    
-    if (response.ok) {
-      showMessage("Availability updated!");
-    } else {
-      showMessage("Failed to update availability.");
+  const validDays = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
+  const normalizedAvailability = [...new Set(availability.map((d) => d.toUpperCase()))];
+  const filteredAvailability = normalizedAvailability.filter(day => validDays.includes(day));
+
+  console.log("Sending valid availability:", filteredAvailability);
+
+  const response = await fetch(
+    "http://localhost:8001/api/auth/user/profile/update-availability",
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, 
+      },
+      body: JSON.stringify({
+        availability: filteredAvailability,
+      }),
     }
-  };
-  
+  );
 
+  if (response.ok) {
+    showMessage("Availability updated!");
+  } else {
+    const errorData = await response.json();
+    console.error("Error response from backend:", errorData);
+    showMessage("Failed to update availability.");
+  }
+};
+
+
+
+
+// Save Blood section
   const handleSaveBloodType = async () => {
     try {
       const response = await fetch(
@@ -179,7 +190,7 @@ const Dashboard = () => {
     }
   };
   
-
+// password change section
   const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword) {
       return showMessage("Fill in both fields.");
@@ -213,7 +224,7 @@ const Dashboard = () => {
     }
   };
   
-
+// Delete account
   const handleDeleteAccount = async () => {
     if (!window.confirm("Are you sure you want to delete your account?")) {
       return;

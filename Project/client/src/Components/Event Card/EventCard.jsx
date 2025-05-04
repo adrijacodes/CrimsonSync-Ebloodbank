@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import randomIndex from '../../Helpers/randomIndex.jsx';  // Import the helper function
+import randomIndex from '../../Helpers/randomIndex.jsx';  
 
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const EventCard = ({ event }) => {
     return <div>Loading...</div>; // Fallback while event data is being loaded
   }
 
-  const selectedImage = randomIndex();  // Get the random image from the helper
+  const selectedImage = randomIndex();  // Get the random image using randomIndex function
 
   return (
     <div
@@ -19,7 +19,7 @@ const EventCard = ({ event }) => {
       onClick={() => navigate(`/event/${event._id}`, { state: { event } })} //Passing the event data via navigate
     >
       <img
-        src={selectedImage}  // Use the selected image in your img tag
+        src={selectedImage}  // Use the selected image in img tag
         alt={event.eventName || 'Event Image'}
         className="w-full h-40 object-cover"
       />
