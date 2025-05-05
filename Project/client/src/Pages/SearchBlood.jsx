@@ -6,27 +6,32 @@ const SearchBlood = () => {
   const [selectedBloodType, setSelectedBloodType] = useState('');
   const [donors, setDonors] = useState([]); // New state for donor results
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Searching donor with:", selectedBloodType, location);
-
-    //  Mock donor data (replace this with real API later)
-    const allDonors = [
-      { name: 'Aarav Sharma', city: 'Delhi', bloodType: 'A+', contact: '9876543210' },
-      { name: 'Meera Verma', city: 'Mumbai', bloodType: 'B+', contact: '9123456780' },
-      { name: 'Kabir Joshi', city: 'Delhi', bloodType: 'A+', contact: '9823412345' },
-      { name: 'Riya Kapoor', city: 'Delhi', bloodType: 'O-', contact: '9090909090' },
-    ];
-
-    // Filter by selected blood type and location (case-insensitive)
-    const filtered = allDonors.filter(
-      (donor) =>
-        donor.bloodType === selectedBloodType &&
-        donor.city.toLowerCase() === location.toLowerCase()
-    );
-
-    setDonors(filtered); // Set the results
+  
+    try {
+      const response = await fetch('/api/donors'); // Replace with your actual endpoint
+      if (!response.ok) {
+        throw new Error('Failed to fetch donors');
+      }
+  
+      const allDonors = await response.json();
+  
+      // Filter by selected blood type and location (case-insensitive)
+      const filtered = allDonors.filter(
+        (donor) =>
+          donor.bloodType === selectedBloodType &&
+          donor.city.toLowerCase() === location.toLowerCase()
+      );
+  
+      setDonors(filtered);
+    } catch (error) {
+      console.error('Error fetching donors:', error);
+      setDonors([]); // Reset or show empty if fetch fails
+    }
   };
+  
 
   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -98,7 +103,6 @@ const SearchBlood = () => {
                     <p className="text-gray-700">Blood Type: {donor.bloodType}</p>
                     <p className="text-gray-700">City: {donor.city}</p>
                   </div>
-                  <p className="text-blue-600 mt-2 md:mt-0">📞 {donor.contact}</p>
                 </li>
               ))}
             </ul>

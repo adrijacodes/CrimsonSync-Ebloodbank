@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FiLogOut } from "react-icons/fi";
 import { BiSolidUserCircle } from "react-icons/bi";
+import { IoNotifications } from "react-icons/io5";
 
 const Navbar = () => {
   const [isRegistered, setIsRegistered] = useState(false);
@@ -118,6 +119,9 @@ const Navbar = () => {
       <div className="flex gap-5 justify-center items-center">
         <Link to="/user-dashboard">
           <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
+        </Link>
+        <Link to="/notification">
+          <IoNotifications  className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
         </Link>
         <button
           onClick={handleLogout}
