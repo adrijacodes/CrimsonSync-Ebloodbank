@@ -88,7 +88,7 @@ export const updateNotificationStatus = AsyncHandler(async (req, res) => {
 
   // Update the notification status to 'seen'
   notification.status = "seen";
-  notification.isSeen = true;
+  notification.isRead = true;
 
   // Save the updated notification
   await notification.save();
