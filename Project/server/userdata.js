@@ -53,18 +53,18 @@ export const userdata = [
     "isDonor": true,
     "isRecipient": false,
     "role": "member",
-    "availability": ["WED", "THURS", "SAT"]
+    "availability": ["WED", "THURS", "SAT","MON"]
   },
   {
     "name": "Ravi Bhosale",
     "email": "ravi@example.com",
     "password": "hashedpassword6",
-    "bloodType": "B-",
-    "location": { "city": "Chennai", "state": "Tamil Nadu" },
+    "bloodType": "O-",
+    "location": { "city": "Hyderabad", "state": "Telangana" },
     "isDonor": false,
     "isRecipient": true,
     "role": "member",
-    "availability": ["THURS", "FRI", "SUN"]
+    "availability": ["MON", "FRI", "SUN"]
   },
   {
     "name": "Ayesha Gaikwad",
