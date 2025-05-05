@@ -10,27 +10,34 @@ const SearchBlood = () => {
     e.preventDefault();
     console.log("Searching donor with:", selectedBloodType, location);
   
+    const accessToken= localStorage.getItem('token');
+  
     try {
-      const response = await fetch('/api/donors'); // Replace with your actual endpoint
+      const response = await fetch('http://localhost:8001/api/blood-requests/search-donors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`, 
+        },
+        body: JSON.stringify({
+          bloodType: selectedBloodType,
+          location: location,
+        }),
+      });
+  
       if (!response.ok) {
         throw new Error('Failed to fetch donors');
       }
   
-      const allDonors = await response.json();
-  
-      // Filter by selected blood type and location (case-insensitive)
-      const filtered = allDonors.filter(
-        (donor) =>
-          donor.bloodType === selectedBloodType &&
-          donor.city.toLowerCase() === location.toLowerCase()
-      );
-  
-      setDonors(filtered);
+      const data = await response.json();
+      setDonors(data);
     } catch (error) {
       console.error('Error fetching donors:', error);
-      setDonors([]); // Reset or show empty if fetch fails
+      setDonors([]); // Clear donors on error
     }
   };
+  
+  
   
 
   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
