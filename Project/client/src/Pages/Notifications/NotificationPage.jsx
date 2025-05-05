@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+
 const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState("all");
