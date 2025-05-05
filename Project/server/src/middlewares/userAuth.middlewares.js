@@ -39,7 +39,6 @@ const verifyUserToken1 = AsyncHandler(async (req, _, next) => {
 
   const userResponse = { ...user };
   delete userResponse.password;
-  //delete userResponse._id;
   delete userResponse.createdAt;
   delete userResponse.updatedAt;
   delete userResponse.__v;
