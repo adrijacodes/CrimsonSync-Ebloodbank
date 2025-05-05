@@ -83,7 +83,7 @@ export const updateNotificationStatus = AsyncHandler(async (req, res) => {
   });
 
   if (!notification) {
-    throw new ApiError(404, "Notification not found or you do not have permission to view it");
+    throw new ApiError(404, "Notification not found ");
   }
 
   // Update the notification status to 'seen'
