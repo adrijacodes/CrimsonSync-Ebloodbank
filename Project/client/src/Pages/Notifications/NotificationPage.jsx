@@ -23,10 +23,12 @@ const NotificationPage = () => {
       });
 
       const data = await response.json();
-      console.log("Fetched data:", data); // Debugging line
-      setNotifications(Array.isArray(data) ? data : data.notifications || []);
+      console.log("Fetched data:", data.data); // Debugging line
+      setNotifications(Array.isArray(data.data) ? data : data.data.notifications || []);
     } catch (error) {
       console.error("Error fetching notifications:", error);
+      console.error("Error:", error.response?.data?.message);  
+      alert(error.response?.data?.message);
       setNotifications([]); // fallback to empty
     } finally {
       setLoading(false);
@@ -98,15 +100,13 @@ const NotificationPage = () => {
                 className={`p-4 border rounded-lg ${
                   notif.isRead
                     ? "bg-gray-100 border-gray-300"
-                    : "bg-red-50 border-red-300"
+                    : "bg-green-50 border-green-300"
                 }`}
               >
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-sm text-gray-800">{notif.message}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Type: {notif.type} | Status: {notif.status}
-                    </p>
+                    
                   </div>
                   {notif.status === "active" && !notif.isRead && (
                     <button
