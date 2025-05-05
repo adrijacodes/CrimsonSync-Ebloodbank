@@ -1,0 +1,41 @@
+import cron from "node-cron";
+import BloodRequest from "../models/bloodRequestModel";
+import Notification from "../models/notificationsModel";
+
+
+const cancelExpiredRequests = () => {
+  cron.schedule("0 * * * *", async () => {
+    const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+
+    const expiredRequests = await BloodRequest.find({
+      status: "pending",
+      createdAt: { $lte: twelveHoursAgo },
+    });
+
+    for (const request of expiredRequests) {
+      request.status = "cancelled";
+      await request.save();
+
+      // Notify the recipient
+      await Notification.create({
+        user: request.user,
+        bloodRequestId: request._id,
+        message:
+          "No donors responded within 12 hours. Your request has been automatically cancelled. We're sorry!",
+        status: "info",
+        isRead: false,
+      });
+
+      // Cancel all related notifications
+      await Notification.updateMany(
+        { bloodRequestId: request._id },
+        { $set: { status: "cancelled" } }
+      );
+    }
+
+    console.log(`[CRON] Expired blood requests cancelled at ${new Date().toLocaleString()}`);
+
+  });
+};
+
+export default cancelExpiredRequests;

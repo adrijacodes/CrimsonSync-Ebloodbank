@@ -7,6 +7,7 @@ import searchBloodRoutes from "../src/routes/bloodRequestSearch.js"
 import notificationRoutes from "./routes/notificationRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import adminRoutes from "./routes/adminAuthRoutes.js";
+import cancelExpiredRequests from "./crons/cancelExpiredRequests.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
     message: "Route not found",
   });
 });
+cancelExpiredRequests();
 
 app.use((err, req, res, next) => {
   if (err instanceof ApiError) {
