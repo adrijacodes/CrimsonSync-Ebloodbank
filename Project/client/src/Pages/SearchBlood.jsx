@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import bloodImage from '../assets/blood2.jpg';
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const SearchBlood = () => {
   const [location, setLocation] = useState('');
   const [selectedBloodType, setSelectedBloodType] = useState('');
@@ -8,34 +9,41 @@ const SearchBlood = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Searching donor with:", selectedBloodType, location);
-  
-    const accessToken= localStorage.getItem('token');
+    const accessToken = localStorage.getItem('token');
   
     try {
       const response = await fetch('http://localhost:8001/api/blood-requests/search-donors', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`, 
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           bloodType: selectedBloodType,
-          location: location,
+          city: location,
         }),
       });
   
+      const data = await response.json();
+  
       if (!response.ok) {
-        throw new Error('Failed to fetch donors');
+        throw new Error(data.message || 'Failed to fetch donors');
       }
   
-      const data = await response.json();
-      setDonors(data);
+      // ✅ Show toast with backend message
+      if (data.message) {
+        toast.success(data.message);
+      }
+  
+      setDonors(data.donors || []);
+  
     } catch (error) {
-      console.error('Error fetching donors:', error);
-      setDonors([]); // Clear donors on error
+      console.error('Error:', error);
+      toast.error(error.message || 'Something went wrong');
+      setDonors([]);
     }
   };
+  
   
   
   
@@ -91,7 +99,7 @@ const SearchBlood = () => {
             type="submit"
             className="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600 transition duration-200"
           >
-            Search Donor
+            Search Blood
           </button>
         </form>
 
@@ -120,6 +128,7 @@ const SearchBlood = () => {
           </div>
         )}
       </div>
+      <ToastContainer />
     </div>
   );
 };
