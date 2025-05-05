@@ -1,53 +1,103 @@
-// controllers/notificationController.js
+
 import AsyncHandler from "express-async-handler";
-import Notification from "../models/notificationModel.js";
-import ApiResponse from "../utils/ApiResponse.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import Notification from "../models/notificationsModel.js";
 import ApiError from "../utils/ApiError.js";
 
 // get all user notifications
 export const getUserNotifications = AsyncHandler(async (req, res) => {
-  const userId = req.user._id; 
-
-  const notifications = await Notification.find({ user: userId })
-    .sort({ createdAt: -1 }); 
-  if (!notifications) {
-    throw new ApiError(404, "No notifications found for this user");
-  }
-
-  return res.status(200).json(new ApiResponse(notifications, "Notifications fetched successfully", true));
-});
-
-//search user notification based on status
-export const searchUserNotifications = AsyncHandler(async (req, res) => {
-    const userId = req.user._id;
+    const userId = req.user._id; 
   
-    const [activeNotifications, seenNotifications] = await Promise.all([
-      Notification.find({
-        user: userId,
-        isSeen: false,
-        status: "active", 
-      }).sort({ createdAt: -1 }),
+    const notifications = await Notification.find({ user: userId })
+      .sort({ createdAt: -1 }); 
   
-      Notification.find({
-        user: userId,
-        isSeen: true,
-        status: "seen", 
-      }).sort({ createdAt: -1 }),
-    ]);
-  
-    if (!activeNotifications.length && !seenNotifications.length) {
+    if (!notifications || notifications.length === 0) {
       throw new ApiError(404, "No notifications found for this user");
     }
   
+    const count = await Notification.countDocuments({ user: userId });
+  
     return res.status(200).json(
       new ApiResponse(
-        {
-          active: activeNotifications,
-          seen: seenNotifications,
-        },
+        { notifications, count },
         "Notifications fetched successfully",
         true
       )
     );
   });
   
+
+// search user notification based on status
+export const searchUserNotifications = AsyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    const status = req.query.status?.toLowerCase();
+  
+    if (!status || !["active", "seen"].includes(status)) {
+      throw new ApiError(400, "Invalid or missing 'status' query parameter (use 'active' or 'seen')");
+    }
+  
+    
+    const isRead = status === "seen";
+  
+  
+    const query = {
+      user: userId,
+      status,
+      isRead
+    };
+  
+    const [notifications, count] = await Promise.all([
+      Notification.find(query).sort({ createdAt: -1 }),
+      Notification.countDocuments(query)
+    ]);
+  
+    if (!notifications.length) {
+      throw new ApiError(404, `No ${status} notifications found`);
+    }
+  
+    return res.status(200).json(
+      new ApiResponse(
+        {
+          status,
+          isRead,
+          count,
+          notifications
+        },
+        `Successfully fetched ${status} notifications`,
+        true
+      )
+    );
+  });
+  
+  
+
+
+export const updateNotificationStatus = AsyncHandler(async (req, res) => {
+  const { notificationId } = req.params; 
+  const userId = req.user._id; 
+
+ 
+  const notification = await Notification.findOne({
+    _id: notificationId,
+    user: userId, 
+  });
+
+  if (!notification) {
+    throw new ApiError(404, "Notification not found or you do not have permission to view it");
+  }
+
+  // Update the notification status to 'seen'
+  notification.status = "seen";
+  notification.isSeen = true;
+
+  // Save the updated notification
+  await notification.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      notification,
+      "Notification status updated to 'seen'",
+      true
+    )
+  );
+});

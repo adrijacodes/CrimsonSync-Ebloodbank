@@ -8,7 +8,7 @@ import {
 const router = express.Router();
 
 router
-  .route("/search-donors")
+  .route("/search-blood")
   .post(verifyUserToken1, userRolecheck, createBloodRequest);
 
 export default router;
