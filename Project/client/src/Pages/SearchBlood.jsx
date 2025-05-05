@@ -103,7 +103,7 @@ const SearchBlood = () => {
           </button>
         </form>
 
-        {/* Donor Results */}
+        {/* Donor Results
         {donors.length > 0 ? (
           <div className="mt-10 bg-white bg-opacity-80 p-6 rounded-xl shadow-md w-full max-w-3xl">
             <h2 className="text-center text-2xl font-semibold mb-4 font-serif">Available Donors</h2>
@@ -126,7 +126,7 @@ const SearchBlood = () => {
           <div className="mt-10 text-center text-white text-lg font-medium">
             {selectedBloodType && location && 'No donors found for your selection.'}
           </div>
-        )}
+        )} */}
       </div>
       <ToastContainer />
     </div>
