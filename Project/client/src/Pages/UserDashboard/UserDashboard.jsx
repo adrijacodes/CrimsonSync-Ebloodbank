@@ -17,7 +17,7 @@ const Dashboard = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const navigate = useNavigate();
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const days = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -138,7 +138,7 @@ const Dashboard = () => {
       validDays.includes(day)
     );
 
-    console.log("Sending valid availability:", filteredAvailability);
+    console.log("Sending valid availability:", availability);
 
     const response = await fetch(
       "http://localhost:8001/api/auth/user/profile/update-availability",
