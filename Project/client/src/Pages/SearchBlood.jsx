@@ -12,7 +12,7 @@ const SearchBlood = () => {
     const accessToken = localStorage.getItem('token');
   
     try {
-      const response = await fetch('http://localhost:8001/api/blood-requests/search-donors', {
+      const response = await fetch('http://localhost:8001/api/blood-requests/search-blood', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,9 +43,6 @@ const SearchBlood = () => {
       setDonors([]);
     }
   };
-  
-  
-  
   
 
   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];

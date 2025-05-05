@@ -1,20 +1,33 @@
 import React, { useEffect, useState } from "react";
 
-const NotificationPage = ({ userId }) => {
+const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
-  const [filtered, setFiltered] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  // Fetch notifications
-  const fetchNotifications = async () => {
+  // Fetch notifications (all, active, seen)
+  const fetchNotifications = async (status = "all") => {
+    setLoading(true);
+    const accessToken = localStorage.getItem("token");
+
     try {
-      const response = await fetch(`/api/notifications/${userId}`);
+      const url =
+        status === "all"
+          ? "http://localhost:8001/api/notifications"
+          : `http://localhost:8001/api/notifications/search?status=${status}`;
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
       const data = await response.json();
-      setNotifications(data);
-      setFiltered(data);
+      console.log("Fetched data:", data); // Debugging line
+      setNotifications(Array.isArray(data) ? data : data.notifications || []);
     } catch (error) {
       console.error("Error fetching notifications:", error);
+      setNotifications([]); // fallback to empty
     } finally {
       setLoading(false);
     }
@@ -22,34 +35,32 @@ const NotificationPage = ({ userId }) => {
 
   // Mark a notification as read
   const markAsRead = async (id) => {
+    const accessToken = localStorage.getItem("token");
+
     try {
-      await fetch(`/api/notifications/${id}/read`, {
-        method: "PUT",
+      await fetch(`http://localhost:8001/api/notifications/${id}/read`, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      const updated = notifications.map((n) =>
-        n._id === id ? { ...n, isRead: true, status: "seen" } : n
-      );
-      setNotifications(updated);
-      applyFilter(filter, updated);
+      // Refresh notifications after marking as read
+      fetchNotifications(filter);
     } catch (error) {
       console.error("Error marking as read:", error);
     }
   };
 
-  // Apply filter to notification list
-  const applyFilter = (type, list = notifications) => {
-    setFilter(type);
-    if (type === "all") setFiltered(list);
-    else if (type === "active") setFiltered(list.filter((n) => n.status === "active"));
-    else if (type === "seen") setFiltered(list.filter((n) => n.status === "seen" || n.isRead));
+  // Handle filter change
+  const handleFilterChange = (status) => {
+    setFilter(status);
+    fetchNotifications(status);
   };
 
   useEffect(() => {
-    fetchNotifications();
+    fetchNotifications("all");
   }, []);
 
   return (
@@ -62,7 +73,7 @@ const NotificationPage = ({ userId }) => {
           {["all", "active", "seen"].map((tab) => (
             <button
               key={tab}
-              onClick={() => applyFilter(tab)}
+              onClick={() => handleFilterChange(tab)}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 filter === tab
                   ? "bg-red-500 text-white"
@@ -77,11 +88,11 @@ const NotificationPage = ({ userId }) => {
         {/* Notification List */}
         {loading ? (
           <p>Loading notifications...</p>
-        ) : filtered.length === 0 ? (
+        ) : notifications.length === 0 ? (
           <p>No {filter} notifications.</p>
         ) : (
           <ul className="space-y-4">
-            {filtered.map((notif) => (
+            {notifications.map((notif) => (
               <li
                 key={notif._id}
                 className={`p-4 border rounded-lg ${
