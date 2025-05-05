@@ -9,14 +9,14 @@ export const userdata = [
     "isDonor": true,
     "isRecipient": false,
     "role": "member",
-    "availability": ["MON", "WED", "THURS"]
+    "availability": ["MON", "WED", "THURS","TUES"]
   },
   {
     "name": "Amit Patil",
     "email": "amit@example.com",
     "password": "hashedpassword2",
-    "bloodType": "A-",
-    "location": { "city": "Mumbai", "state": "Maharashtra" },
+    "bloodType": "B+",
+    "location": { "city": "Kolkata", "state": "West Bengal" },
     "isDonor": false,
     "isRecipient": true,
     "role": "member",

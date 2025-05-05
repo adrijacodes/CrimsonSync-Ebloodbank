@@ -74,21 +74,16 @@ export const searchUserNotifications = AsyncHandler(async (req, res) => {
 
 export const updateNotificationStatus = AsyncHandler(async (req, res) => {
   const { notificationId } = req.params; 
-  const userId = req.user._id; 
-
  
-  const notification = await Notification.findOne({
-    _id: notificationId,
-    user: userId, 
-  });
+  const notification = await Notification.findById(notificationId);
 
   if (!notification) {
-    throw new ApiError(404, "Notification not found or you do not have permission to view it");
+    throw new ApiError(404, "Notification not found ");
   }
 
   // Update the notification status to 'seen'
   notification.status = "seen";
-  notification.isSeen = true;
+  notification.isRead = true;
 
   // Save the updated notification
   await notification.save();
