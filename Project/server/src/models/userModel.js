@@ -66,6 +66,9 @@ const userSchema = new Schema(
         ref: "BloodRequests",
       },
     ],
+    lastBloodDonationDate: {
+      type: Date, 
+    },
     role: {
       type: String,
       default: "member",
@@ -102,3 +105,4 @@ userSchema.methods.generateUserAccessToken = async function () {
 
 const User = mongoose.model("Users", userSchema);
 export default User;
+ 
