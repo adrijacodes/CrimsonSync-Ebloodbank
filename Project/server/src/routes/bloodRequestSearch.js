@@ -1,6 +1,5 @@
 import express from "express";
-import { searchdonors } from "../controllers/searchdonorcontroller.js";
-import verifyUserToken from "../middlewares/auth.middleware.js";
+import { createBloodRequest } from "../controllers/searchdonorcontroller.js";
 import verifyUserToken1 from "../middlewares/userAuth.middlewares.js";
 import {
   adminRolecheck,
@@ -10,6 +9,6 @@ const router = express.Router();
 
 router
   .route("/search-donors")
-  .get(verifyUserToken1, userRolecheck, searchdonors);
+  .post(verifyUserToken1, userRolecheck, createBloodRequest);
 
-  export default router;
+export default router;

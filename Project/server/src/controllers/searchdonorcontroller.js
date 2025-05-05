@@ -1,94 +1,113 @@
+import mongoose from "mongoose";
 import User from "../models/userModel.js";
 import AsyncHandler from "express-async-handler";
 import ApiError from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import BloodRequest from "../models/bloodRequestModel.js";
+import Notification from "../models/notificationsModel.js";
+import moment from "moment";
 
-// Helper function to get today's day
-const getTodayDay = () => {
-  const days = ["SUN", "MON", "TUES", "WED", "THURS", "FRI", "SAT"];
-  const today = new Date();
-  return days[today.getDay()];
-};
+// Create a blood request
+export const createBloodRequest = AsyncHandler(async (req, res) => {
+  const { city, bloodType } = req.body;
+  const recipient = req.user;
+  const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
-// Helper function to extract donor IDs
-const getdonorIDs = (donors) => {
-  return donors.map((donor) => donor._id);
-};
-
-// Random item selection and removal
-const getRandomItemAndRemove = (arr) => {
-  const randomIndex = Math.floor(Math.random() * arr.length);
-  const randomItem = arr[randomIndex];
-  arr.splice(randomIndex, 1);
-  return randomItem;
-};
-
-// Simulated function X for testing
-const functionX = () => {
-  return 0.2 > 0.5;  // For testing purposes: returns true or false
-};
-
-export const searchdonors = AsyncHandler(async (req, res, next) => {
-  const { city, bloodType } = req.query;
-
-  // Validate input
   if (!city || !bloodType) {
-    throw ApiError(400, "City and BloodType are required!");
+    throw new ApiError(400, "City and Blood Type are required fields.");
   }
 
-  const today = getTodayDay();
-
-  // Query to find donors based on city, bloodType, and today's availability
-  const searchQuery = {
-    "location.city": city,
-    bloodType: bloodType,
-    isDonor: true,
-    availability: { $in: [today] },
-  };
-
-  // Fetch available donors
-  const availableDonors = await User.find(searchQuery);
-
-  if (availableDonors.length === 0) {
-    return res.status(404).json(new ApiResponse({}, "No Donors found!", true));
+  if (!validBloodTypes.includes(bloodType)) {
+    throw new ApiError(400, "Invalid blood type provided.");
   }
 
-  // Prepare the donor list (just the IDs for now)
-  let donorList = getdonorIDs(availableDonors);
-  console.log("Initial Available Donors: ", donorList);  // Log the initial list of available donors
+  const days = ["SUN", "MON", "TUES", "WED", "THURS", "FRI", "SAT"];
+  const todayIndex = new Date().getDay();
+  const day = days[todayIndex];
 
-  const attemptDonorSelection = () => {
-    if (donorList.length === 0) {
-      console.log("No donors left to attempt. Exiting.");  // Log when all donors are exhausted
-      return res.status(404).json(new ApiResponse({}, "No available donors after attempts.", true));
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // Create a new blood request
+    const bloodRequest = new BloodRequest({
+      recipient: recipient._id,
+      city: city.toLowerCase(),
+      bloodType,
+      day,
+    });
+
+    await bloodRequest.save({ session });
+
+    const potentialDonors = await User.find({
+      bloodType,
+      "location.city": city.toLowerCase(),
+      $or: [
+        {
+          lastBloodDonationDate: {
+            $lt: moment().subtract(3, "months").toDate(),
+          },
+        },
+        { lastBloodDonationDate: { $exists: false } },
+      ],
+      availability: { $in: [day] },
+      isDonor: true,
+    });
+
+    if (potentialDonors.length === 0) {
+      throw new ApiError(
+        404,
+        `No eligible donors found for blood type ${bloodType} in ${city}.`
+      );
     }
 
-    // Select a random donor
-    const selectedDonor = getRandomItemAndRemove(donorList);
-    console.log(`Picked Donor: ${selectedDonor}`);  // Log which donor was selected
+    // Notify recipient
+    const recipientNotification = new Notification({
+      user: recipient._id,
+      bloodRequestId: bloodRequest._id,
+      message: `Your blood request for type ${bloodType} in ${city} has been submitted. We are actively looking for a donor. You will be notified once a match is found or if the request is fulfilled.Please Wait`,
+      type: "info",
+      status: "active",
+      isSeen: false,
+    });
 
-    // Log the remaining donor list
-    console.log("Remaining Donors: ", donorList);
+    await recipientNotification.save({ session });
 
-    // Start a 5-millisecond timer to check if the donor is available
-    const timer = setTimeout(() => {
-      if (!functionX()) {
-        console.log(`Donor ${selectedDonor} failed. Trying another one.`);  // Log when a donor fails
-        attemptDonorSelection();  // Retry with the next donor
-      } else {
-        console.log(`Donor ${selectedDonor} selected successfully.`);  // Log when a donor is successfully selected
-        clearTimeout(timer); // Clear the timer once donor is selected
+    // Notify potential donors
+    const donorNotifications = potentialDonors.map((donor) => {
+      return new Notification({
+        user: donor._id,
+        bloodRequestId: bloodRequest._id,
+        message: `A request for blood type ${bloodType} in ${city} is available. Are you available to donate? (Accept/Reject)`,
+        type: "acknowledgement",
+        status: "active",
+        isSeen: false,
+      }).save({ session });
+    });
 
-        // Send the response
-        return res.status(200).json({
-          success: true,
-          data: selectedDonor,
-        });
-      }
-    }, 5); // Timer set to 5 milliseconds
-  };
+    await Promise.all(donorNotifications);
 
-  // Start attempting to select a donor
-  console.log("Attempting to select a donor...");
-  attemptDonorSelection();
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return res
+      .status(201)
+      .json(
+        new ApiResponse(
+          null,
+          `The blood request for type ${bloodType} in city ${city} has been created successfully. Notifications have been sent to potential donors.`,
+          true
+        )
+      );
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error(
+      "Error creating blood request or sending notifications:",
+      error
+    );
+    throw new ApiError(500, "An error occurred while processing your request.");
+  }
 });

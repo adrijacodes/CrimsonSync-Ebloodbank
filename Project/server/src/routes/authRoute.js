@@ -14,7 +14,7 @@ import {
   updateBloodType,
 } from "../controllers/authcontroller.js";
 import verifyUserToken from "../middlewares/auth.middleware.js";
-import verifyUserToken1 from "../middlewares/userAuth.middlewares.js";
+import verifyUserToken1 from "../middlewares/userAuth.middlewares.js"; 
 import {
   adminRolecheck,
   userRolecheck,

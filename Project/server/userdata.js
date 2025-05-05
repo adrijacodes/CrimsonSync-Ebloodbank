@@ -26,7 +26,7 @@ export const userdata = [
     "name": "Priya Jadhav",
     "email": "priya@example.com",
     "password": "hashedpassword3",
-    "bloodType": "B+",
+    "bloodType": "AB+",
     "location": { "city": "Delhi", "state": "Delhi" },
     "isDonor": true,
     "isRecipient": false,
@@ -38,11 +38,11 @@ export const userdata = [
     "email": "soham@example.com",
     "password": "hashedpassword4",
     "bloodType": "AB+",
-    "location": { "city": "Bangalore", "state": "Karnataka" },
-    "isDonor": false,
+    "location": {  "city": "Delhi", "state": "Delhi" },
+    "isDonor": true,
     "isRecipient": true,
     "role": "member",
-    "availability": ["THURS", "SUN"]
+    "availability": ["THURS", "SUN","MON"]
   },
   {
     "name": "Neha Shinde",
@@ -53,18 +53,18 @@ export const userdata = [
     "isDonor": true,
     "isRecipient": false,
     "role": "member",
-    "availability": ["WED", "THURS", "SAT"]
+    "availability": ["WED", "THURS", "SAT","MON"]
   },
   {
     "name": "Ravi Bhosale",
     "email": "ravi@example.com",
     "password": "hashedpassword6",
-    "bloodType": "B-",
-    "location": { "city": "Chennai", "state": "Tamil Nadu" },
+    "bloodType": "O-",
+    "location": { "city": "Hyderabad", "state": "Telangana" },
     "isDonor": false,
     "isRecipient": true,
     "role": "member",
-    "availability": ["THURS", "FRI", "SUN"]
+    "availability": ["MON", "FRI", "SUN"]
   },
   {
     "name": "Ayesha Gaikwad",
