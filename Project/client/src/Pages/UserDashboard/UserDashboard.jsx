@@ -51,24 +51,24 @@ const Dashboard = () => {
     toast(msg, { autoClose: duration });
   };
 
-  const updateProfile = async (url, method, body) => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
+  // const updateProfile = async (url, method, body) => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const res = await fetch(url, {
+  //       method,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(body),
+  //     });
 
-      if (!res.ok) throw new Error();
-      return true;
-    } catch {
-      return false;
-    }
-  };
+  //     if (!res.ok) throw new Error();
+  //     return true;
+  //   } catch {
+  //     return false;
+  //   }
+  // };
   // Location section
   const handleSaveLocation = async () => {
     const response = await fetch(
