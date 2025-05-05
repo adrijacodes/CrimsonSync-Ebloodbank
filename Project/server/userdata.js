@@ -61,7 +61,7 @@ export const userdata = [
     "password": "hashedpassword6",
     "bloodType": "O-",
     "location": { "city": "Hyderabad", "state": "Telangana" },
-    "isDonor": false,
+    "isDonor": true,
     "isRecipient": true,
     "role": "member",
     "availability": ["MON", "FRI", "SUN"]

@@ -31,7 +31,7 @@ const verifyUserToken1 = AsyncHandler(async (req, _, next) => {
   }
 
   const user = await User.findOne({ email: decodedToken.email }).lean();
-  console.log("User found:", user);
+  //console.log("User found:", user);
 
   if (!user) {
     throw new ApiError(401, "Invalid access token");
