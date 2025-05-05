@@ -36,6 +36,8 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
       bloodType,
       day,
     });
+    //console.log(bloodRequest);
+    
 
     await bloodRequest.save({ session });
 

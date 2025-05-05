@@ -53,7 +53,7 @@ export const userdata = [
     "isDonor": true,
     "isRecipient": false,
     "role": "member",
-    "availability": ["WED", "THURS", "SAT","MON"]
+    "availability": ["WED", "THURS", "SAT","MON","TUES"]
   },
   {
     "name": "Ravi Bhosale",
@@ -64,7 +64,7 @@ export const userdata = [
     "isDonor": true,
     "isRecipient": true,
     "role": "member",
-    "availability": ["MON", "FRI", "SUN"]
+    "availability": ["MON", "FRI", "SUN","TUES"]
   },
   {
     "name": "Ayesha Gaikwad",
