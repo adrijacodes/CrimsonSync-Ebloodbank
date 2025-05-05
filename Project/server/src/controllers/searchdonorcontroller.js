@@ -29,14 +29,13 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
   session.startTransaction();
 
   try {
-    // Create a new blood request
+  
     const bloodRequest = new BloodRequest({
       recipient: recipient._id,
       city: city.toLowerCase(),
       bloodType,
       day,
     });
-    //console.log(bloodRequest);
     
 
     await bloodRequest.save({ session });
@@ -64,7 +63,6 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
       );
     }
 
-    // Notify recipient
     const recipientNotification = new Notification({
       user: recipient._id,
       bloodRequestId: bloodRequest._id,
@@ -77,7 +75,6 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
     await recipientNotification.save({ session });
     
 
-    // Notify potential donors
     const donorNotifications = potentialDonors.map((donor) => {
       return new Notification({
         user: donor._id,
@@ -91,7 +88,6 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
 
     await Promise.all(donorNotifications);
 
-    // Commit the transaction
     await session.commitTransaction();
     session.endSession();
 

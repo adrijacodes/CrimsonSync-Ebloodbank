@@ -69,30 +69,32 @@ export const searchUserNotifications = AsyncHandler(async (req, res) => {
     );
   });
   
+  export const updateNotificationStatus = AsyncHandler(async (req, res) => {
+    const { notificationId } = req.params;
+    const { status } = req.body;
   
-
-
-export const updateNotificationStatus = AsyncHandler(async (req, res) => {
-  const { notificationId } = req.params; 
- 
-  const notification = await Notification.findById(notificationId);
-
-  if (!notification) {
-    throw new ApiError(404, "Notification not found ");
-  }
-
-  // Update the notification status to 'seen'
-  notification.status = "seen";
-  notification.isRead = true;
-
-  // Save the updated notification
-  await notification.save();
-
-  return res.status(200).json(
-    new ApiResponse(
-      notification,
-      "Notification status updated to 'seen'",
-      true
-    )
-  );
-});
+    const validStatuses = ["seen", "rejected"]; 
+  
+    if (!validStatuses.includes(status)) {
+      throw new ApiError(400, "Invalid notification status");
+    }
+  
+    const notification = await Notification.findById(notificationId);
+    if (!notification) {
+      throw new ApiError(404, "Notification not found");
+    }
+  
+    notification.status = status;
+    notification.isRead = true;
+  
+    await notification.save();
+  
+    return res.status(200).json(
+      new ApiResponse(
+        notification,
+        `Notification status updated to '${status}'`,
+        true
+      )
+    );
+  });
+  
