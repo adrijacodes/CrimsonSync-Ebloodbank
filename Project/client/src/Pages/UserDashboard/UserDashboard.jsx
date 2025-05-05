@@ -69,6 +69,8 @@ const Dashboard = () => {
   //     return false;
   //   }
   // };
+
+  
   // Location section
   const handleSaveLocation = async () => {
     const response = await fetch(

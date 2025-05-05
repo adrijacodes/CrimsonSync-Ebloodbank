@@ -26,7 +26,7 @@ export const userdata = [
     "name": "Priya Jadhav",
     "email": "priya@example.com",
     "password": "hashedpassword3",
-    "bloodType": "B+",
+    "bloodType": "AB+",
     "location": { "city": "Delhi", "state": "Delhi" },
     "isDonor": true,
     "isRecipient": false,
@@ -38,11 +38,11 @@ export const userdata = [
     "email": "soham@example.com",
     "password": "hashedpassword4",
     "bloodType": "AB+",
-    "location": { "city": "Bangalore", "state": "Karnataka" },
-    "isDonor": false,
+    "location": {  "city": "Delhi", "state": "Delhi" },
+    "isDonor": true,
     "isRecipient": true,
     "role": "member",
-    "availability": ["THURS", "SUN"]
+    "availability": ["THURS", "SUN","MON"]
   },
   {
     "name": "Neha Shinde",
