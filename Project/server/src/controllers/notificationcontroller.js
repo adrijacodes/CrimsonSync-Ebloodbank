@@ -74,13 +74,8 @@ export const searchUserNotifications = AsyncHandler(async (req, res) => {
 
 export const updateNotificationStatus = AsyncHandler(async (req, res) => {
   const { notificationId } = req.params; 
-  const userId = req.user._id; 
-
  
-  const notification = await Notification.findOne({
-    _id: notificationId,
-    user: userId, 
-  });
+  const notification = await Notification.findById(notificationId);
 
   if (!notification) {
     throw new ApiError(404, "Notification not found ");
