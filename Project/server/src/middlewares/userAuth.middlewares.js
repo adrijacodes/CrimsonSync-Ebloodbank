@@ -6,15 +6,15 @@ import User from "../models/userModel.js";
 
 const verifyUserToken1 = AsyncHandler(async (req, _, next) => {
   let token =
-    req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+    req.cookies?.accessToken ||
+    req.header("Authorization")?.replace("Bearer ", "");
 
-  console.log("Token received:", token); 
+  console.log("Token received:", token);
 
   if (!token) {
     throw new ApiError(401, "Unauthorized request: No token provided");
   }
 
-  
   if (token.startsWith('"') && token.endsWith('"')) {
     token = token.slice(1, -1);
   }
@@ -22,7 +22,7 @@ const verifyUserToken1 = AsyncHandler(async (req, _, next) => {
   let decodedToken;
   try {
     decodedToken = jwt.verify(token, TOKENSECRETKEY);
-    console.log("Decoded Token:", decodedToken); 
+    console.log("Decoded Token:", decodedToken);
   } catch (error) {
     throw new ApiError(
       401,
@@ -30,25 +30,22 @@ const verifyUserToken1 = AsyncHandler(async (req, _, next) => {
     );
   }
 
- 
-  const user = await User.findOne({ email: decodedToken.email }).lean(); 
-  console.log("User found:", user); 
+  const user = await User.findOne({ email: decodedToken.email }).lean();
+  console.log("User found:", user);
 
   if (!user) {
     throw new ApiError(401, "Invalid access token");
   }
 
-  
-  const userResponse = { ...user }; 
+  const userResponse = { ...user };
   delete userResponse.password;
-  delete userResponse._id;
+  //delete userResponse._id;
   delete userResponse.createdAt;
   delete userResponse.updatedAt;
   delete userResponse.__v;
 
- 
   req.user = userResponse;
-  next(); 
+  next();
 });
 
 export default verifyUserToken1;
