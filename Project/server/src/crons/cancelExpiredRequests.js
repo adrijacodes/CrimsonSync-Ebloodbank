@@ -22,7 +22,7 @@ const cancelExpiredRequests = () => {
         bloodRequestId: request._id,
         message:
           "No donors responded within 12 hours. Your request has been automatically cancelled. We're sorry!",
-        status: "info",
+        status: "active",
         isRead: false,
       });
 
@@ -45,7 +45,7 @@ export const checkAndCancelExpiredRequests = async () => {
     status: "pending",
     createdAt: { $lte: twelveHoursAgo },
   });
-  console.log(expiredRequests);
+  //console.log(expiredRequests);
   
 
   for (const request of expiredRequests) {
@@ -57,7 +57,7 @@ export const checkAndCancelExpiredRequests = async () => {
       bloodRequestId: request._id,
       message:
         "No donors responded within 12 hours. Your request has been automatically cancelled. We're sorry!",
-      status: "info",
+      status: "active",
       isRead: false,
     });
 
