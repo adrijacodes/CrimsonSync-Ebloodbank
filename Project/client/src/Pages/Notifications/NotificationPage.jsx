@@ -16,10 +16,10 @@ const NotificationPage = () => {
 
   // ✅ Play notification sound
   const playNotificationSound = () => {
-    const audio = new Audio(NotificationSound );
-    audio.play().catch((err) =>
-      console.warn("Notification sound failed to play:", err)
-    );
+    const audio = new Audio(NotificationSound);
+    audio
+      .play()
+      .catch((err) => console.warn("Notification sound failed to play:", err));
   };
 
   // ✅ Fetch counts and notify on new active
@@ -50,7 +50,11 @@ const NotificationPage = () => {
 
       // 🔔 Show toast and sound on new active notifications
       if (activeCount > previousActiveCount) {
-        toast.info(`🔔 You have ${activeCount - previousActiveCount} new notification(s)!`);
+        toast.info(
+          `🔔 You have ${
+            activeCount - previousActiveCount
+          } new notification(s)!`
+        );
         playNotificationSound();
       }
 
@@ -89,9 +93,7 @@ const NotificationPage = () => {
       const data = await response.json();
 
       setNotifications(
-        Array.isArray(data.data)
-          ? data.data
-          : data.data.notifications || []
+        Array.isArray(data.data) ? data.data : data.data.notifications || []
       );
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -103,8 +105,13 @@ const NotificationPage = () => {
 
   // ✅ Mark a notification as read
   const markAsRead = async (id) => {
-    setMarkingAsRead(id);
+    setMarkingAsRead(id); // Set the current notification as being marked
+    const status = "seen";
+    console.log("Sending status:", status);
+
     try {
+      console.log("Sending status:", status);
+
       const response = await fetch(
         `http://localhost:8001/api/notifications/${id}`,
         {
@@ -113,6 +120,7 @@ const NotificationPage = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
+          body: JSON.stringify({ status: status }), // Send status as part of the request body
         }
       );
 
@@ -120,12 +128,13 @@ const NotificationPage = () => {
         throw new Error("Failed to mark as read");
       }
 
+      // Fetch notifications and counts after successfully updating the status
       fetchNotifications(filter);
       fetchCounts();
     } catch (error) {
       console.error("Error marking as read:", error);
     } finally {
-      setMarkingAsRead(null);
+      setMarkingAsRead(null); // Reset the marking state
     }
   };
 
