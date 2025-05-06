@@ -9,6 +9,7 @@ import { IoNotifications } from "react-icons/io5";
 const Navbar = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0); // state for notifications count
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,7 +21,30 @@ const Navbar = () => {
     const loggedIn = localStorage.getItem("loggedIn");
     setIsRegistered(registered === "true");
     setIsLoggedIn(loggedIn === "true");
-  }, [location]);
+
+    // Fetch notification count when logged in
+    if (accessToken) {
+      // API call to fetch notifications
+      const fetchNotifications = async () => {
+        try {
+          const response = await axios.get(
+            "http://localhost:8001/api/notifications/search?status=active",
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+          console.log(response.data.data.count); // Debug: Check the full response
+          setNotificationCount(response.data.data.count);
+        } catch (error) {
+          console.error("Error fetching notifications:", error);
+        }
+      };
+
+      fetchNotifications();
+    }
+  }, [location, accessToken]);
 
   const handleLogout = async () => {
     if (!accessToken || !role) {
@@ -83,7 +107,7 @@ const Navbar = () => {
               <li className="hover:underline">About</li>
             </Link>
             <Link to="/faq">
-              <li className="hover:underline">FAQ's</li>
+              <li className="hover:underline">FAQ&apos;s</li>
             </Link>
             <Link to="/how-it-works">
               <li className="hover:underline">How It Works</li>
@@ -96,60 +120,53 @@ const Navbar = () => {
             )}
 
             {accessToken && role === "Admin" && (
-              <>
-                <Link to="/admin-dashboard">
-                  <li className="hover:underline">Admin Dashboard</li>
-                </Link>
-              </>
-            )}
-            {/* {accessToken && role === "User" && (
-              <Link to="/user-dashboard">
-                <li>
-                  <BiSolidUserCircle className="text-3xl" />
-                </li>
+              <Link to="/admin-dashboard">
+                <li className="hover:underline">Admin Dashboard</li>
               </Link>
-            )} */}
+            )}
           </ul>
         </nav>
 
         {/* Logout Button */}
         {(isLoggedIn || isRegistered) && accessToken && (
-  <>
-    {role === 'User' && (
-      <div className="flex gap-5 justify-center items-center">
-        <Link to="/user-dashboard">
-          <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
-        </Link>
-        <Link to="/notification">
-          <IoNotifications  className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
-        </Link>
-        <button
-          onClick={handleLogout}
-          className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition-colors duration-200"
-        >
-          <FiLogOut className="text-lg" />
-          Logout
-        </button>
-      </div>
-    )}
+          <>
+            {role === "User" && (
+              <div className="flex gap-5 justify-center items-center">
+                <Link to="/user-dashboard">
+                  <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
+                </Link>
+                <Link to="/notification" className="relative">
+                  <IoNotifications className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
+                  <span className="absolute -top-2 -right-2 text-[10px] bg-yellow-300 text-black font-bold rounded-full px-[6px] py-[2px] shadow-md">
+                    {notificationCount}
+                  </span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition-colors duration-200"
+                >
+                  <FiLogOut className="text-lg" />
+                  Logout
+                </button>
+              </div>
+            )}
 
-    {role === 'Admin' && (
-      <div className="flex gap-5 justify-center items-center">
-        <Link to="/admin-profile">
-          <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
-        </Link>
-        <button
-          onClick={handleLogout}
-          className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition-colors duration-200"
-        >
-          <FiLogOut className="text-lg" />
-          Logout
-        </button>
-      </div>
-    )}
-  </>
-)}
-
+            {role === "Admin" && (
+              <div className="flex gap-5 justify-center items-center">
+                <Link to="/admin-profile">
+                  <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition-colors duration-200"
+                >
+                  <FiLogOut className="text-lg" />
+                  Logout
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </header>
   );
