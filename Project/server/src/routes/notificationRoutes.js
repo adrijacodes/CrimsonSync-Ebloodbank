@@ -1,6 +1,6 @@
 // routes/notificationRoutes.js
 import express from "express";
-import { getUserNotifications, searchUserNotifications, updateNotificationStatus } from "../controllers/notificationcontroller.js";
+import { getUserNotifications, searchUserNotifications,updateMarkAsReadStatus} from "../controllers/notificationcontroller.js";
 import { userRolecheck } from "../middlewares/userRoleChecking.js";
 import verifyUserToken1 from "../middlewares/userAuth.middlewares.js";
 
@@ -27,7 +27,7 @@ router.patch(
   "/:notificationId",
   verifyUserToken1,
   userRolecheck,
-  updateNotificationStatus
+ updateMarkAsReadStatus
 );
 
 export default router;
