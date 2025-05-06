@@ -5,6 +5,7 @@ import {
   searchUserNotifications,
   updateMarkAsReadStatus,
   rejectRequestNotification,
+  acceptRequestNotification
 } from "../controllers/notificationcontroller.js";
 import { userRolecheck } from "../middlewares/userRoleChecking.js";
 import verifyUserToken1 from "../middlewares/userAuth.middlewares.js";
@@ -26,10 +27,17 @@ router.patch(
 );
 // Route to update notification status  to rejected
 router.patch(
-  "/action/:notificationId",
+  "/reject/:notificationId",
   verifyUserToken1,
   userRolecheck,
   rejectRequestNotification
+);
+// Route to update notification status  to accepted
+router.patch(
+  "/accept/:notificationId",
+  verifyUserToken1,
+  userRolecheck,
+ acceptRequestNotification
 );
 
 export default router;
