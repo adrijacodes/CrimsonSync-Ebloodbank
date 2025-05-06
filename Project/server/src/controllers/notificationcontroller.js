@@ -134,3 +134,35 @@ export const rejectRequestNotification = AsyncHandler(async (req, res) => {
       )
     );
 });
+
+
+// Accept blood request notification
+export const acceptRequestNotification = AsyncHandler(async (req, res) => {
+  const { notificationId } = req.params;
+
+  const notification = await Notification.findById(notificationId);
+  
+  if (!notification) {
+    throw new ApiError(404, "Notification not found.");
+  }
+
+  if (notification.status === "accepted") {
+    throw new ApiError(400, "This notification is already marked as accepted.");
+  }
+
+  if (notification.status === "rejected") {
+    throw new ApiError(400, "This notification has already been rejected.");
+  }
+
+  notification.status = "accepted";
+  notification.isRead = true;
+  await notification.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      notification,
+      "Your response has been recorded. Please proceed to fill out the eligibility form.",
+      true
+    )
+  );
+});

@@ -79,7 +79,7 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
       return new Notification({
         user: donor._id,
         bloodRequestId: bloodRequest._id,
-        message: `A request for blood type ${bloodType} in ${city} is available. Are you available to donate? (Accept/Reject)`,
+        message: `A request for blood type ${bloodType} in ${city} is available. Are you available to donate? `,
         type: "action_required",
         status: "active",
         isSeen: false,

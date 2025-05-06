@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+
 const bloodRequestSchema = new mongoose.Schema(
   {
     recipient: {
@@ -20,14 +21,18 @@ const bloodRequestSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-  
     status: {
       type: String,
       enum: ["pending", "fulfilled", "cancelled"],
       default: "pending",
     },
+    eligibilityForm: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "EligibilityForm",
+      required: false, // Optional at first, as form will be filled later
+    },
   },
-  { timestamps: true } 
+  { timestamps: true }
 );
 
 export default mongoose.model("BloodRequest", bloodRequestSchema);
