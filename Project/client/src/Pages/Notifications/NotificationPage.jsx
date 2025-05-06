@@ -41,7 +41,7 @@ const NotificationPage = () => {
         fetch("http://localhost:8001/api/notifications/search?status=accepted", {
           headers: { Authorization: `Bearer ${accessToken}` },
         }),
-        fetch("http://localhost:8001/api/notifications/action/search?status=rejected", {
+        fetch("http://localhost:8001/api/notifications/search?status=rejected", {
           headers: { Authorization: `Bearer ${accessToken}` },
         }),
       ]);
@@ -147,12 +147,12 @@ const NotificationPage = () => {
   };
 
   // ✅ Accept or Reject notification
-  const handleActionRequired = async (id, action) => {
-    const status = action === "accept" ? "accepted" : "rejected";
-
+  const handleRejectionRequired = async (id) => {
+    const status = "rejected";
+  
     try {
       const response = await fetch(
-        `http://localhost:8001/api/notifications/${id}`,
+        `http://localhost:8001/api/notifications/action/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -162,18 +162,19 @@ const NotificationPage = () => {
           body: JSON.stringify({ status }),
         }
       );
-
+  
       if (!response.ok) {
         throw new Error("Failed to process action");
       }
-
+  
       fetchNotifications(filter);
       fetchCounts();
-      toast.success(`Notification ${status === "accepted" ? "accepted" : "rejected"}`);
+      toast.success("Notification rejected!");
     } catch (error) {
       console.error("Error processing action:", error);
     }
   };
+  
 
   // ✅ Change tab
   const handleFilterChange = (status) => {
@@ -269,7 +270,7 @@ const NotificationPage = () => {
                         Accept
                       </button>
                       <button
-                        onClick={() => handleActionRequired(notif._id, "reject")}
+                        onClick={() => handleRejectionRequired(notif._id, "reject")}
                         className="text-sm bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                       >
                         Reject
