@@ -4,6 +4,7 @@ import AsyncHandler from "express-async-handler";
 import ApiError from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import BloodRequest from "../models/bloodRequestModel.js";
+import EligibilityForm from "../models/eligibilityFormModel.js";
 import Notification from "../models/notificationsModel.js";
 import moment from "moment";
 
@@ -29,14 +30,12 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
   session.startTransaction();
 
   try {
-  
     const bloodRequest = new BloodRequest({
       recipient: recipient._id,
       city: city.toLowerCase(),
       bloodType,
       day,
     });
-    
 
     await bloodRequest.save({ session });
 
@@ -73,7 +72,6 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
     });
 
     await recipientNotification.save({ session });
-    
 
     const donorNotifications = potentialDonors.map((donor) => {
       return new Notification({
@@ -110,5 +108,58 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
     );
     throw new ApiError(500, "An error occurred while processing your request.");
   }
+});
+
+// eligibility form submission
+
+
+
+export const submitEligibilityForm = AsyncHandler(async (req, res) => {
+  const { notificationId } = req.params;
+  const donorId = req.user?._id;
+  const { formData } = req.body;
+console.log(notificationId);
+
+  if (!notificationId || !formData || typeof formData !== "object") {
+    throw new ApiError(400, "Notification ID and form data are required.");
+  }
+
+  const notification = await Notification.findById(notificationId);
+  if (!notification || !notification.bloodRequestId) {
+    throw new ApiError(404, "Notification or associated blood request not found.");
+  }
+
+  const bloodRequestId = notification.bloodRequestId;
+
+  const bloodRequest = await BloodRequest.findById(bloodRequestId);
+  if (!bloodRequest) {
+    throw new ApiError(404, "Blood request not found.");
+  }
+
+  const existingForm = await EligibilityForm.findOne({
+    donor: donorId,
+    bloodRequest: bloodRequestId,
+  });
+
+  if (existingForm) {
+    throw new ApiError(
+      400,
+      "You have already submitted this form for this request."
+    );
+  }
+
+  const newForm = await EligibilityForm.create({
+    donor: donorId,
+    bloodRequest: bloodRequestId,
+    formData: formData,
+  });
+
+  return res.status(201).json(
+    new ApiResponse(
+      newForm,
+      "Eligibility form submitted successfully. Your response has been recorded. Please wait while we review your eligibility.",
+      true
+    )
+  );
 });
 
