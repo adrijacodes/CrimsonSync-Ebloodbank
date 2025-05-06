@@ -23,10 +23,15 @@ const NotificationPage = () => {
   const [formData, setFormData] = useState({
     age: "",
     weight: "",
-    hasChronicDisease: "No",
-    onMedication: "No",
+    hadRecentIllness: "No",
+    onMedication: "",
+    recentSurgery: "No",
+    alcoholUse: "No",
+    chronicDiseases: "No",
+    covidExposure: "No",
     lastDonationDate: "",
-    recentInfection: "No",
+    currentlyPregnant: "No",
+    consent: "No",
   });
 
   const [currentNotificationId, setCurrentNotificationId] = useState(null);
@@ -200,7 +205,7 @@ const NotificationPage = () => {
       );
 
       if (!response.ok) throw new Error("Failed to process acceptance");
-
+console.log(id);
       // After accepting, show form modal
       setCurrentNotificationId(id);
       setShowFormModal(true);
@@ -221,6 +226,7 @@ const NotificationPage = () => {
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     try {
+      console.log(currentNotificationId);
       const response = await fetch(
         `http://localhost:8001/api/blood-requests/eligibility-form/${currentNotificationId}`,
         {
@@ -369,7 +375,7 @@ const NotificationPage = () => {
             <form onSubmit={handleSubmitForm} className="space-y-4">
               <input
                 type="number"
-                placeholder="Age"
+                placeholder="What is your age?"
                 value={formData.age}
                 onChange={(e) =>
                   setFormData({ ...formData, age: e.target.value })
@@ -377,9 +383,10 @@ const NotificationPage = () => {
                 className="w-full p-2 border rounded"
                 required
               />
+
               <input
                 type="text"
-                placeholder="Weight (e.g., 65kg)"
+                placeholder="What is your current weight (in kg)?"
                 value={formData.weight}
                 onChange={(e) =>
                   setFormData({ ...formData, weight: e.target.value })
@@ -387,48 +394,122 @@ const NotificationPage = () => {
                 className="w-full p-2 border rounded"
                 required
               />
+
               <select
-                value={formData.hasChronicDisease}
+                value={formData.hadRecentIllness}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    hasChronicDisease: e.target.value,
-                  })
+                  setFormData({ ...formData, hadRecentIllness: e.target.value })
                 }
                 className="w-full p-2 border rounded"
               >
                 <option value="No">
-                  Do you have any chronic disease? - No
+                  Have you had any illness (cold, flu, etc.) in the last 7 days?
+                  - No
                 </option>
                 <option value="Yes">Yes</option>
               </select>
-              <select
+
+              <textarea
+                placeholder="Are you currently on any medication? If yes, please mention."
                 value={formData.onMedication}
                 onChange={(e) =>
                   setFormData({ ...formData, onMedication: e.target.value })
                 }
                 className="w-full p-2 border rounded"
+              />
+
+              <select
+                value={formData.recentSurgery}
+                onChange={(e) =>
+                  setFormData({ ...formData, recentSurgery: e.target.value })
+                }
+                className="w-full p-2 border rounded"
               >
-                <option value="No">Are you on medication? - No</option>
+                <option value="No">
+                  Have you undergone any surgery in the past 6 months? - No
+                </option>
                 <option value="Yes">Yes</option>
               </select>
+
+              <select
+                value={formData.alcoholUse}
+                onChange={(e) =>
+                  setFormData({ ...formData, alcoholUse: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              >
+                <option value="No">
+                  Did you consume alcohol in the past 24 hours? - No
+                </option>
+                <option value="Yes">Yes</option>
+              </select>
+
+              <select
+                value={formData.chronicDiseases}
+                onChange={(e) =>
+                  setFormData({ ...formData, chronicDiseases: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              >
+                <option value="No">
+                  Do you have any chronic diseases (like diabetes,
+                  hypertension)? - No
+                </option>
+                <option value="Yes">Yes</option>
+              </select>
+
+              <select
+                value={formData.covidExposure}
+                onChange={(e) =>
+                  setFormData({ ...formData, covidExposure: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              >
+                <option value="No">
+                  Have you been exposed to COVID-19 or tested positive recently?
+                  - No
+                </option>
+                <option value="Yes">Yes</option>
+              </select>
+
               <input
                 type="date"
+                placeholder="When was your last blood donation?"
                 value={formData.lastDonationDate}
                 onChange={(e) =>
                   setFormData({ ...formData, lastDonationDate: e.target.value })
                 }
                 className="w-full p-2 border rounded"
-                required
               />
+
               <select
-                value={formData.recentInfection}
+                value={formData.currentlyPregnant}
                 onChange={(e) =>
-                  setFormData({ ...formData, recentInfection: e.target.value })
+                  setFormData({
+                    ...formData,
+                    currentlyPregnant: e.target.value,
+                  })
                 }
                 className="w-full p-2 border rounded"
               >
-                <option value="No">Any recent infection? - No</option>
+                <option value="No">
+                  Are you currently pregnant or gave birth in last 6 months? -
+                  No
+                </option>
+                <option value="Yes">Yes</option>
+              </select>
+
+              <select
+                value={formData.consent}
+                onChange={(e) =>
+                  setFormData({ ...formData, consent: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="No">
+                  Do you give your consent to donate blood voluntarily? - No
+                </option>
                 <option value="Yes">Yes</option>
               </select>
 
