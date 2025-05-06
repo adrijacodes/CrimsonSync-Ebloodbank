@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { FaBell } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -8,13 +8,21 @@ const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [counts, setCounts] = useState({ all: 0, active: 0, seen: 0, cancelled: 0, accepted: 0, rejected: 0 });
+  const [counts, setCounts] = useState({
+    all: 0,
+    active: 0,
+    seen: 0,
+    cancelled: 0,
+    accepted: 0,
+    rejected: 0,
+  });
   const [markingAsRead, setMarkingAsRead] = useState(null);
   const [previousActiveCount, setPreviousActiveCount] = useState(0);
 
+  const filterRef = useRef(filter);
   const accessToken = localStorage.getItem("token");
 
-  // ✅ Play notification sound
+// play NotificationSound when new "active" notifications are received
   const playNotificationSound = () => {
     const audio = new Audio(NotificationSound);
     audio
@@ -22,10 +30,17 @@ const NotificationPage = () => {
       .catch((err) => console.warn("Notification sound failed to play:", err));
   };
 
-  // ✅ Fetch counts and notify on new active
+  // Fetch the number of notifications in each category and detect new ones
   const fetchCounts = async () => {
     try {
-      const [allRes, activeRes, seenRes, cancelledRes, acceptedRes, rejectedRes] = await Promise.all([
+      const [
+        allRes,
+        activeRes,
+        seenRes,
+        cancelledRes,
+        acceptedRes,
+        rejectedRes,
+      ] = await Promise.all([
         fetch("http://localhost:8001/api/notifications", {
           headers: { Authorization: `Bearer ${accessToken}` },
         }),
@@ -46,7 +61,14 @@ const NotificationPage = () => {
         }),
       ]);
 
-      const [allData, activeData, seenData, cancelledData, acceptedData, rejectedData] = await Promise.all([
+      const [
+        allData,
+        activeData,
+        seenData,
+        cancelledData,
+        acceptedData,
+        rejectedData,
+      ] = await Promise.all([
         allRes.json(),
         activeRes.json(),
         seenRes.json(),
@@ -82,10 +104,9 @@ const NotificationPage = () => {
     }
   };
 
-  // ✅ Fetch notifications
+  // Fetch and display filtered notification list based on selected tab
   const fetchNotifications = async (status = "all") => {
     setLoading(true);
-
     try {
       const url =
         status === "all"
@@ -115,29 +136,24 @@ const NotificationPage = () => {
     }
   };
 
-  // ✅ Mark a notification as read
+  // Update notification status to "seen" and refresh list + counts
   const markAsRead = async (id) => {
     setMarkingAsRead(id);
-    const status = "seen";
-
     try {
-      const response = await fetch(
-        `http://localhost:8001/api/notifications/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ status }),
-        }
-      );
+      const response = await fetch(`http://localhost:8001/api/notifications/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ status: "seen" }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to mark as read");
       }
 
-      fetchNotifications(filter);
+      fetchNotifications(filterRef.current);
       fetchCounts();
     } catch (error) {
       console.error("Error marking as read:", error);
@@ -146,10 +162,9 @@ const NotificationPage = () => {
     }
   };
 
-  // ✅ Accept or Reject notification
+  // Handles rejection of action-required notifications
   const handleRejectionRequired = async (id) => {
-    const status = "rejected";
-  
+    const notif = notifications.find((n) => n._id === id);
     try {
       const response = await fetch(
         `http://localhost:8001/api/notifications/action/${id}`,
@@ -159,42 +174,46 @@ const NotificationPage = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
-          body: JSON.stringify({ status }),
+          body: JSON.stringify({ status: "rejected" }),
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to process action");
       }
-  
-      fetchNotifications(filter);
+
+      fetchNotifications(filterRef.current);
       fetchCounts();
-      toast.success("Notification rejected!");
+      toast.success(`❌ Rejected: "${notif?.message}"`);
     } catch (error) {
       console.error("Error processing action:", error);
     }
   };
-  
 
-  // ✅ Change tab
+  // Changes the visible notification list and remembers current tab for polling
   const handleFilterChange = (status) => {
     setFilter(status);
+    filterRef.current = status;
     fetchNotifications(status);
   };
 
-  // ✅ Initial fetch & polling
+  //  (**Polling & Initialization**)every 50s, refresh notifications and counts for current tab
   useEffect(() => {
     if (accessToken) {
-      fetchNotifications("all");
+      fetchNotifications(filter);
       fetchCounts();
 
       const interval = setInterval(() => {
-        fetchNotifications(filter);
+        fetchNotifications(filterRef.current);
         fetchCounts();
       }, 50000);
 
       return () => clearInterval(interval);
     }
+  }, [accessToken]);
+  // Ensure filterRef always matches the latest selected tab, for polling to work
+  useEffect(() => {
+    filterRef.current = filter;
   }, [filter]);
 
   return (
@@ -217,9 +236,7 @@ const NotificationPage = () => {
               key={tab}
               onClick={() => handleFilterChange(tab)}
               className={`relative px-4 py-2 rounded-full text-sm font-medium ${
-                filter === tab
-                  ? "bg-red-500 text-white"
-                  : "bg-gray-200 text-gray-700"
+                filter === tab ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -251,32 +268,31 @@ const NotificationPage = () => {
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-gray-800">{notif.message}</p>
 
-                  {notif.status === "active" && !notif.isRead && notif.type === "info" && (
-                    <button
-                      onClick={() => markAsRead(notif._id)}
-                      disabled={markingAsRead === notif._id}
-                      className="ml-4 text-sm bg-red-500 text-white w-32 h-10 px-4 py-2 rounded hover:bg-red-600 disabled:bg-gray-300 flex-shrink-0"
-                    >
-                      {markingAsRead === notif._id ? "Marking..." : "Mark as read"}
-                    </button>
-                  )}
+                  {notif.status === "active" &&
+                    !notif.isRead &&
+                    notif.type === "info" && (
+                      <button
+                        onClick={() => markAsRead(notif._id)}
+                        disabled={markingAsRead === notif._id}
+                        className="ml-4 text-sm bg-red-500 text-white w-32 h-10 px-4 py-2 rounded hover:bg-red-600 disabled:bg-gray-300"
+                      >
+                        {markingAsRead === notif._id ? "Marking..." : "Mark as read"}
+                      </button>
+                    )}
 
-                  {notif.type === "action_required" && (
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => handleActionRequired(notif._id, "accept")}
-                        className="text-sm bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                      >
-                        Accept
-                      </button>
-                      <button
-                        onClick={() => handleRejectionRequired(notif._id, "reject")}
-                        className="text-sm bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  )}
+                  {notif.type === "action_required" &&
+                    (notif.status === "rejected" ? (
+                      <span className="ml-4 text-lg font-bold text-red-600">Rejected</span>
+                    ) : (
+                      <div className="flex gap-4">
+                        <button
+                          onClick={() => handleRejectionRequired(notif._id)}
+                          className="text-sm bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ))}
                 </div>
               </li>
             ))}
