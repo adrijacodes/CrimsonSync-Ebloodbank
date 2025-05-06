@@ -19,10 +19,21 @@ const NotificationPage = () => {
   const [markingAsRead, setMarkingAsRead] = useState(null);
   const [previousActiveCount, setPreviousActiveCount] = useState(0);
 
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [formData, setFormData] = useState({
+    age: "",
+    weight: "",
+    hasChronicDisease: "No",
+    onMedication: "No",
+    lastDonationDate: "",
+    recentInfection: "No",
+  });
+
+  const [currentNotificationId, setCurrentNotificationId] = useState(null);
+
   const filterRef = useRef(filter);
   const accessToken = localStorage.getItem("token");
 
-  // play NotificationSound when new "active" notifications are received
   const playNotificationSound = () => {
     const audio = new Audio(NotificationSound);
     audio
@@ -30,9 +41,16 @@ const NotificationPage = () => {
       .catch((err) => console.warn("Notification sound failed to play:", err));
   };
 
-  // Fetch the number of notifications in each category and detect new ones
   const fetchCounts = async () => {
     try {
+      const urls = [
+        "notifications",
+        "notifications/search?status=active",
+        "notifications/search?status=seen",
+        "notifications/search?status=cancelled",
+        "notifications/search?status=accepted",
+        "notifications/search?status=rejected",
+      ];
       const [
         allRes,
         activeRes,
@@ -40,36 +58,13 @@ const NotificationPage = () => {
         cancelledRes,
         acceptedRes,
         rejectedRes,
-      ] = await Promise.all([
-        fetch("http://localhost:8001/api/notifications", {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }),
-        fetch("http://localhost:8001/api/notifications/search?status=active", {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }),
-        fetch("http://localhost:8001/api/notifications/search?status=seen", {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }),
-        fetch(
-          "http://localhost:8001/api/notifications/search?status=cancelled",
-          {
+      ] = await Promise.all(
+        urls.map((url) =>
+          fetch(`http://localhost:8001/api/${url}`, {
             headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        ),
-        fetch(
-          "http://localhost:8001/api/notifications/search?status=accepted",
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        ),
-        fetch(
-          "http://localhost:8001/api/notifications/search?status=rejected",
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        ),
-      ]);
-
+          })
+        )
+      );
       const [
         allData,
         activeData,
@@ -88,11 +83,6 @@ const NotificationPage = () => {
 
       const activeCount = activeData.data?.notifications?.length || 0;
       const seenCount = seenData.data?.notifications?.length || 0;
-      const allCount =
-        allData.data?.length || allData.data?.notifications?.length || 0;
-      const cancelledCount = cancelledData.data?.notifications?.length || 0;
-      const acceptedCount = acceptedData.data?.notifications?.length || 0;
-      const rejectedCount = rejectedData.data?.notifications?.length || 0;
 
       if (activeCount > previousActiveCount) {
         toast.info(
@@ -104,21 +94,19 @@ const NotificationPage = () => {
       }
 
       setPreviousActiveCount(activeCount);
-
       setCounts({
         all: activeCount + seenCount,
         active: activeCount,
         seen: seenCount,
-        cancelled: cancelledCount,
-        accepted: acceptedCount,
-        rejected: rejectedCount,
+        cancelled: cancelledData.data?.notifications?.length || 0,
+        accepted: acceptedData.data?.notifications?.length || 0,
+        rejected: rejectedData.data?.notifications?.length || 0,
       });
     } catch (err) {
       console.error("Error fetching counts:", err);
     }
   };
 
-  // Fetch and display filtered notification list based on selected tab
   const fetchNotifications = async (status = "all") => {
     setLoading(true);
     try {
@@ -133,12 +121,9 @@ const NotificationPage = () => {
         },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch notifications");
-      }
+      if (!response.ok) throw new Error("Failed to fetch notifications");
 
       const data = await response.json();
-
       setNotifications(
         Array.isArray(data.data) ? data.data : data.data.notifications || []
       );
@@ -150,7 +135,6 @@ const NotificationPage = () => {
     }
   };
 
-  // Update notification status to "seen" and refresh list + counts
   const markAsRead = async (id) => {
     setMarkingAsRead(id);
     try {
@@ -166,9 +150,7 @@ const NotificationPage = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to mark as read");
-      }
+      if (!response.ok) throw new Error("Failed to mark as read");
 
       fetchNotifications(filterRef.current);
       fetchCounts();
@@ -179,9 +161,7 @@ const NotificationPage = () => {
     }
   };
 
-  // Handles rejection of action-required notifications
   const handleRejectionRequired = async (id) => {
-    const notif = notifications.find((n) => n._id === id);
     try {
       const response = await fetch(
         `http://localhost:8001/api/notifications/reject/${id}`,
@@ -195,9 +175,7 @@ const NotificationPage = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to process action");
-      }
+      if (!response.ok) throw new Error("Failed to process rejection");
 
       fetchNotifications(filterRef.current);
       fetchCounts();
@@ -207,9 +185,7 @@ const NotificationPage = () => {
     }
   };
 
-  // Handles acceptence of action-required notifications
   const handleAcceptRequired = async (id) => {
-    const notif = notifications.find((n) => n._id === id);
     try {
       const response = await fetch(
         `http://localhost:8001/api/notifications/accept/${id}`,
@@ -223,41 +199,63 @@ const NotificationPage = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to process action");
-      }
-      const output = response.data.data.message;
+      if (!response.ok) throw new Error("Failed to process acceptance");
+
+      // After accepting, show form modal
+      setCurrentNotificationId(id);
+      setShowFormModal(true);
 
       fetchNotifications(filterRef.current);
       fetchCounts();
-      toast.success(`Accepted ${output}`);
     } catch (error) {
       console.error("Error processing action:", error);
     }
   };
 
-  // Changes the visible notification list and remembers current tab for polling
   const handleFilterChange = (status) => {
     setFilter(status);
     filterRef.current = status;
     fetchNotifications(status);
   };
 
-  //  (**Polling & Initialization**)every 30s, refresh notifications and counts for current tab
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(
+        `http://localhost:8001/api/blood-requests/eligibility-form/${currentNotificationId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) throw new Error("Form submission failed");
+
+      toast.success("✅ Form submitted successfully!");
+      setShowFormModal(false);
+      setFormData({ name: "", message: "" });
+    } catch (err) {
+      toast.error("❌ Failed to submit form.");
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     if (accessToken) {
       fetchNotifications(filter);
       fetchCounts();
-
       const interval = setInterval(() => {
         fetchNotifications(filterRef.current);
         fetchCounts();
       }, 30000);
-
       return () => clearInterval(interval);
     }
   }, [accessToken]);
-  // Ensure filterRef always matches the latest selected tab, for polling to work
+
   useEffect(() => {
     filterRef.current = filter;
   }, [filter]);
@@ -275,7 +273,6 @@ const NotificationPage = () => {
           )}
         </h2>
 
-        {/* Tabs */}
         <div className="flex gap-4 mb-6">
           {["all", "active", "seen", "cancelled", "accepted", "rejected"].map(
             (tab) => (
@@ -299,7 +296,6 @@ const NotificationPage = () => {
           )}
         </div>
 
-        {/* Notification List */}
         {loading ? (
           <p>Loading notifications...</p>
         ) : notifications.length === 0 ? (
@@ -317,7 +313,6 @@ const NotificationPage = () => {
               >
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-gray-800">{notif.message}</p>
-
                   {notif.status === "active" &&
                     !notif.isRead &&
                     notif.type === "info" && (
@@ -331,7 +326,6 @@ const NotificationPage = () => {
                           : "Mark as read"}
                       </button>
                     )}
-
                   {notif.type === "action_required" && (
                     <div className="flex gap-4 ml-4">
                       {notif.status === "rejected" ? (
@@ -366,6 +360,97 @@ const NotificationPage = () => {
           </ul>
         )}
       </div>
+
+      {/* Modal */}
+      {showFormModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Submit Form</h3>
+            <form onSubmit={handleSubmitForm} className="space-y-4">
+              <input
+                type="number"
+                placeholder="Age"
+                value={formData.age}
+                onChange={(e) =>
+                  setFormData({ ...formData, age: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Weight (e.g., 65kg)"
+                value={formData.weight}
+                onChange={(e) =>
+                  setFormData({ ...formData, weight: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+                required
+              />
+              <select
+                value={formData.hasChronicDisease}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    hasChronicDisease: e.target.value,
+                  })
+                }
+                className="w-full p-2 border rounded"
+              >
+                <option value="No">
+                  Do you have any chronic disease? - No
+                </option>
+                <option value="Yes">Yes</option>
+              </select>
+              <select
+                value={formData.onMedication}
+                onChange={(e) =>
+                  setFormData({ ...formData, onMedication: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              >
+                <option value="No">Are you on medication? - No</option>
+                <option value="Yes">Yes</option>
+              </select>
+              <input
+                type="date"
+                value={formData.lastDonationDate}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastDonationDate: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+                required
+              />
+              <select
+                value={formData.recentInfection}
+                onChange={(e) =>
+                  setFormData({ ...formData, recentInfection: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              >
+                <option value="No">Any recent infection? - No</option>
+                <option value="Yes">Yes</option>
+              </select>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowFormModal(false)}
+                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
