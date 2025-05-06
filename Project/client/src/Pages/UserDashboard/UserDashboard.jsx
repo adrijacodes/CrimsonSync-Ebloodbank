@@ -16,6 +16,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("donor");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [bloodRequests, setBloodRequests] = useState([]);
   const navigate = useNavigate();
   const days = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
   const token = localStorage.getItem("token");
@@ -51,27 +52,30 @@ const Dashboard = () => {
     toast(msg, { autoClose: duration });
   };
 
-  // const updateProfile = async (url, method, body) => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     const res = await fetch(url, {
-  //       method,
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify(body),
-  //     });
+  // Fetch Blood Requests
+  const fetchBloodRequests = async () => {
+    try {
+      const res = await fetch("http://localhost:8001/api/blood/requests", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  //     if (!res.ok) throw new Error();
-  //     return true;
-  //   } catch {
-  //     return false;
-  //   }
-  // };
+      if (!res.ok) throw new Error("Failed to fetch blood requests");
 
-  
-  // Location section
+      const { data } = await res.json();
+      setBloodRequests(data);
+    } catch (err) {
+      console.error("Error fetching blood requests:", err);
+      showMessage("Failed to load blood requests.");
+    }
+  };
+
+  useEffect(() => {
+    fetchBloodRequests();
+  }, []);
+
+// Save Location 
   const handleSaveLocation = async () => {
     const response = await fetch(
       "http://localhost:8001/api/auth/user/profile/update-location",
@@ -100,7 +104,7 @@ const Dashboard = () => {
 
     setIsEditingLocation(false);
   };
-  // SaveDonor Section
+// Donor Status
   const handleSaveDonorSettings = async () => {
     try {
       const response = await fetch(
@@ -127,8 +131,7 @@ const Dashboard = () => {
       showMessage("Something went wrong while updating donor status.");
     }
   };
-
-  // Availability section
+// Save Availability
   const handleSaveAvailability = async () => {
     const token = localStorage.getItem("token");
 
@@ -139,8 +142,6 @@ const Dashboard = () => {
     const filteredAvailability = normalizedAvailability.filter((day) =>
       validDays.includes(day)
     );
-
-    console.log("Sending valid availability:", availability);
 
     const response = await fetch(
       "http://localhost:8001/api/auth/user/profile/update-availability",
@@ -164,8 +165,7 @@ const Dashboard = () => {
       showMessage("Failed to update availability.");
     }
   };
-
-  // SaveBlood section
+// Save BloodType
   const handleSaveBloodType = async () => {
     try {
       const response = await fetch(
@@ -192,8 +192,7 @@ const Dashboard = () => {
       showMessage("Something went wrong while updating blood type.");
     }
   };
-
-  // password change section
+// Password Change
   const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword) {
       return showMessage("Fill in both fields.");
@@ -226,8 +225,7 @@ const Dashboard = () => {
       showMessage("Something went wrong while updating password.");
     }
   };
-
-  // Delete account section
+  // Delete Account
   const handleDeleteAccount = async () => {
     if (!window.confirm("Are you sure you want to delete your account?")) {
       return;
@@ -427,38 +425,70 @@ const Dashboard = () => {
           <div>
             <input
               type="password"
-              placeholder="Current Password"
+              placeholder="Current password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="border p-2 rounded mb-4 w-full"
+              className="border p-2 rounded mb-2 w-full"
             />
             <input
               type="password"
-              placeholder="New Password"
+              placeholder="New password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="border p-2 rounded mb-4 w-full"
+              className="border p-2 rounded mb-2 w-full"
             />
             <button
               onClick={handlePasswordChange}
               className="bg-red-500 py-2 px-4 rounded text-white"
             >
-              Change Password
+              Save
             </button>
           </div>
         )}
-
-        <div className="mt-4">
-          <button
-            onClick={handleDeleteAccount}
-            className="bg-red-700 py-2 px-4 rounded text-white"
-          >
-            Delete Account
-          </button>
-        </div>
       </motion.div>
 
-      {/* Toast Container */}
+      {/* Delete Account */}
+      <motion.div
+        className="bg-white p-6 rounded-lg shadow-md mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <button
+          onClick={handleDeleteAccount}
+          className="bg-red-600 py-2 px-4 rounded text-white"
+        >
+          Delete Account
+        </button>
+      </motion.div>
+
+      {/* Blood Requests */}
+      <motion.div
+        className="bg-white p-6 rounded-lg shadow-md mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <h2 className="text-xl font-serif text-red-600 font-semibold mb-4">Blood Donation Request </h2>
+        <ul>
+          {bloodRequests.length > 0 ? (
+            bloodRequests.map((request, index) => (
+              <li key={index} className="mb-4">
+                <p>{request.name}</p>
+                <p>{request.message}</p>
+                <button className="bg-red-500 py-1 px-4 rounded text-white">
+                  Accept
+                </button>
+                <button className="bg-gray-500 py-1 px-4 rounded text-white ml-2">
+                  Reject
+                </button>
+              </li>
+            ))
+          ) : (
+            <p>No blood requests available.</p>
+          )}
+        </ul>
+      </motion.div>
+
+
       <ToastContainer />
     </div>
   );

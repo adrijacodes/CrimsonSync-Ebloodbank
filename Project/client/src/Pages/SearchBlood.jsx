@@ -1,32 +1,49 @@
 import React, { useState } from 'react';
 import bloodImage from '../assets/blood2.jpg';
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const SearchBlood = () => {
   const [location, setLocation] = useState('');
   const [selectedBloodType, setSelectedBloodType] = useState('');
   const [donors, setDonors] = useState([]); // New state for donor results
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Searching donor with:", selectedBloodType, location);
-
-    //  Mock donor data (replace this with real API later)
-    const allDonors = [
-      { name: 'Aarav Sharma', city: 'Delhi', bloodType: 'A+', contact: '9876543210' },
-      { name: 'Meera Verma', city: 'Mumbai', bloodType: 'B+', contact: '9123456780' },
-      { name: 'Kabir Joshi', city: 'Delhi', bloodType: 'A+', contact: '9823412345' },
-      { name: 'Riya Kapoor', city: 'Delhi', bloodType: 'O-', contact: '9090909090' },
-    ];
-
-    // Filter by selected blood type and location (case-insensitive)
-    const filtered = allDonors.filter(
-      (donor) =>
-        donor.bloodType === selectedBloodType &&
-        donor.city.toLowerCase() === location.toLowerCase()
-    );
-
-    setDonors(filtered); // Set the results
+    const accessToken = localStorage.getItem('token');
+  
+    try {
+      const response = await fetch('http://localhost:8001/api/blood-requests/search-blood', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          bloodType: selectedBloodType,
+          city: location,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch donors');
+      }
+  
+      // ✅ Show toast with backend message
+      if (data.message) {
+        toast.success(data.message);
+      }
+  
+      setDonors(data.donors || []);
+  
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error(error.message || 'Something went wrong');
+      setDonors([]);
+    }
   };
+  
 
   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -79,11 +96,11 @@ const SearchBlood = () => {
             type="submit"
             className="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600 transition duration-200"
           >
-            Search Donor
+            Search Blood
           </button>
         </form>
 
-        {/* Donor Results */}
+        {/* Donor Results
         {donors.length > 0 ? (
           <div className="mt-10 bg-white bg-opacity-80 p-6 rounded-xl shadow-md w-full max-w-3xl">
             <h2 className="text-center text-2xl font-semibold mb-4 font-serif">Available Donors</h2>
@@ -98,7 +115,6 @@ const SearchBlood = () => {
                     <p className="text-gray-700">Blood Type: {donor.bloodType}</p>
                     <p className="text-gray-700">City: {donor.city}</p>
                   </div>
-                  <p className="text-blue-600 mt-2 md:mt-0">📞 {donor.contact}</p>
                 </li>
               ))}
             </ul>
@@ -107,8 +123,9 @@ const SearchBlood = () => {
           <div className="mt-10 text-center text-white text-lg font-medium">
             {selectedBloodType && location && 'No donors found for your selection.'}
           </div>
-        )}
+        )} */}
       </div>
+      <ToastContainer />
     </div>
   );
 };
