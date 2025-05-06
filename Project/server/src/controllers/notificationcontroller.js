@@ -111,20 +111,28 @@ export const updateMarkAsReadStatus = AsyncHandler(async (req, res) => {
 export const rejectRequestNotification = AsyncHandler(async (req, res) => {
   const { notificationId } = req.params;
 
-
   const notification = await Notification.findById(notificationId);
+  if (notification.status == "rejected")
+    throw new ApiError(
+      400,
+      "Action failed: This notification has already been marked as rejected."
+    );
+
   if (!notification) {
     throw new ApiError(404, "Notification not found");
   }
 
   notification.status = "rejected";
+  notification.isRead = true;
   await notification.save();
 
-  return res.status(200).json(
-    new ApiResponse(
-      notification,
-      "Notification updated to 'rejected' status.",
-      true
-    )
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        notification,
+        "Notification updated to 'rejected' status.",
+        true
+      )
+    );
 });
