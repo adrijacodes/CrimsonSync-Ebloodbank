@@ -72,7 +72,10 @@ export const searchUserNotifications = AsyncHandler(async (req, res) => {
   export const updateNotificationStatus = AsyncHandler(async (req, res) => {
     const { notificationId } = req.params;
     const { status } = req.body;
-  
+    console.log(notificationId);
+    console.log(status);
+    
+    
     const validStatuses = ["seen", "rejected"]; 
   
     if (!validStatuses.includes(status)) {
