@@ -41,7 +41,7 @@ const NotificationPage = () => {
         fetch("http://localhost:8001/api/notifications/search?status=accepted", {
           headers: { Authorization: `Bearer ${accessToken}` },
         }),
-        fetch("http://localhost:8001/api/notifications/search?status=rejected", {
+        fetch("http://localhost:8001/api/notifications/action/search?status=rejected", {
           headers: { Authorization: `Bearer ${accessToken}` },
         }),
       ]);
