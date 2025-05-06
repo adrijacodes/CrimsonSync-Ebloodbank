@@ -39,16 +39,15 @@ export const searchUserNotifications = AsyncHandler(async (req, res) => {
   ) {
     throw new ApiError(
       400,
-      "Invalid or missing 'status' query parameter (use 'active' or 'seen')"
+      "Invalid or missing 'status' query parameter"
     );
   }
 
-  const isRead = status === "seen";
+ // const isRead = status === "seen";
 
   const query = {
     user: userId,
     status,
-    isRead,
   };
 
   const [notifications, count] = await Promise.all([
@@ -64,7 +63,6 @@ export const searchUserNotifications = AsyncHandler(async (req, res) => {
     new ApiResponse(
       {
         status,
-        isRead,
         count,
         notifications,
       },
