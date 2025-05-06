@@ -8,7 +8,7 @@ const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [counts, setCounts] = useState({ all: 0, active: 0, seen: 0 });
+  const [counts, setCounts] = useState({ all: 0, active: 0, seen: 0, cancelled: 0, accepted: 0, rejected: 0 });
   const [markingAsRead, setMarkingAsRead] = useState(null);
   const [previousActiveCount, setPreviousActiveCount] = useState(0);
 
@@ -16,16 +16,16 @@ const NotificationPage = () => {
 
   // ✅ Play notification sound
   const playNotificationSound = () => {
-    const audio = new Audio(NotificationSound );
-    audio.play().catch((err) =>
-      console.warn("Notification sound failed to play:", err)
-    );
+    const audio = new Audio(NotificationSound);
+    audio
+      .play()
+      .catch((err) => console.warn("Notification sound failed to play:", err));
   };
 
   // ✅ Fetch counts and notify on new active
   const fetchCounts = async () => {
     try {
-      const [allRes, activeRes, seenRes] = await Promise.all([
+      const [allRes, activeRes, seenRes, cancelledRes, acceptedRes, rejectedRes] = await Promise.all([
         fetch("http://localhost:8001/api/notifications", {
           headers: { Authorization: `Bearer ${accessToken}` },
         }),
@@ -35,20 +35,33 @@ const NotificationPage = () => {
         fetch("http://localhost:8001/api/notifications/search?status=seen", {
           headers: { Authorization: `Bearer ${accessToken}` },
         }),
+        fetch("http://localhost:8001/api/notifications/search?status=cancelled", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
+        fetch("http://localhost:8001/api/notifications/search?status=accepted", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
+        fetch("http://localhost:8001/api/notifications/search?status=rejected", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
       ]);
 
-      const [allData, activeData, seenData] = await Promise.all([
+      const [allData, activeData, seenData, cancelledData, acceptedData, rejectedData] = await Promise.all([
         allRes.json(),
         activeRes.json(),
         seenRes.json(),
+        cancelledRes.json(),
+        acceptedRes.json(),
+        rejectedRes.json(),
       ]);
 
       const activeCount = activeData.data?.notifications?.length || 0;
       const seenCount = seenData.data?.notifications?.length || 0;
-      const allCount =
-        allData.data?.length || allData.data?.notifications?.length || 0;
+      const allCount = allData.data?.length || allData.data?.notifications?.length || 0;
+      const cancelledCount = cancelledData.data?.notifications?.length || 0;
+      const acceptedCount = acceptedData.data?.notifications?.length || 0;
+      const rejectedCount = rejectedData.data?.notifications?.length || 0;
 
-      // 🔔 Show toast and sound on new active notifications
       if (activeCount > previousActiveCount) {
         toast.info(`🔔 You have ${activeCount - previousActiveCount} new notification(s)!`);
         playNotificationSound();
@@ -60,6 +73,9 @@ const NotificationPage = () => {
         all: activeCount + seenCount,
         active: activeCount,
         seen: seenCount,
+        cancelled: cancelledCount,
+        accepted: acceptedCount,
+        rejected: rejectedCount,
       });
     } catch (err) {
       console.error("Error fetching counts:", err);
@@ -89,13 +105,11 @@ const NotificationPage = () => {
       const data = await response.json();
 
       setNotifications(
-        Array.isArray(data.data)
-          ? data.data
-          : data.data.notifications || []
+        Array.isArray(data.data) ? data.data : data.data.notifications || []
       );
     } catch (error) {
       console.error("Error fetching notifications:", error);
-      setNotifications([]); // fallback to empty
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -104,6 +118,8 @@ const NotificationPage = () => {
   // ✅ Mark a notification as read
   const markAsRead = async (id) => {
     setMarkingAsRead(id);
+    const status = "seen";
+
     try {
       const response = await fetch(
         `http://localhost:8001/api/notifications/${id}`,
@@ -113,6 +129,7 @@ const NotificationPage = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
+          body: JSON.stringify({ status }),
         }
       );
 
@@ -126,6 +143,35 @@ const NotificationPage = () => {
       console.error("Error marking as read:", error);
     } finally {
       setMarkingAsRead(null);
+    }
+  };
+
+  // ✅ Accept or Reject notification
+  const handleActionRequired = async (id, action) => {
+    const status = action === "accept" ? "accepted" : "rejected";
+
+    try {
+      const response = await fetch(
+        `http://localhost:8001/api/notifications/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ status }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to process action");
+      }
+
+      fetchNotifications(filter);
+      fetchCounts();
+      toast.success(`Notification ${status === "accepted" ? "accepted" : "rejected"}`);
+    } catch (error) {
+      console.error("Error processing action:", error);
     }
   };
 
@@ -156,16 +202,16 @@ const NotificationPage = () => {
         <h2 className="text-2xl font-bold mb-4 text-red-600 flex items-center gap-2">
           <FaBell />
           Notifications
-          {counts.all > 0 && (
+          {counts.active > 0 && (
             <span className="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-              {counts.all > 99 ? "99+" : counts.all}
+              {counts.active > 99 ? "99+" : counts.active}
             </span>
           )}
         </h2>
 
         {/* Tabs */}
         <div className="flex gap-4 mb-6">
-          {["all", "active", "seen"].map((tab) => (
+          {["all", "active", "seen", "cancelled", "accepted", "rejected"].map((tab) => (
             <button
               key={tab}
               onClick={() => handleFilterChange(tab)}
@@ -176,9 +222,9 @@ const NotificationPage = () => {
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              {counts[tab] > 0 && (
+              {tab === "active" && counts.active > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full px-2 text-xs font-bold">
-                  {counts[tab] > 99 ? "99+" : counts[tab]}
+                  {counts.active > 99 ? "99+" : counts.active}
                 </span>
               )}
             </button>
@@ -204,16 +250,31 @@ const NotificationPage = () => {
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-gray-800">{notif.message}</p>
 
-                  {notif.status === "active" && !notif.isRead && (
+                  {notif.status === "active" && !notif.isRead && notif.type === "info" && (
                     <button
                       onClick={() => markAsRead(notif._id)}
                       disabled={markingAsRead === notif._id}
                       className="ml-4 text-sm bg-red-500 text-white w-32 h-10 px-4 py-2 rounded hover:bg-red-600 disabled:bg-gray-300 flex-shrink-0"
                     >
-                      {markingAsRead === notif._id
-                        ? "Marking..."
-                        : "Mark as read"}
+                      {markingAsRead === notif._id ? "Marking..." : "Mark as read"}
                     </button>
+                  )}
+
+                  {notif.type === "action_required" && (
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => handleActionRequired(notif._id, "accept")}
+                        className="text-sm bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => handleActionRequired(notif._id, "reject")}
+                        className="text-sm bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                      >
+                        Reject
+                      </button>
+                    </div>
                   )}
                 </div>
               </li>

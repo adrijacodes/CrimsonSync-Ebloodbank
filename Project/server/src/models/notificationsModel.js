@@ -16,16 +16,15 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["info", "acknowledgement"],
-      default: "info",
+      enum: ["info", "action_required"],
     },
     isRead: {
       type: Boolean,
       default: false,
     },
   },
-  { timestamps: true } 
+  { timestamps: true }
 );
 
-const Notification = mongoose.model("Notifications", notificationSchema);
+const Notification = mongoose.model("Notification", notificationSchema);
 export default Notification;

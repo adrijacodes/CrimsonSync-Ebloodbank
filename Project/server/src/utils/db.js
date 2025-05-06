@@ -10,7 +10,9 @@ async function connectDb(){
             if (!mongodburl) {
                 throw new Error("MONGO_URI is not defined in the environment variables");
             }
-            await mongoose.connect(mongodburl);
+            await mongoose.connect(mongodburl, {
+                serverSelectionTimeoutMS: 25000, 
+            });            
             console.log("Database connected");
             console.log(mongoose.connection.host);    
             

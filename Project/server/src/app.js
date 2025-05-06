@@ -3,11 +3,12 @@ import ApiError from "./utils/ApiError.js";
 import cors from "cors";
 import morgan from "morgan";
 import authRoutes from "../src/routes/authRoute.js";
-import searchBloodRoutes from "../src/routes/bloodRequestSearch.js"
+import searchBloodRoutes from "../src/routes/bloodRequestSearch.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import adminRoutes from "./routes/adminAuthRoutes.js";
 import cancelExpiredRequests from "./crons/cancelExpiredRequests.js";
+import { checkAndCancelExpiredRequests } from "./crons/cancelExpiredRequests.js";
 
 const app = express();
 
@@ -15,7 +16,6 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 
 app.use("/api/auth/user", authRoutes);
 app.use("/api/blood-requests", searchBloodRoutes);
@@ -31,6 +31,7 @@ app.use((req, res, next) => {
   });
 });
 cancelExpiredRequests();
+checkAndCancelExpiredRequests();
 
 app.use((err, req, res, next) => {
   if (err instanceof ApiError) {
