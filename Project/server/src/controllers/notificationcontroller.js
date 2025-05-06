@@ -35,7 +35,7 @@ export const searchUserNotifications = AsyncHandler(async (req, res) => {
 
   if (
     !status ||
-    !["active", "seen", "rejected", "cancelled"].includes(status)
+    !["active", "seen", "rejected", "cancelled","accepted"].includes(status)
   ) {
     throw new ApiError(
       400,
