@@ -9,7 +9,7 @@ const verifyUserToken1 = AsyncHandler(async (req, _, next) => {
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer ", "");
 
-  console.log("Token received:", token);
+  //console.log("Token received:", token);
 
   if (!token) {
     throw new ApiError(401, "Unauthorized request: No token provided");
@@ -22,7 +22,7 @@ const verifyUserToken1 = AsyncHandler(async (req, _, next) => {
   let decodedToken;
   try {
     decodedToken = jwt.verify(token, TOKENSECRETKEY);
-    console.log("Decoded Token:", decodedToken);
+   // console.log("Decoded Token:", decodedToken);
   } catch (error) {
     throw new ApiError(
       401,
