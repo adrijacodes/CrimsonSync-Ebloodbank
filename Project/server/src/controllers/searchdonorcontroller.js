@@ -81,7 +81,7 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
         bloodRequestId: bloodRequest._id,
         message: `A request for blood type ${bloodType} in ${city} is available. Are you available to donate? (Accept/Reject)`,
         type: "acknowledgement",
-        status: "active",
+        status: "action_required",
         isSeen: false,
       }).save({ session });
     });
