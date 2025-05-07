@@ -21,24 +21,26 @@ const NotificationPage = () => {
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [formData, setFormData] = useState({
-    age: "",
-    weight: "",
-    hadRecentIllness: "No",
-    onMedication: "",
-    recentSurgery: "No",
-    alcoholUse: "No",
-    chronicDiseases: "No",
-    covidExposure: "No",
-    lastDonationDate: "",
-    currentlyPregnant: "No",
-    consent: "No",
+    formData: {
+      age: "",
+      weight: "",
+      hadRecentIllness: "No",
+      onMedication: "",
+      recentSurgery: "No",
+      alcoholUse: "No",
+      chronicDiseases: "No",
+      covidExposure: "No",
+      lastDonationDate: "",
+      currentlyPregnant: "No",
+      consent: "No",
+    },
   });
 
   const [currentNotificationId, setCurrentNotificationId] = useState(null);
 
   const filterRef = useRef(filter);
   const accessToken = localStorage.getItem("token");
-
+  // play NotificationSound when new "active" notifications are received
   const playNotificationSound = () => {
     const audio = new Audio(NotificationSound);
     audio
@@ -46,45 +48,32 @@ const NotificationPage = () => {
       .catch((err) => console.warn("Notification sound failed to play:", err));
   };
 
+  // Fetch the number of notifications in each category and detect new ones
   const fetchCounts = async () => {
     try {
       const urls = [
         "notifications",
         "notifications/search?status=active",
         "notifications/search?status=seen",
-        "notifications/search?status=cancelled",
         "notifications/search?status=accepted",
         "notifications/search?status=rejected",
       ];
-      const [
-        allRes,
-        activeRes,
-        seenRes,
-        cancelledRes,
-        acceptedRes,
-        rejectedRes,
-      ] = await Promise.all(
-        urls.map((url) =>
-          fetch(`http://localhost:8001/api/${url}`, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          })
-        )
-      );
-      const [
-        allData,
-        activeData,
-        seenData,
-        cancelledData,
-        acceptedData,
-        rejectedData,
-      ] = await Promise.all([
-        allRes.json(),
-        activeRes.json(),
-        seenRes.json(),
-        cancelledRes.json(),
-        acceptedRes.json(),
-        rejectedRes.json(),
-      ]);
+      const [allRes, activeRes, seenRes, acceptedRes, rejectedRes] =
+        await Promise.all(
+          urls.map((url) =>
+            fetch(`http://localhost:8001/api/${url}`, {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            })
+          )
+        );
+      const [allData, activeData, seenData, acceptedData, rejectedData] =
+        await Promise.all([
+          allRes.json(),
+          activeRes.json(),
+          seenRes.json(),
+          acceptedRes.json(),
+          rejectedRes.json(),
+        ]);
 
       const activeCount = activeData.data?.notifications?.length || 0;
       const seenCount = seenData.data?.notifications?.length || 0;
@@ -103,7 +92,6 @@ const NotificationPage = () => {
         all: activeCount + seenCount,
         active: activeCount,
         seen: seenCount,
-        cancelled: cancelledData.data?.notifications?.length || 0,
         accepted: acceptedData.data?.notifications?.length || 0,
         rejected: rejectedData.data?.notifications?.length || 0,
       });
@@ -111,7 +99,7 @@ const NotificationPage = () => {
       console.error("Error fetching counts:", err);
     }
   };
-
+// Fetch and display filtered notification list based on selected tab
   const fetchNotifications = async (status = "all") => {
     setLoading(true);
     try {
@@ -139,7 +127,7 @@ const NotificationPage = () => {
       setLoading(false);
     }
   };
-
+  // Update notification status to "seen" and refresh list + counts
   const markAsRead = async (id) => {
     setMarkingAsRead(id);
     try {
@@ -165,7 +153,7 @@ const NotificationPage = () => {
       setMarkingAsRead(null);
     }
   };
-
+  // Handles rejection of action-required notifications
   const handleRejectionRequired = async (id) => {
     try {
       const response = await fetch(
@@ -189,7 +177,7 @@ const NotificationPage = () => {
       console.error("Error processing action:", error);
     }
   };
-
+  // Handles acceptence of action-required notifications
   const handleAcceptRequired = async (id) => {
     try {
       const response = await fetch(
@@ -205,7 +193,7 @@ const NotificationPage = () => {
       );
 
       if (!response.ok) throw new Error("Failed to process acceptance");
-console.log(id);
+      console.log(id);
       // After accepting, show form modal
       setCurrentNotificationId(id);
       setShowFormModal(true);
@@ -216,7 +204,7 @@ console.log(id);
       console.error("Error processing action:", error);
     }
   };
-
+// Changes the visible notification list and remembers current tab for polling
   const handleFilterChange = (status) => {
     setFilter(status);
     filterRef.current = status;
@@ -226,6 +214,7 @@ console.log(id);
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     try {
+      console.log(formData);
       console.log(currentNotificationId);
       const response = await fetch(
         `http://localhost:8001/api/blood-requests/eligibility-form/${currentNotificationId}`,
@@ -235,7 +224,7 @@ console.log(id);
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({ formData }),
         }
       );
 
@@ -249,7 +238,8 @@ console.log(id);
       console.error(err);
     }
   };
-
+  
+  //(**Polling & Initialization**)every 30s, refresh notifications and counts for current tab
   useEffect(() => {
     if (accessToken) {
       fetchNotifications(filter);
@@ -262,6 +252,7 @@ console.log(id);
     }
   }, [accessToken]);
 
+  // Ensure filterRef always matches the latest selected tab, for polling to work
   useEffect(() => {
     filterRef.current = filter;
   }, [filter]);
@@ -278,30 +269,28 @@ console.log(id);
             </span>
           )}
         </h2>
-
+          {/* Tabs */}
         <div className="flex gap-4 mb-6">
-          {["all", "active", "seen", "cancelled", "accepted", "rejected"].map(
-            (tab) => (
-              <button
-                key={tab}
-                onClick={() => handleFilterChange(tab)}
-                className={`relative px-4 py-2 rounded-full text-sm font-medium ${
-                  filter === tab
-                    ? "bg-red-500 text-white"
-                    : "bg-gray-200 text-gray-700"
-                }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                {tab === "active" && counts.active > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full px-2 text-xs font-bold">
-                    {counts.active > 99 ? "99+" : counts.active}
-                  </span>
-                )}
-              </button>
-            )
-          )}
+          {["all", "active", "seen", "accepted", "rejected"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => handleFilterChange(tab)}
+              className={`relative px-4 py-2 rounded-full text-sm font-medium ${
+                filter === tab
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === "active" && counts.active > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full px-2 text-xs font-bold">
+                  {counts.active > 99 ? "99+" : counts.active}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
-
+       {/* Notification List */}
         {loading ? (
           <p>Loading notifications...</p>
         ) : notifications.length === 0 ? (
@@ -370,7 +359,7 @@ console.log(id);
       {/* Modal */}
       {showFormModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold mb-4">Submit Form</h3>
             <form onSubmit={handleSubmitForm} className="space-y-4">
               <input
@@ -402,15 +391,13 @@ console.log(id);
                 }
                 className="w-full p-2 border rounded"
               >
-                <option value="No">
-                  Have you had any illness (cold, flu, etc.) in the last 7 days?
-                  - No
-                </option>
+                <option value="">--Had illness in the last 7 days?--</option>
+                <option value="No"> No</option>
                 <option value="Yes">Yes</option>
               </select>
 
               <textarea
-                placeholder="Are you currently on any medication? If yes, please mention."
+                placeholder="Any medication? Mention here."
                 value={formData.onMedication}
                 onChange={(e) =>
                   setFormData({ ...formData, onMedication: e.target.value })
@@ -425,9 +412,8 @@ console.log(id);
                 }
                 className="w-full p-2 border rounded"
               >
-                <option value="No">
-                  Have you undergone any surgery in the past 6 months? - No
-                </option>
+                <option value="">--Surgery in past 6 months?--</option>
+                <option value="No"> No</option>
                 <option value="Yes">Yes</option>
               </select>
 
@@ -438,9 +424,8 @@ console.log(id);
                 }
                 className="w-full p-2 border rounded"
               >
-                <option value="No">
-                  Did you consume alcohol in the past 24 hours? - No
-                </option>
+                <option value="">--Alcohol in last 24 hours?--</option>
+                <option value="No"> No</option>
                 <option value="Yes">Yes</option>
               </select>
 
@@ -451,10 +436,8 @@ console.log(id);
                 }
                 className="w-full p-2 border rounded"
               >
-                <option value="No">
-                  Do you have any chronic diseases (like diabetes,
-                  hypertension)? - No
-                </option>
+                <option value="">--Any chronic diseases?--</option>
+                <option value="No"> No</option>
                 <option value="Yes">Yes</option>
               </select>
 
@@ -465,16 +448,14 @@ console.log(id);
                 }
                 className="w-full p-2 border rounded"
               >
-                <option value="No">
-                  Have you been exposed to COVID-19 or tested positive recently?
-                  - No
-                </option>
+                <option value="">--Exposed to COVID-19 recently?--</option>
+                <option value="No"> No</option>
                 <option value="Yes">Yes</option>
               </select>
 
               <input
                 type="date"
-                placeholder="When was your last blood donation?"
+                placeholder="Last blood donation date"
                 value={formData.lastDonationDate}
                 onChange={(e) =>
                   setFormData({ ...formData, lastDonationDate: e.target.value })
@@ -492,10 +473,8 @@ console.log(id);
                 }
                 className="w-full p-2 border rounded"
               >
-                <option value="No">
-                  Are you currently pregnant or gave birth in last 6 months? -
-                  No
-                </option>
+                <option value="">--Currently pregnant?--</option>
+                <option value="No"> No</option>
                 <option value="Yes">Yes</option>
               </select>
 
@@ -507,13 +486,12 @@ console.log(id);
                 className="w-full p-2 border rounded"
                 required
               >
-                <option value="No">
-                  Do you give your consent to donate blood voluntarily? - No
-                </option>
+                <option value="">--Do you give consent to donate blood?--</option>
+                <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
 
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-4">
                 <button
                   type="button"
                   onClick={() => setShowFormModal(false)}
@@ -523,7 +501,7 @@ console.log(id);
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                 >
                   Submit
                 </button>
