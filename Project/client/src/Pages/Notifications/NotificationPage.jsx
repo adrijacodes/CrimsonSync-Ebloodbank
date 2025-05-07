@@ -176,7 +176,7 @@ const NotificationPage = () => {
       // setTimeout(() => {
       //   navigate("/");
       // }, 3000);
-    
+
       setTimeout(() => {
         window.location.reload();
       }, 3000);
@@ -240,12 +240,11 @@ const NotificationPage = () => {
       setTimeout(() => {
         navigate("/");
       }, 3000);
-    
+
       setTimeout(() => {
         window.location.reload();
       }, 3000);
-    
-       
+
       setShowFormModal(false);
       setFormData({ name: "", message: "" });
     } catch (err) {
@@ -497,32 +496,36 @@ const NotificationPage = () => {
                 <option value="Yes">Yes</option>
               </select>
 
-              <select
-                value={formData.consent}
-                onChange={(e) =>
-                  setFormData({ ...formData, consent: e.target.value })
-                }
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                required
-              >
-                <option value="">
-                  --Do you give consent to donate blood?--
-                </option>
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="consent"
+                  checked={formData.consent === "Yes"}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      consent: e.target.checked ? "Yes" : "No",
+                    })
+                  }
+                  className="w-5 h-5 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                  required
+                />
+                <label htmlFor="consent" className="text-sm text-black font-bold">
+                  I give my consent to donate blood.
+                </label>
+              </div>
 
               <div className="flex justify-between pt-4">
                 <button
                   type="button"
                   onClick={() => setShowFormModal(false)}
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black rounded-lg transition"
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black font-serif rounded-lg transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white  font-serif rounded-lg transition"
                 >
                   Submit
                 </button>
