@@ -19,32 +19,46 @@ const Navbar = () => {
   useEffect(() => {
     const registered = localStorage.getItem("registered");
     const loggedIn = localStorage.getItem("loggedIn");
-    setIsRegistered(registered === "true");
     setIsLoggedIn(loggedIn === "true");
 
-    // Fetch notification count when logged in
-    if (accessToken) {
-      // API call to fetch notifications
-      const fetchNotifications = async () => {
-        try {
-          const response = await axios.get(
-            "http://localhost:8001/api/notifications/search?status=active",
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          );
-          console.log(response.data.data.count); // Debug: Check the full response
-          setNotificationCount(response.data.data.count);
-        } catch (error) {
-          console.error("Error fetching notifications:", error);
-        }
-      };
+    let intervalId;
 
-      fetchNotifications();
+    // Function to fetch notifications
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8001/api/notifications/search?status=active",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        console.log(response.data.data.count);  // Debugging log to check response
+        setNotificationCount(response.data.data.count);  // Update notification count
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    // Polling every 3 seconds if logged in
+    if (accessToken && isLoggedIn) {
+      fetchNotifications(); // Initial call to fetch notifications
+      intervalId = setInterval(() => {
+        const stillLoggedIn = localStorage.getItem("loggedIn");
+        if (stillLoggedIn !== "true") {
+          clearInterval(intervalId); // Stop polling when logged out
+        } else {
+          fetchNotifications(); // Continue polling for new notifications
+        }
+      }, 3000);
     }
-  }, [location, accessToken]);
+
+    // Cleanup the interval when the component is unmounted or logged out
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [location, accessToken, isLoggedIn]);
 
   const handleLogout = async () => {
     if (!accessToken || !role) {
@@ -136,11 +150,13 @@ const Navbar = () => {
                   <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
                 </Link>
                 <Link to="/notification" className="relative">
-                  <IoNotifications className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
-                  <span className="absolute -top-2 -right-2 text-[10px] bg-yellow-300 text-black font-bold rounded-full px-[6px] py-[2px] shadow-md">
-                    {notificationCount}
-                  </span>
-                </Link>
+      <IoNotifications className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
+      {notificationCount > 0 && (
+        <span className="absolute -top-2 -right-2 text-[10px] bg-yellow-300 text-black font-bold rounded-full px-[6px] py-[2px] shadow-md">
+          {notificationCount}
+        </span>
+      )}
+    </Link>
                 <button
                   onClick={handleLogout}
                   className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition-colors duration-200"

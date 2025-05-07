@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { FaBell } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import NotificationSound from "../../assets/Sound/notificationsound.mp3";
 
@@ -17,22 +18,21 @@ const NotificationPage = () => {
   });
   const [markingAsRead, setMarkingAsRead] = useState(null);
   const [previousActiveCount, setPreviousActiveCount] = useState(0);
+  const navigate = useNavigate();
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [formData, setFormData] = useState({
-    formData: {
-      age: "",
-      weight: "",
-      hadRecentIllness: "No",
-      onMedication: "",
-      recentSurgery: "No",
-      alcoholUse: "No",
-      chronicDiseases: "No",
-      covidExposure: "No",
-      lastDonationDate: "",
-      currentlyPregnant: "No",
-      consent: "No",
-    },
+    age: "",
+    weight: "",
+    hadRecentIllness: "",
+    onMedication: "",
+    recentSurgery: "",
+    alcoholUse: "",
+    chronicDiseases: "",
+    covidExposure: "",
+    lastDonationDate: "",
+    currentlyPregnant: "",
+    consent: "",
   });
 
   const [currentNotificationId, setCurrentNotificationId] = useState(null);
@@ -98,7 +98,7 @@ const NotificationPage = () => {
       console.error("Error fetching counts:", err);
     }
   };
-// Fetch and display filtered notification list based on selected tab
+  // Fetch and display filtered notification list based on selected tab
   const fetchNotifications = async (status = "all") => {
     setLoading(true);
     try {
@@ -146,6 +146,7 @@ const NotificationPage = () => {
 
       fetchNotifications(filterRef.current);
       fetchCounts();
+      window.location.reload();
     } catch (error) {
       console.error("Error marking as read:", error);
     } finally {
@@ -172,6 +173,11 @@ const NotificationPage = () => {
       fetchNotifications(filterRef.current);
       fetchCounts();
       toast.success("❌ Notification is Rejected :(");
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    
+
     } catch (error) {
       console.error("Error processing action:", error);
     }
@@ -199,11 +205,12 @@ const NotificationPage = () => {
 
       fetchNotifications(filterRef.current);
       fetchCounts();
+      window.location.reload();
     } catch (error) {
       console.error("Error processing action:", error);
     }
   };
-// Changes the visible notification list and remembers current tab for polling
+  // Changes the visible notification list and remembers current tab for polling
   const handleFilterChange = (status) => {
     setFilter(status);
     filterRef.current = status;
@@ -228,8 +235,10 @@ const NotificationPage = () => {
       );
 
       if (!response.ok) throw new Error("Form submission failed");
-
       toast.success("✅ Form submitted successfully!");
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
       setShowFormModal(false);
       setFormData({ name: "", message: "" });
     } catch (err) {
@@ -237,6 +246,7 @@ const NotificationPage = () => {
       console.error(err);
     }
   };
+
   
   //(**Polling & Initialization**)every 30s, refresh notifications and counts for current tab
   useEffect(() => {
@@ -268,7 +278,7 @@ const NotificationPage = () => {
             </span>
           )}
         </h2>
-          {/* Tabs */}
+        {/* Tabs */}
         <div className="flex gap-4 mb-6">
           {["all", "active", "seen", "accepted", "rejected"].map((tab) => (
             <button
@@ -289,7 +299,7 @@ const NotificationPage = () => {
             </button>
           ))}
         </div>
-       {/* Notification List */}
+        {/* Notification List */}
         {loading ? (
           <p>Loading notifications...</p>
         ) : notifications.length === 0 ? (
@@ -485,7 +495,9 @@ const NotificationPage = () => {
                 className="w-full p-2 border rounded"
                 required
               >
-                <option value="">--Do you give consent to donate blood?--</option>
+                <option value="">
+                  --Do you give consent to donate blood?--
+                </option>
                 <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
