@@ -120,6 +120,7 @@ const NotificationPage = () => {
       setNotifications(
         Array.isArray(data.data) ? data.data : data.data.notifications || []
       );
+      
     } catch (error) {
       console.error("Error fetching notifications:", error);
       setNotifications([]);
@@ -206,7 +207,6 @@ const NotificationPage = () => {
 
       fetchNotifications(filterRef.current);
       fetchCounts();
-      window.location.reload();
     } catch (error) {
       console.error("Error processing action:", error);
     }
