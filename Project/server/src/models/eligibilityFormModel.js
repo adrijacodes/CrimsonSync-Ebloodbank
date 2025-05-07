@@ -4,7 +4,7 @@ const eligibilityFormSchema = new mongoose.Schema(
   {
     donor: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to the donor user
+      ref: "User", 
       required: true,
     },
     bloodRequest: {

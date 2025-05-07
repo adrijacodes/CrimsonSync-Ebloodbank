@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import CountUp from "react-countup";
 import { Link, useNavigate } from "react-router-dom";
 import { SlMagnifier } from "react-icons/sl";
 import { BiDonateBlood } from "react-icons/bi";
+import woman from "../../assets/woman.png"
+import man from "../../assets/man.png"
+import human from "../../assets/human.png"
 
 const testimonials = [
   {
@@ -77,16 +81,18 @@ const HomePage = () => {
           transition={{ staggerChildren: 0.2 }}
         >
           {[
-            { label: "Lives Saved", value: "10,000+" },
-            { label: "Active Donors", value: "5,000+" },
-            { label: "Donation Drives", value: "1,000+" },
+            { label: "Lives Saved", value: 10000 },
+            { label: "Active Donors", value: 5000 },
+            { label: "Donation Drives", value: 1000 },
           ].map((stat, index) => (
             <motion.div
               key={index}
               className="flex flex-col items-start justify-center bg-red-600 rounded-xl p-6 shadow-lg"
               variants={itemVariants}
             >
-              <h3 className="text-5xl text-white">{stat.value}</h3>
+              <h3 className="text-5xl text-white">
+                <CountUp end={stat.value} duration={2.5} separator="," />+
+              </h3>
               <p className="text-xl text-yellow-400 font-semibold">
                 {stat.label}
               </p>
@@ -168,6 +174,62 @@ const HomePage = () => {
           </AnimatePresence>
         </div>
       </motion.div>
+      {/* Developer Carousel / About the Creators */}
+<motion.div
+  className="py-10 px-4"
+  variants={sectionVariants}
+  initial="hidden"
+  animate="visible"
+  transition={{ duration: 0.8, delay: 0.6 }}
+>
+  <h2 className="text-4xl text-center font-bold font-serif mb-8">
+    Meet the Creators
+  </h2>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center">
+    {[
+      {
+        name: "Aindrila Dutta",
+        role: "Backend & API Developer",
+        image: woman,
+        vision: "By designing efficient APIs and optimizing server-side processes, we ensure that CrimsonSync operates smoothly, even during peak demand, helping save lives when it matters most."
+      }
+      ,
+      {
+        name: "Adrija Gowri",
+        role: "Lead Frontend Developer",
+        image:
+          human,
+        vision:
+        "Building responsive and engaging interfaces that empower users to connect quickly and easily, saving lives when it matters the most."
+      },
+      {
+        name: "Debjit Dey",
+        role: "Frontend Developer",
+        image:
+          man,
+        vision:
+          "Creating intuitive and seamless user experiences to ensure that every interaction with CrimsonSync is as impactful as the lives we aim to save."
+,
+      },
+    ].map((dev, idx) => (
+      <motion.div
+        key={idx}
+        className="bg-gray-100 rounded-xl shadow-md p-6 text-center"
+        variants={itemVariants}
+      >
+        <img
+          src={dev.image}
+          alt={dev.name}
+          className="w-24 h-24 mx-auto rounded-full mb-4"
+        />
+        <h3 className="text-2xl font-bold text-red-600">{dev.name}</h3>
+        <p className="text-sm font-medium text-gray-600 mb-2">{dev.role}</p>
+        <p className="italic text-gray-700">"{dev.vision}"</p>
+      </motion.div>
+    ))}
+  </div>
+</motion.div>
+
     </div>
   );
 };

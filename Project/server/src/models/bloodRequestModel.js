@@ -8,6 +8,11 @@ const bloodRequestSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    donor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     city: {
       type: String,
       required: true,
