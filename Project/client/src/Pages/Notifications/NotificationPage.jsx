@@ -21,6 +21,7 @@ const NotificationPage = () => {
   const navigate = useNavigate();
 
   const [showFormModal, setShowFormModal] = useState(false);
+  const [activeNotifId, setActiveNotifId] = useState(null);
   const [formData, setFormData] = useState({
     age: "",
     weight: "",
@@ -236,7 +237,7 @@ const NotificationPage = () => {
       );
 
       if (!response.ok) throw new Error("Form submission failed");
-      toast.success("✅ Form submitted successfully!");
+      toast.success("Form submitted successfully!");
       setTimeout(() => {
         navigate("/");
       }, 3000);
@@ -354,7 +355,10 @@ const NotificationPage = () => {
                             Reject
                           </button>
                           <button
-                            onClick={() => handleAcceptRequired(notif._id)}
+                            onClick={() => {
+                              setActiveNotifId(notif._id); // track which notif is being processed
+                              setShowFormModal(true); // open the form modal
+                            }}
                             className="text-sm bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                           >
                             Accept
@@ -510,7 +514,10 @@ const NotificationPage = () => {
                   className="w-5 h-5 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                   required
                 />
-                <label htmlFor="consent" className="text-sm text-black font-bold">
+                <label
+                  htmlFor="consent"
+                  className="text-sm text-black font-bold"
+                >
                   I give my consent to donate blood.
                 </label>
               </div>
@@ -518,14 +525,25 @@ const NotificationPage = () => {
               <div className="flex justify-between pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowFormModal(false)}
+                  onClick={() => {
+                    handleRejectionRequired(activeNotifId); // reject only if Cancel clicked
+                    setShowFormModal(false);
+                    setActiveNotifId(null);
+                  }}
                   className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black font-serif rounded-lg transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white  font-serif rounded-lg transition"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleFormSubmit(); // handle your form data
+                    handleAcceptRequired(activeNotifId); // now accept the notif
+                    setShowFormModal(false);
+                    setActiveNotifId(null);
+                  }}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-serif rounded-lg transition"
                 >
                   Submit
                 </button>
