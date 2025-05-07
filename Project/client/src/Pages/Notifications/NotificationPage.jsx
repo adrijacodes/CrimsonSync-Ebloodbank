@@ -120,7 +120,7 @@ const NotificationPage = () => {
       setNotifications(
         Array.isArray(data.data) ? data.data : data.data.notifications || []
       );
-      
+
     } catch (error) {
       console.error("Error fetching notifications:", error);
       setNotifications([]);
@@ -240,6 +240,7 @@ const NotificationPage = () => {
       setTimeout(() => {
         navigate("/");
       }, 3000);
+      window.location.reload();
       setShowFormModal(false);
       setFormData({ name: "", message: "" });
     } catch (err) {
