@@ -325,7 +325,7 @@ console.log(id);
                       <button
                         onClick={() => markAsRead(notif._id)}
                         disabled={markingAsRead === notif._id}
-                        className="ml-4 text-sm bg-red-500 text-white w-32 h-10 px-4 py-2 rounded hover:bg-red-600 disabled:bg-gray-300"
+                        className="ml-4 text-sm bg-red-500 text-white w-32 h-10 px-4 py-2 rounded hover:bg-red-600 disabled:bg-gray-300 flex-shrink-0"
                       >
                         {markingAsRead === notif._id
                           ? "Marking..."
