@@ -238,9 +238,9 @@ const NotificationPage = () => {
       if (!response.ok) throw new Error("Form submission failed");
       toast.success("✅ Form submitted successfully!");
       setTimeout(() => {
-        navigate("/");
       }, 3000);
       window.location.reload();
+      navigate("/");
       setShowFormModal(false);
       setFormData({ name: "", message: "" });
     } catch (err) {
