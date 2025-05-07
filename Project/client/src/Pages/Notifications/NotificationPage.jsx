@@ -239,7 +239,7 @@ const NotificationPage = () => {
       toast.success("✅ Form submitted successfully!");
       setTimeout(() => {
       }, 3000);
-      window.location.reload();
+      //window.location.reload();
       navigate("/");
       setShowFormModal(false);
       setFormData({ name: "", message: "" });
