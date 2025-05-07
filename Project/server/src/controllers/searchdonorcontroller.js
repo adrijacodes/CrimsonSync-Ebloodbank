@@ -9,10 +9,11 @@ import Notification from "../models/notificationsModel.js";
 import moment from "moment";
 
 // Create a blood request
-export const createBloodRequest = AsyncHandler(async (req, res) => {
+export const createBloodRequest = AsyncHandler(async (req, res, next) => {
   const { city, bloodType } = req.body;
   const recipient = req.user;
   const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
 
   if (!city || !bloodType) {
     throw new ApiError(400, "City and Blood Type are required fields.");
@@ -54,13 +55,14 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
       availability: { $in: [day] },
       isDonor: true,
     });
-
+    
     if (potentialDonors.length === 0) {
       throw new ApiError(
         404,
         `No eligible donors found for blood type ${bloodType} in ${city}.`
       );
     }
+    
 
     const recipientNotification = new Notification({
       user: recipient._id,
@@ -98,16 +100,19 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
           true
         )
       );
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-
-    console.error(
-      "Error creating blood request or sending notifications:",
-      error
-    );
-    throw new ApiError(500, "An error occurred while processing your request.");
-  }
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+    
+      console.error("Error creating blood request or sending notifications:", error);
+    
+      if (error instanceof ApiError) {
+        throw error; 
+      }
+    
+      throw new ApiError(500, "An error occurred while processing your request.");
+    }
+    
 });
 
 // eligibility form submission
@@ -116,7 +121,7 @@ export const submitEligibilityForm = AsyncHandler(async (req, res) => {
   const { notificationId } = req.params;
   const donorId = req.user?._id;
   const { formData } = req.body;
-console.log(notificationId);
+  console.log(formData);
 
   if (!notificationId || !formData || typeof formData !== "object") {
     throw new ApiError(400, "Notification ID and form data are required.");
@@ -124,7 +129,10 @@ console.log(notificationId);
 
   const notification = await Notification.findById(notificationId);
   if (!notification || !notification.bloodRequestId) {
-    throw new ApiError(404, "Notification or associated blood request not found.");
+    throw new ApiError(
+      404,
+      "Notification or associated blood request not found."
+    );
   }
 
   const bloodRequestId = notification.bloodRequestId;
@@ -152,12 +160,13 @@ console.log(notificationId);
     formData: formData,
   });
 
-  return res.status(201).json(
-    new ApiResponse(
-      newForm,
-      "Eligibility form submitted successfully. Your response has been recorded. Please wait while we review your eligibility.",
-      true
-    )
-  );
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(
+        newForm,
+        "Eligibility form submitted successfully. Your response has been recorded. Please wait while we review your eligibility.",
+        true
+      )
+    );
 });
-

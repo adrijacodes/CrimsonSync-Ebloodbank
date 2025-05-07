@@ -1,51 +1,58 @@
-import React, { useState } from 'react';
-import bloodImage from '../assets/blood2.jpg';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import bloodImage from "../assets/blood2.jpg";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const SearchBlood = () => {
-  const [location, setLocation] = useState('');
-  const [selectedBloodType, setSelectedBloodType] = useState('');
-  const [donors, setDonors] = useState([]); // New state for donor results
+  const [location, setLocation] = useState("");
+  const [selectedBloodType, setSelectedBloodType] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const accessToken = localStorage.getItem('token');
-  
+    const accessToken = localStorage.getItem("token");
+
     try {
-      const response = await fetch('http://localhost:8001/api/blood-requests/search-blood', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          bloodType: selectedBloodType,
-          city: location,
-        }),
-      });
-  
+      const response = await fetch(
+        "http://localhost:8001/api/blood-requests/search-blood",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            bloodType: selectedBloodType,
+            city: location,
+          }),
+        }
+      );
+
       const data = await response.json();
-  
+      
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to fetch donors');
+        
+        throw new Error(data.message || "Failed to fetch donors");
       }
-  
-      // ✅ Show toast with backend message
+
       if (data.message) {
         toast.success(data.message);
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
       }
-  
-      setDonors(data.donors || []);
-  
     } catch (error) {
-      console.error('Error:', error);
-      toast.error(error.message || 'Something went wrong');
-      setDonors([]);
+      
+      console.error("Error:", error);
+      toast.error(error.message || "Something went wrong");
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     }
   };
-  
 
-  const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+  const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   return (
     <div
@@ -68,8 +75,8 @@ const SearchBlood = () => {
                   key={type}
                   className={`flex justify-center items-center p-2 rounded cursor-pointer font-serif transition-transform duration-200 ${
                     selectedBloodType === type
-                      ? 'bg-red-600 text-white shadow-lg scale-105'
-                      : 'bg-gray-200 text-gray-800 hover:bg-red-500 hover:text-white'
+                      ? "bg-red-600 text-white shadow-lg scale-105"
+                      : "bg-gray-200 text-gray-800 hover:bg-red-500 hover:text-white"
                   }`}
                   onClick={() => setSelectedBloodType(type)}
                 >
@@ -99,31 +106,6 @@ const SearchBlood = () => {
             Search Blood
           </button>
         </form>
-
-        {/* Donor Results
-        {donors.length > 0 ? (
-          <div className="mt-10 bg-white bg-opacity-80 p-6 rounded-xl shadow-md w-full max-w-3xl">
-            <h2 className="text-center text-2xl font-semibold mb-4 font-serif">Available Donors</h2>
-            <ul className="space-y-4">
-              {donors.map((donor, index) => (
-                <li
-                  key={index}
-                  className="border border-gray-300 rounded-md p-4 flex flex-col md:flex-row justify-between items-start md:items-center"
-                >
-                  <div>
-                    <p className="font-bold">{donor.name}</p>
-                    <p className="text-gray-700">Blood Type: {donor.bloodType}</p>
-                    <p className="text-gray-700">City: {donor.city}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <div className="mt-10 text-center text-white text-lg font-medium">
-            {selectedBloodType && location && 'No donors found for your selection.'}
-          </div>
-        )} */}
       </div>
       <ToastContainer />
     </div>

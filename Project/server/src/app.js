@@ -35,6 +35,7 @@ checkAndCancelExpiredRequests();
 
 app.use((err, req, res, next) => {
   if (err instanceof ApiError) {
+
     return res.status(err.status).json({
       success: false,
       status: err.status,
