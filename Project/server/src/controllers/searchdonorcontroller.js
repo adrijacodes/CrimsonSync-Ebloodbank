@@ -112,8 +112,6 @@ export const createBloodRequest = AsyncHandler(async (req, res) => {
 
 // eligibility form submission
 
-
-
 export const submitEligibilityForm = AsyncHandler(async (req, res) => {
   const { notificationId } = req.params;
   const donorId = req.user?._id;
