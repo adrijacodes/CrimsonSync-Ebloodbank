@@ -173,8 +173,12 @@ const NotificationPage = () => {
       fetchNotifications(filterRef.current);
       fetchCounts();
       toast.success("❌ Notification is Rejected :(");
+      // setTimeout(() => {
+      //   navigate("/");
+      // }, 3000);
+    
       setTimeout(() => {
-        navigate("/");
+        window.location.reload();
       }, 3000);
     } catch (error) {
       console.error("Error processing action:", error);
@@ -233,9 +237,15 @@ const NotificationPage = () => {
 
       if (!response.ok) throw new Error("Form submission failed");
       toast.success("✅ Form submitted successfully!");
-      setTimeout(() => {}, 3000);
-      window.location.reload();
-      navigate("/");
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    
+       
       setShowFormModal(false);
       setFormData({ name: "", message: "" });
     } catch (err) {
