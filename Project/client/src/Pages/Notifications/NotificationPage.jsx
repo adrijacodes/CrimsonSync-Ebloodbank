@@ -12,7 +12,6 @@ const NotificationPage = () => {
     all: 0,
     active: 0,
     seen: 0,
-    cancelled: 0,
     accepted: 0,
     rejected: 0,
   });
