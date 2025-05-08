@@ -1,204 +1,366 @@
 // member dummy data
 export const userdata = [
+  // Pair 1 - A+ | Pune | MON, TUES, THURS
   {
-    "name": "Rahul Deshmukh",
-    "email": "rahul@example.com",
-    "password": "hashedpassword1",
-    "bloodType": "B+",
-    "location": { "city": "Kolkata", "state": "West Bengal" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["MON", "WED", "THURS","TUES"]
+    name: "Rahul Deshmukh",
+    email: "rahul1@example.com",
+    password: "hashedpassword1",
+    bloodType: "A+",
+    location: { city: "Pune", state: "Maharashtra" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["MON", "TUES", "THURS"]
   },
   {
-    "name": "Amit Patil",
-    "email": "amit@example.com",
-    "password": "hashedpassword2",
-    "bloodType": "B+",
-    "location": { "city": "Kolkata", "state": "West Bengal" },
-    "isDonor": false,
-    "isRecipient": true,
-    "role": "member",
-    "availability": ["TUES", "THURS", "SAT"]
+    name: "Rakesh Mehta",
+    email: "rakesh1@example.com",
+    password: "hashedpassword2",
+    bloodType: "A+",
+    location: { city: "Pune", state: "Maharashtra" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["MON", "TUES", "THURS"]
+  },
+
+  // Pair 2 - B+ | Kolkata | THURS, SAT, SUN
+  {
+    name: "Piku Sen",
+    email: "piku@example.com",
+    password: "hashedpassword3",
+    bloodType: "B+",
+    location: { city: "Kolkata", state: "West Bengal" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["THURS", "SAT", "SUN"]
   },
   {
-    "name": "Priya Jadhav",
-    "email": "priya@example.com",
-    "password": "hashedpassword3",
-    "bloodType": "AB+",
-    "location": { "city": "Delhi", "state": "Delhi" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["MON", "THURS", "FRI"]
+    name: "Nahin Das",
+    email: "nahin@example.com",
+    password: "hashedpassword4",
+    bloodType: "B+",
+    location: { city: "Kolkata", state: "West Bengal" },
+    isDonor: true,
+    isRecipient: true,
+    role: "member",
+    availability: ["THURS", "SAT", "SUN"]
+  },
+
+  // Pair 3 - AB+ | Delhi | WED, FRI
+  {
+    name: "Neha Verma",
+    email: "neha@example.com",
+    password: "hashedpassword5",
+    bloodType: "AB+",
+    location: { city: "Delhi", state: "Delhi" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["WED", "FRI"]
   },
   {
-    "name": "Soham Kulkarni",
-    "email": "soham@example.com",
-    "password": "hashedpassword4",
-    "bloodType": "AB+",
-    "location": {  "city": "Delhi", "state": "Delhi" },
-    "isDonor": true,
-    "isRecipient": true,
-    "role": "member",
-    "availability": ["THURS", "SUN","MON"]
+    name: "Sohan Bhat",
+    email: "sohan@example.com",
+    password: "hashedpassword6",
+    bloodType: "AB+",
+    location: { city: "Delhi", state: "Delhi" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["WED", "FRI"]
+  },
+
+  // Pair 4 - O- | Chennai | MON, WED, FRI
+  {
+    name: "Tanvi Rao",
+    email: "tanvi@example.com",
+    password: "hashedpassword7",
+    bloodType: "O-",
+    location: { city: "Chennai", state: "Tamil Nadu" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["MON", "WED", "FRI"]
   },
   {
-    "name": "Neha Shinde",
-    "email": "neha@example.com",
-    "password": "hashedpassword5",
-    "bloodType": "O-",
-    "location": { "city": "Hyderabad", "state": "Telangana" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["WED", "THURS", "SAT","MON","TUES"]
+    name: "Arjun Pillai",
+    email: "arjun@example.com",
+    password: "hashedpassword8",
+    bloodType: "O-",
+    location: { city: "Chennai", state: "Tamil Nadu" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["MON", "WED", "FRI"]
+  },
+
+  // Pair 5 - A- | Jaipur | TUES, THURS, SUN
+  {
+    name: "Megha Singh",
+    email: "megha@example.com",
+    password: "hashedpassword9",
+    bloodType: "A-",
+    location: { city: "Jaipur", state: "Rajasthan" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["TUES", "THURS", "SUN"]
   },
   {
-    "name": "Ravi Bhosale",
-    "email": "ravi@example.com",
-    "password": "hashedpassword6",
-    "bloodType": "O-",
-    "location": { "city": "Hyderabad", "state": "Telangana" },
-    "isDonor": true,
-    "isRecipient": true,
-    "role": "member",
-    "availability": ["MON", "FRI", "SUN","TUES"]
+    name: "Rajat Yadav",
+    email: "rajat@example.com",
+    password: "hashedpassword10",
+    bloodType: "A-",
+    location: { city: "Jaipur", state: "Rajasthan" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["TUES", "THURS", "SUN"]
+  },
+
+  // Pair 6 - AB- | Lucknow | MON, TUES, FRI
+  {
+    name: "Rina Joshi",
+    email: "rina@example.com",
+    password: "hashedpassword11",
+    bloodType: "AB-",
+    location: { city: "Lucknow", state: "Uttar Pradesh" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["MON", "TUES", "FRI"]
   },
   {
-    "name": "Ayesha Gaikwad",
-    "email": "ayesha@example.com",
-    "password": "hashedpassword7",
-    "bloodType": "A+",
-    "location": { "city": "Pune", "state": "Maharashtra" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["TUES", "THURS", "SUN"]
+    name: "Devendra Gupta",
+    email: "dev@example.com",
+    password: "hashedpassword12",
+    bloodType: "AB-",
+    location: { city: "Lucknow", state: "Uttar Pradesh" },
+    isDonor: true,
+    isRecipient: true,
+    role: "member",
+    availability: ["MON", "TUES", "FRI"]
+  },
+
+  // Pair 7 - O+ | Ahmedabad | MON, THURS
+  {
+    name: "Amit Shah",
+    email: "amit@example.com",
+    password: "hashedpassword13",
+    bloodType: "O+",
+    location: { city: "Ahmedabad", state: "Gujarat" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["MON", "THURS"]
   },
   {
-    "name": "Vikram More",
-    "email": "vikram@example.com",
-    "password": "hashedpassword8",
-    "bloodType": "O+",
-    "location": { "city": "Ahmedabad", "state": "Gujarat" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["MON", "THURS", "SAT"]
+    name: "Simran Patel",
+    email: "simran@example.com",
+    password: "hashedpassword14",
+    bloodType: "O+",
+    location: { city: "Ahmedabad", state: "Gujarat" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["MON", "THURS"]
+  },
+
+  // Pair 8 - B- | Bengaluru | WED, SAT
+  {
+    name: "Lakshmi Reddy",
+    email: "lakshmi@example.com",
+    password: "hashedpassword15",
+    bloodType: "B-",
+    location: { city: "Bengaluru", state: "Karnataka" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["WED", "SAT"]
   },
   {
-    "name": "Meera Pawar",
-    "email": "meera@example.com",
-    "password": "hashedpassword9",
-    "bloodType": "AB-",
-    "location": { "city": "Lucknow", "state": "Uttar Pradesh" },
-    "isDonor": false,
-    "isRecipient": true,
-    "role": "member",
-    "availability": ["THURS", "FRI", "SAT"]
+    name: "Manish Rao",
+    email: "manish@example.com",
+    password: "hashedpassword16",
+    bloodType: "B-",
+    location: { city: "Bengaluru", state: "Karnataka" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["WED", "SAT"]
+  },
+
+  // Pair 9 - A+ | Surat | MON, TUES
+  {
+    name: "Reena Bhatt",
+    email: "reena@example.com",
+    password: "hashedpassword17",
+    bloodType: "A+",
+    location: { city: "Surat", state: "Gujarat" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["MON", "TUES"]
   },
   {
-    "name": "Rohit Salunkhe",
-    "email": "rohit@example.com",
-    "password": "hashedpassword10",
-    "bloodType": "A+",
-    "location": { "city": "Jaipur", "state": "Rajasthan" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["WED", "THURS", "SUN"]
+    name: "Hardik Thakkar",
+    email: "hardik@example.com",
+    password: "hashedpassword18",
+    bloodType: "A+",
+    location: { city: "Surat", state: "Gujarat" },
+    isDonor: true,
+    isRecipient: true,
+    role: "member",
+    availability: ["MON", "TUES"]
+  },
+
+  // Pair 10 - B+ | Bhopal | TUES, THURS
+  {
+    name: "Anjali Mishra",
+    email: "anjali@example.com",
+    password: "hashedpassword19",
+    bloodType: "B+",
+    location: { city: "Bhopal", state: "Madhya Pradesh" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["TUES", "THURS"]
   },
   {
-    "name": "Kavita Singh",
-    "email": "kavita@example.com",
-    "password": "hashedpassword11",
-    "bloodType": "B+",
-    "location": { "city": "Mumbai", "state": "Maharashtra" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["MON", "THURS", "SAT"]
+    name: "Ravi Tripathi",
+    email: "ravi@example.com",
+    password: "hashedpassword20",
+    bloodType: "B+",
+    location: { city: "Bhopal", state: "Madhya Pradesh" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["TUES", "THURS"]
+  },
+
+  // Pair 11 - AB+ | Noida | MON, FRI
+  {
+    name: "Priya Saxena",
+    email: "priya@example.com",
+    password: "hashedpassword21",
+    bloodType: "AB+",
+    location: { city: "Noida", state: "Uttar Pradesh" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["MON", "FRI"]
   },
   {
-    "name": "Rajesh Naik",
-    "email": "rajesh@example.com",
-    "password": "hashedpassword12",
-    "bloodType": "B+",
-    "location": { "city": "Mumbai", "state": "Maharashtra" },
-    "isDonor": false,
-    "isRecipient": true,
-    "role": "member",
-    "availability": ["TUES", "THURS", "SUN"]
+    name: "Kabir Malhotra",
+    email: "kabir@example.com",
+    password: "hashedpassword22",
+    bloodType: "AB+",
+    location: { city: "Noida", state: "Uttar Pradesh" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["MON", "FRI"]
+  },
+
+  // Pair 12 - O- | Patna | TUES, WED
+  {
+    name: "Anita Singh",
+    email: "anita@example.com",
+    password: "hashedpassword23",
+    bloodType: "O-",
+    location: { city: "Patna", state: "Bihar" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["TUES", "WED"]
   },
   {
-    "name": "Shruti Verma",
-    "email": "shruti@example.com",
-    "password": "hashedpassword13",
-    "bloodType": "B+",
-    "location": { "city": "Mumbai", "state": "Maharashtra" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["WED", "THURS", "FRI"]
+    name: "Suraj Kumar",
+    email: "suraj@example.com",
+    password: "hashedpassword24",
+    bloodType: "O-",
+    location: { city: "Patna", state: "Bihar" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["TUES", "WED"]
+  },
+
+  // Pair 13 - A- | Kochi | MON, THURS
+  {
+    name: "Sneha Nair",
+    email: "sneha@example.com",
+    password: "hashedpassword25",
+    bloodType: "A-",
+    location: { city: "Kochi", state: "Kerala" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["MON", "THURS"]
   },
   {
-    "name": "Rina Joshi",
-    "email": "rina@example.com",
-    "password": "hashedpassword14",
-    "bloodType": "B+",
-    "location": { "city": "Mumbai", "state": "Maharashtra" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["MON", "THURS", "SUN"]
+    name: "Vivek Menon",
+    email: "vivek@example.com",
+    password: "hashedpassword26",
+    bloodType: "A-",
+    location: { city: "Kochi", state: "Kerala" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["MON", "THURS"]
+  },
+
+  // Pair 14 - AB- | Ranchi | FRI, SAT
+  {
+    name: "Komal Singh",
+    email: "komal@example.com",
+    password: "hashedpassword27",
+    bloodType: "AB-",
+    location: { city: "Ranchi", state: "Jharkhand" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["FRI", "SAT"]
   },
   {
-    "name": "Sandeep Reddy",
-    "email": "sandeep@example.com",
-    "password": "hashedpassword15",
-    "bloodType": "B+",
-    "location": { "city": "Mumbai", "state": "Maharashtra" },
-    "isDonor": false,
-    "isRecipient": true,
-    "role": "member",
-    "availability": ["TUES", "THURS", "SAT"]
+    name: "Nikhil Sinha",
+    email: "nikhil@example.com",
+    password: "hashedpassword28",
+    bloodType: "AB-",
+    location: { city: "Ranchi", state: "Jharkhand" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["FRI", "SAT"]
+  },
+
+  // Pair 15 - B- | Guwahati | MON, TUES, FRI
+  {
+    name: "Reetika Baruah",
+    email: "reetika@example.com",
+    password: "hashedpassword29",
+    bloodType: "B-",
+    location: { city: "Guwahati", state: "Assam" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["MON", "TUES", "FRI"]
   },
   {
-    "name": "Maya Shah",
-    "email": "maya@example.com",
-    "password": "hashedpassword16",
-    "bloodType": "B+",
-    "location": { "city": "Mumbai", "state": "Maharashtra" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["WED", "THURS", "SAT"]
-  },
-  {
-    "name": "Vishal Kapoor",
-    "email": "vishal@example.com",
-    "password": "hashedpassword17",
-    "bloodType": "B+",
-    "location": { "city": "Mumbai", "state": "Maharashtra" },
-    "isDonor": false,
-    "isRecipient": true,
-    "role": "member",
-    "availability": ["MON", "THURS", "FRI"]
-  },
-  {
-    "name": "Alok Gupta",
-    "email": "alok@example.com",
-    "password": "hashedpassword18",
-    "bloodType": "B+",
-    "location": { "city": "Mumbai", "state": "Maharashtra" },
-    "isDonor": true,
-    "isRecipient": false,
-    "role": "member",
-    "availability": ["TUES", "THURS", "FRI"]
+    name: "Jayanta Gogoi",
+    email: "jayanta@example.com",
+    password: "hashedpassword30",
+    bloodType: "B-",
+    location: { city: "Guwahati", state: "Assam" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["MON", "TUES", "FRI"]
   }
 ];
+
 
 // event dummy data
 // export const eventData = [
