@@ -70,8 +70,10 @@ cron.schedule("*/2 * * * * ", async () => {
       console.log(selectedDonor._id);
 
       await User.findByIdAndUpdate(selectedDonor._id, {
-        lastBloodDonationDate: new Date(),
+        $set: { lastBloodDonationDate: new Date() },
+        $push: { userBloodDonationHistory: bloodID }
       });
+      
 
       // Notify rejected donors
       const rejectedForms = await EligibilityForm.find({
