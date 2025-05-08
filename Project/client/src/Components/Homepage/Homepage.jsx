@@ -4,30 +4,53 @@ import CountUp from "react-countup";
 import { Link, useNavigate } from "react-router-dom";
 import { SlMagnifier } from "react-icons/sl";
 import { BiDonateBlood } from "react-icons/bi";
-import woman from "../../assets/woman.png"
-import man from "../../assets/man.png"
-import human from "../../assets/human.png"
-
+import woman from "../../assets/woman.png";
+import man from "../../assets/man.png";
+import human from "../../assets/human.png";
+import pedro from "../../assets/Pedro.jpg";
+import mona from "../../assets/mona.jpeg";
+import sofia from "../../assets/sofia.jpg";
+import joe from "../../assets/joe.jpeg";
+import millie from "../../assets/millie.jpg";
+import namita from "../../assets/namita.jpg";
 const testimonials = [
   {
     text: "CrimsonSync made it so easy to find a donor in an emergency. I am forever grateful for this platform.",
-    author: "Raj Tripathy",
-    avatar:
-      "https://media.istockphoto.com/id/1406197730/photo/portrait-of-a-young-handsome-indian-man.jpg?s=612x612&w=0&k=20&c=CncNUTbw6mzGsbojks2Vt0kV85N_pQaI3zaSkBQJFTc=",
+    author: "Pedro Pascal",
+    avatar: pedro,
     stars: 5,
   },
   {
     text: "Donating blood has never been simpler. The community here is amazing and supportive.",
-    author: "Ajoy Sen",
-    avatar:
-      "https://t3.ftcdn.net/jpg/03/67/70/92/360_F_367709239_wWNdUSrtEvG6psATqu1sO9AkKUXALpR8.jpg",
+    author: "Millie Bobby Brown",
+    avatar: millie,
     stars: 4,
   },
   {
     text: "I appreciate the efforts of CrimsonSync. It's a lifeline for so many people.",
-    author: "Soumili Das",
+    author: "Penn Dayton Badgley ",
+    avatar: joe,
+    stars: 5,
+  },
+  {
+    text: "The interface is clean, and I was able to get help within minutes. Highly recommend it to everyone.",
+    author: "Sofia Carson",
     avatar:
-      "https://media.istockphoto.com/id/1338134319/photo/portrait-of-young-indian-businesswoman-or-school-teacher-pose-indoors.jpg?s=612x612&w=0&k=20&c=Dw1nKFtnU_Bfm2I3OPQxBmSKe9NtSzux6bHqa9lVZ7A=",
+      sofia,
+    stars: 4,
+  },
+  {
+    text: "This platform helped us during a crisis when we had no other option. Thank you for building this!",
+    author: "Mona Patel",
+    avatar:
+      mona,
+    stars: 5,
+  },
+  {
+    text: "Volunteering as a donor on CrimsonSync is fulfilling. You truly feel part of something bigger.",
+    author: "Namita Thapar ",
+    avatar:
+     namita,
     stars: 5,
   },
 ];
@@ -136,36 +159,39 @@ const HomePage = () => {
 
       {/* Review Carousel */}
       <motion.div
-        className="py-10 px-4"
+        className="py-16 px-4 bg-gradient-to-b from-white to-red-50"
         variants={sectionVariants}
         initial="hidden"
         animate="visible"
         transition={{ duration: 0.8, delay: 0.6 }}
       >
-        <h2 className="text-4xl text-center font-bold font-serif mb-8">
-          What Our Users Say
+        <h2 className="text-4xl text-center font-extrabold font-serif mb-12 text-gray-800">
+          ❤️ What Our Users Say
         </h2>
+
         <div className="relative flex justify-center items-center overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.5 }}
-              className="bg-white w-full max-w-3xl p-6 rounded-lg shadow-lg text-center"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -40 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              className="bg-white/80 backdrop-blur-md w-full max-w-3xl p-8 rounded-2xl shadow-xl text-center border border-red-100"
             >
               <div className="flex flex-col items-center">
                 <img
                   src={testimonials[currentSlide].avatar}
                   alt={testimonials[currentSlide].author}
-                  className="w-20 h-20 rounded-full mb-4 shadow-md"
+                  className="w-24 h-24 rounded-full mb-6 shadow-lg border-4 border-white"
                 />
-                <p className="text-lg italic mb-2">{`"${testimonials[currentSlide].text}"`}</p>
-                <p className="mt-2 font-semibold text-red-600">
-                  - {testimonials[currentSlide].author}
+                <p className="text-xl italic mb-4 text-gray-700 max-w-xl mx-auto leading-relaxed">
+                  “{testimonials[currentSlide].text}”
                 </p>
-                <div className="text-yellow-400 text-xl mt-1">
+                <p className="mt-3 font-semibold text-red-600 text-lg">
+                  — {testimonials[currentSlide].author}
+                </p>
+                <div className="text-yellow-400 text-2xl mt-2">
                   {"★".repeat(testimonials[currentSlide].stars)}
                   {"☆".repeat(5 - testimonials[currentSlide].stars)}
                 </div>
@@ -173,63 +199,75 @@ const HomePage = () => {
             </motion.div>
           </AnimatePresence>
         </div>
-      </motion.div>
-      {/* Developer Carousel / About the Creators */}
-<motion.div
-  className="py-10 px-4"
-  variants={sectionVariants}
-  initial="hidden"
-  animate="visible"
-  transition={{ duration: 0.8, delay: 0.6 }}
->
-  <h2 className="text-4xl text-center font-bold font-serif mb-8">
-    Meet the Creators
-  </h2>
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center">
-    {[
-      {
-        name: "Aindrila Dutta",
-        role: "Backend & API Developer",
-        image: woman,
-        vision: "By designing efficient APIs and optimizing server-side processes, we ensure that CrimsonSync operates smoothly, even during peak demand, helping save lives when it matters most."
-      }
-      ,
-      {
-        name: "Adrija Gowri",
-        role: "Lead Frontend Developer",
-        image:
-          human,
-        vision:
-        "Building responsive and engaging interfaces that empower users to connect quickly and easily, saving lives when it matters the most."
-      },
-      {
-        name: "Debjit Dey",
-        role: "Frontend Developer",
-        image:
-          man,
-        vision:
-          "Creating intuitive and seamless user experiences to ensure that every interaction with CrimsonSync is as impactful as the lives we aim to save."
-,
-      },
-    ].map((dev, idx) => (
-      <motion.div
-        key={idx}
-        className="bg-gray-100 rounded-xl shadow-md p-6 text-center"
-        variants={itemVariants}
-      >
-        <img
-          src={dev.image}
-          alt={dev.name}
-          className="w-24 h-24 mx-auto rounded-full mb-4"
-        />
-        <h3 className="text-2xl font-bold text-red-600">{dev.name}</h3>
-        <p className="text-sm font-medium text-gray-600 mb-2">{dev.role}</p>
-        <p className="italic text-gray-700">"{dev.vision}"</p>
-      </motion.div>
-    ))}
-  </div>
-</motion.div>
 
+        {/* Optional: Dot Indicators for Slides */}
+        <div className="flex justify-center mt-6 space-x-2">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-3 w-3 rounded-full transition-all duration-300 ${
+                index === currentSlide ? "bg-red-600 w-4" : "bg-gray-300"
+              }`}
+            ></button>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Developer Carousel / About the Creators */}
+      <motion.div
+        className="py-10 px-4"
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 0.8, delay: 0.6 }}
+      >
+        <h2 className="text-4xl text-center font-bold font-serif mb-8">
+          Meet the Creators
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center">
+          {[
+            {
+              name: "Aindrila Dutta",
+              role: "Backend & API Developer",
+              image: woman,
+              vision:
+                "By designing efficient APIs and optimizing server-side processes, we ensure that CrimsonSync operates smoothly, even during peak demand, helping save lives when it matters most.",
+            },
+            {
+              name: "Adrija Gowri",
+              role: "Lead Frontend Developer",
+              image: human,
+              vision:
+                "Building responsive and engaging interfaces that empower users to connect quickly and easily, saving lives when it matters the most.",
+            },
+            {
+              name: "Debjit Dey",
+              role: "Frontend Developer",
+              image: man,
+              vision:
+                "Creating intuitive and seamless user experiences to ensure that every interaction with CrimsonSync is as impactful as the lives we aim to save.",
+            },
+          ].map((dev, idx) => (
+            <motion.div
+              key={idx}
+              className="bg-gray-100 rounded-xl shadow-md p-6 text-center"
+              variants={itemVariants}
+            >
+              <img
+                src={dev.image}
+                alt={dev.name}
+                className="w-24 h-24 mx-auto rounded-full mb-4"
+              />
+              <h3 className="text-2xl font-bold text-red-600">{dev.name}</h3>
+              <p className="text-sm font-medium text-gray-600 mb-2">
+                {dev.role}
+              </p>
+              <p className="italic text-gray-700">"{dev.vision}"</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
     </div>
   );
 };

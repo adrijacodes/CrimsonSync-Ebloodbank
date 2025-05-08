@@ -29,7 +29,7 @@ const EventCard = ({ event }) => {
         <p className="text-sm text-gray-600">
           📍 {venue}, {city}
         </p>
-        <p className="text-sm text-gray-600 mt-2">{event.description}</p>
+        {/* <p className="text-sm text-gray-600 mt-2">{event.description}</p> */}
       </div>
     </div>
   );
