@@ -18,7 +18,7 @@ export const userdata = [
     password: "hashedpassword2",
     bloodType: "A+",
     location: { city: "Pune", state: "Maharashtra" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["MON", "TUES", "THURS"]
@@ -66,7 +66,7 @@ export const userdata = [
     password: "hashedpassword6",
     bloodType: "AB+",
     location: { city: "Delhi", state: "Delhi" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["WED", "FRI"]
@@ -90,7 +90,7 @@ export const userdata = [
     password: "hashedpassword8",
     bloodType: "O-",
     location: { city: "Chennai", state: "Tamil Nadu" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["MON", "WED", "FRI"]
@@ -114,7 +114,7 @@ export const userdata = [
     password: "hashedpassword10",
     bloodType: "A-",
     location: { city: "Jaipur", state: "Rajasthan" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["TUES", "THURS", "SUN"]
@@ -162,7 +162,7 @@ export const userdata = [
     password: "hashedpassword14",
     bloodType: "O+",
     location: { city: "Ahmedabad", state: "Gujarat" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["MON", "THURS"]
@@ -186,7 +186,7 @@ export const userdata = [
     password: "hashedpassword16",
     bloodType: "B-",
     location: { city: "Bengaluru", state: "Karnataka" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["WED", "SAT"]
@@ -223,7 +223,7 @@ export const userdata = [
     password: "hashedpassword19",
     bloodType: "B+",
     location: { city: "Bhopal", state: "Madhya Pradesh" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["TUES", "THURS"]
@@ -258,7 +258,7 @@ export const userdata = [
     password: "hashedpassword22",
     bloodType: "AB+",
     location: { city: "Noida", state: "Uttar Pradesh" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["MON", "FRI"]
@@ -282,7 +282,7 @@ export const userdata = [
     password: "hashedpassword24",
     bloodType: "O-",
     location: { city: "Patna", state: "Bihar" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["TUES", "WED"]
@@ -306,7 +306,7 @@ export const userdata = [
     password: "hashedpassword26",
     bloodType: "A-",
     location: { city: "Kochi", state: "Kerala" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["MON", "THURS"]
@@ -330,7 +330,7 @@ export const userdata = [
     password: "hashedpassword28",
     bloodType: "AB-",
     location: { city: "Ranchi", state: "Jharkhand" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["FRI", "SAT"]
@@ -354,7 +354,7 @@ export const userdata = [
     password: "hashedpassword30",
     bloodType: "B-",
     location: { city: "Guwahati", state: "Assam" },
-    isDonor: false,
+    isDonor: true,
     isRecipient: true,
     role: "member",
     availability: ["MON", "TUES", "FRI"]
