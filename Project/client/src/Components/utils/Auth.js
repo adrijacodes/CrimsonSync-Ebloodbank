@@ -1,4 +1,4 @@
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 
 export const checkTokenValidity = () => {
@@ -6,16 +6,16 @@ export const checkTokenValidity = () => {
   if (!token) return false;
 
   try {
-    const decoded = jwt_decode(token);
-    const currentTime = Date.now() / 1000; // Current time in seconds
+    const decoded = jwtDecode(token); // ✅ Use named import
+    const currentTime = Date.now() / 1000;
 
     if (decoded.exp < currentTime) {
       toast.info("Session expired. Please login again.");
       localStorage.clear();
-      return false; // Token expired
+      return false;
     }
 
-    return true; // Token valid
+    return true;
   } catch (error) {
     console.error("Invalid token:", error);
     localStorage.clear();
