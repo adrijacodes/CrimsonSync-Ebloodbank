@@ -56,6 +56,7 @@ export const createBloodRequest = AsyncHandler(async (req, res, next) => {
       availability: { $in: [day] },
       isDonor: true,
     });
+    console.log(potentialDonors);
     
     if (potentialDonors.length === 0) {
       throw new ApiError(

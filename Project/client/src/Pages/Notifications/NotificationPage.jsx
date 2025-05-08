@@ -21,7 +21,6 @@ const NotificationPage = () => {
   const navigate = useNavigate();
 
   const [showFormModal, setShowFormModal] = useState(false);
-  const [activeNotifId, setActiveNotifId] = useState(null);
   const [formData, setFormData] = useState({
     age: "",
     weight: "",
@@ -57,15 +56,22 @@ const NotificationPage = () => {
         "notifications/search?status=seen",
         "notifications/search?status=accepted",
         "notifications/search?status=rejected",
+        "notifications/search?status=cancelled", // Added
       ];
-      const [allRes, activeRes, seenRes, acceptedRes, rejectedRes] =
-        await Promise.all(
-          urls.map((url) =>
-            fetch(`http://localhost:8001/api/${url}`, {
-              headers: { Authorization: `Bearer ${accessToken}` },
-            })
-          )
-        );
+      const [
+        allRes,
+        activeRes,
+        seenRes,
+        acceptedRes,
+        rejectedRes,
+        cancelledRes,
+      ] = await Promise.all(
+        urls.map((url) =>
+          fetch(`http://localhost:8001/api/${url}`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          })
+        )
+      );
       const [allData, activeData, seenData, acceptedData, rejectedData] =
         await Promise.all([
           allRes.json(),
@@ -73,6 +79,7 @@ const NotificationPage = () => {
           seenRes.json(),
           acceptedRes.json(),
           rejectedRes.json(),
+          cancelledRes.json(), // Discarded
         ]);
 
       const activeCount = activeData.data?.notifications?.length || 0;
@@ -89,16 +96,18 @@ const NotificationPage = () => {
 
       setPreviousActiveCount(activeCount);
       setCounts({
-        all: activeCount + seenCount,
+        all: allData.data?.notifications?.length || 0,
         active: activeCount,
         seen: seenCount,
         accepted: acceptedData.data?.notifications?.length || 0,
         rejected: rejectedData.data?.notifications?.length || 0,
+        // Not adding cancelled count here
       });
     } catch (err) {
       console.error("Error fetching counts:", err);
     }
   };
+
   // Fetch and display filtered notification list based on selected tab
   const fetchNotifications = async (status = "all") => {
     setLoading(true);
@@ -237,13 +246,9 @@ const NotificationPage = () => {
       );
 
       if (!response.ok) throw new Error("Form submission failed");
-      toast.success("Form submitted successfully!");
+      toast.success("✅ Form submitted successfully!");
       setTimeout(() => {
         navigate("/");
-      }, 3000);
-
-      setTimeout(() => {
-        window.location.reload();
       }, 3000);
 
       setShowFormModal(false);
@@ -254,7 +259,7 @@ const NotificationPage = () => {
     }
   };
 
-  //(**Polling & Initialization**)every 30s, refresh notifications and counts for current tab
+  //(**Polling & Initialization**)every 20s, refresh notifications and counts for current tab
   useEffect(() => {
     if (accessToken) {
       fetchNotifications(filter);
@@ -262,7 +267,7 @@ const NotificationPage = () => {
       const interval = setInterval(() => {
         fetchNotifications(filterRef.current);
         fetchCounts();
-      }, 30000);
+      }, 20000);
       return () => clearInterval(interval);
     }
   }, [accessToken]);
@@ -286,25 +291,50 @@ const NotificationPage = () => {
         </h2>
         {/* Tabs */}
         <div className="flex gap-4 mb-6">
-          {["all", "active", "seen", "accepted", "rejected"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => handleFilterChange(tab)}
-              className={`relative px-4 py-2 rounded-full text-sm font-medium ${
-                filter === tab
+          {["all", "active", "seen", "accepted", "rejected", "cancelled"].map(
+            (tab) => {
+              const isActive = filter === tab;
+
+              // Define color classes for each tab
+              const tabColors = {
+                all: isActive
+                  ? "bg-pink-500 text-white"
+                  : "bg-pink-100 text-white-800",
+                active: isActive
+                  ? "bg-blue-500 text-white"
+                  : "bg-blue-100 text-blue-800",
+                seen: isActive
+                  ? "bg-gray-500 text-white"
+                  : "bg-gray-200 text-gray-800",
+                accepted: isActive
+                  ? "bg-green-600 text-white"
+                  : "bg-green-100 text-green-800",
+                rejected: isActive
                   ? "bg-red-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              {tab === "active" && counts.active > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full px-2 text-xs font-bold">
-                  {counts.active > 99 ? "99+" : counts.active}
-                </span>
-              )}
-            </button>
-          ))}
+                  : "bg-red-100 text-yellow-800",
+                cancelled: isActive
+                  ? "bg-purple-600 text-white"
+                  : "bg-purple-100 text-purple-800",
+              };
+
+              return (
+                <button
+                  key={tab}
+                  onClick={() => handleFilterChange(tab)}
+                  className={`relative px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${tabColors[tab]}`}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab === "active" && counts.active > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full px-2 text-xs font-bold">
+                      {counts.active > 99 ? "99+" : counts.active}
+                    </span>
+                  )}
+                </button>
+              );
+            }
+          )}
         </div>
+
         {/* Notification List */}
         {loading ? (
           <p>Loading notifications...</p>
@@ -312,64 +342,82 @@ const NotificationPage = () => {
           <p>No {filter} notifications.</p>
         ) : (
           <ul className="space-y-4">
-            {notifications.map((notif) => (
-              <li
-                key={notif._id}
-                className={`p-4 border rounded-lg ${
-                  notif.isRead
-                    ? "bg-gray-100 border-gray-300"
-                    : "bg-green-50 border-green-300"
-                }`}
-              >
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-800">{notif.message}</p>
-                  {notif.status === "active" &&
-                    !notif.isRead &&
-                    notif.type === "info" && (
-                      <button
-                        onClick={() => markAsRead(notif._id)}
-                        disabled={markingAsRead === notif._id}
-                        className="ml-4 text-sm bg-red-500 text-white w-32 h-10 px-4 py-2 rounded hover:bg-red-600 disabled:bg-gray-300 flex-shrink-0"
-                      >
-                        {markingAsRead === notif._id
-                          ? "Marking..."
-                          : "Mark as read"}
-                      </button>
-                    )}
-                  {notif.type === "action_required" && (
-                    <div className="flex gap-4 ml-4">
-                      {notif.status === "rejected" ? (
-                        <span className="text-lg font-bold text-red-600">
-                          Rejected
-                        </span>
-                      ) : notif.status === "accepted" ? (
-                        <span className="text-lg font-bold text-green-600">
-                          Accepted
-                        </span>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => handleRejectionRequired(notif._id)}
-                            className="text-sm bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                          >
-                            Reject
-                          </button>
-                          <button
-                            onClick={() => {
-                              setActiveNotifId(notif._id); // track which notif is being processed
-                              setShowFormModal(true); // open the form modal
-                            }}
-                            className="text-sm bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                          >
-                            Accept
-                          </button>
-                        </>
+            {notifications.map((notif) => {
+              // Define colors based on notification status
+              const notificationStatusColors = {
+                active: notif.isRead
+                  ? "bg-blue-50 border-blue-300"
+                  : "bg-blue-100 border-blue-500",
+                seen: notif.isRead
+                  ? "bg-gray-50 border-gray-300"
+                  : "bg-gray-200 border-gray-500",
+                accepted: notif.isRead
+                  ? "bg-green-50 border-green-300"
+                  : "bg-green-100 border-green-500",
+                rejected: notif.isRead
+                  ? "bg-red-50 border-red-300"
+                  : "bg-red-100 border-red-500",
+                cancelled: notif.isRead
+                  ? "bg-yellow-50 border-yellow-300"
+                  : "bg-yellow-100 border-yellow-500",
+              };
+
+              return (
+                <li
+                  key={notif._id}
+                  className={`p-4 border rounded-lg ${
+                    notificationStatusColors[notif.status]
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-800">{notif.message}</p>
+
+                    {notif.status === "active" &&
+                      !notif.isRead &&
+                      notif.type === "info" && (
+                        <button
+                          onClick={() => markAsRead(notif._id)}
+                          disabled={markingAsRead === notif._id}
+                          className="ml-4 text-sm bg-red-500 text-white w-32 h-10 px-4 py-2 rounded hover:bg-red-600 disabled:bg-gray-300 flex-shrink-0"
+                        >
+                          {markingAsRead === notif._id
+                            ? "Marking..."
+                            : "Mark as read"}
+                        </button>
                       )}
-                    </div>
-                  )}
-                </div>
-              </li>
-            ))}
+
+                    {notif.status === "action_required" && (
+                      <div className="flex gap-4 ml-4">
+                        {notif.status === "rejected" ? (
+                          <span className="text-lg font-bold text-red-600">
+                            Rejected
+                          </span>
+                        ) : notif.status === "accepted" ? (
+                          <span className="text-lg font-bold text-green-600">
+                            Accepted
+                          </span>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleRejectionRequired(notif._id)}
+                              className="text-sm bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                            >
+                              Reject
+                            </button>
+                            <button
+                              onClick={() => handleAcceptRequired(notif._id)}
+                              className="text-sm bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                            >
+                              Accept
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
@@ -500,50 +548,32 @@ const NotificationPage = () => {
                 <option value="Yes">Yes</option>
               </select>
 
-              <div className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  id="consent"
-                  checked={formData.consent === "Yes"}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      consent: e.target.checked ? "Yes" : "No",
-                    })
-                  }
-                  className="w-5 h-5 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-                  required
-                />
-                <label
-                  htmlFor="consent"
-                  className="text-sm text-black font-bold"
-                >
-                  I give my consent to donate blood.
-                </label>
-              </div>
+              <select
+                value={formData.consent}
+                onChange={(e) =>
+                  setFormData({ ...formData, consent: e.target.value })
+                }
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                required
+              >
+                <option value="">
+                  --Do you give consent to donate blood?--
+                </option>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
 
               <div className="flex justify-between pt-4">
                 <button
                   type="button"
-                  onClick={() => {
-                    handleRejectionRequired(activeNotifId); // reject only if Cancel clicked
-                    setShowFormModal(false);
-                    setActiveNotifId(null);
-                  }}
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black font-serif rounded-lg transition"
+                  onClick={() => setShowFormModal(false)}
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black rounded-lg transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleFormSubmit(); // handle your form data
-                    handleAcceptRequired(activeNotifId); // now accept the notif
-                    setShowFormModal(false);
-                    setActiveNotifId(null);
-                  }}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-serif rounded-lg transition"
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
                 >
                   Submit
                 </button>

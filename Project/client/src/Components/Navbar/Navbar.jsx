@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { checkTokenValidity } from "../utils/Auth"; 
+
 import { FiLogOut } from "react-icons/fi";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
@@ -26,11 +26,6 @@ const Navbar = () => {
 
     // Function to fetch notifications
     const fetchNotifications = async () => {
-    const isValid = checkTokenValidity();   // Check if token is still valid
-    if (!isValid) {
-      navigate("/login");
-      return;
-    }
       try {
         const response = await axios.get(
           "http://localhost:8001/api/notifications/search?status=active",
@@ -40,8 +35,8 @@ const Navbar = () => {
             },
           }
         );
-        console.log(response.data.data.count);  // Debugging log to check response
-        setNotificationCount(response.data.data.count);  // Update notification count
+        console.log(response.data.data.count); // Debugging log to check response
+        setNotificationCount(response.data.data.count); // Update notification count
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
@@ -64,7 +59,7 @@ const Navbar = () => {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [location, accessToken, isLoggedIn, navigate]);
+  }, [location, accessToken, isLoggedIn]);
 
   const handleLogout = async () => {
     if (!accessToken || !role) {
@@ -93,20 +88,20 @@ const Navbar = () => {
       toast.success("Logged out successfully!");
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Logout failed.";
+
+      // Handle expired JWT and navigate to login
+      if (errorMsg.toLowerCase().includes("jwt expired")) {
+        toast.info("Session expired. Please login again.");
+        navigate("/");
+      } else {
+        toast.error(errorMsg);
+        console.error("Logout error:", error);
+        return;
+      }
+    } finally {
+      localStorage.clear();
+      navigate("/login");
     }
-    //   // Handle expired JWT and navigate to login
-    //   if (errorMsg.toLowerCase().includes("jwt expired")) {
-    //     toast.info("Session expired. Please login again.");
-    //     navigate("/");
-    //   } else {
-    //     toast.error(errorMsg);
-    //     console.error("Logout error:", error);
-    //     return;
-    //   }
-    // } finally {
-    //   localStorage.clear();
-    //   navigate("/login");
-    // }
   };
 
   return (
@@ -156,13 +151,13 @@ const Navbar = () => {
                   <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
                 </Link>
                 <Link to="/notification" className="relative">
-      <IoNotifications className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
-      {notificationCount > 0 && (
-        <span className="absolute -top-2 -right-2 text-[10px] bg-yellow-300 text-black font-bold rounded-full px-[6px] py-[2px] shadow-md">
-          {notificationCount}
-        </span>
-      )}
-    </Link>
+                  <IoNotifications className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
+                  {notificationCount > 0 && (
+                    <span className="absolute -top-2 -right-2 text-[10px] bg-yellow-300 text-black font-bold rounded-full px-[6px] py-[2px] shadow-md">
+                      {notificationCount}
+                    </span>
+                  )}
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition-colors duration-200"
