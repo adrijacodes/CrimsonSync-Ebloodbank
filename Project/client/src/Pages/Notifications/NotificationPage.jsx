@@ -13,7 +13,6 @@ const NotificationPage = () => {
     all: 0,
     active: 0,
     seen: 0,
-    cancelled: 0,
     accepted: 0,
     rejected: 0,
   });
@@ -22,6 +21,7 @@ const NotificationPage = () => {
   const navigate = useNavigate();
 
   const [showFormModal, setShowFormModal] = useState(false);
+  const [activeNotifId, setActiveNotifId] = useState(null);
   const [formData, setFormData] = useState({
     age: "",
     weight: "",
@@ -120,7 +120,6 @@ const NotificationPage = () => {
       setNotifications(
         Array.isArray(data.data) ? data.data : data.data.notifications || []
       );
-
     } catch (error) {
       console.error("Error fetching notifications:", error);
       setNotifications([]);
@@ -178,7 +177,7 @@ const NotificationPage = () => {
       // setTimeout(() => {
       //   navigate("/");
       // }, 3000);
-    
+
       setTimeout(() => {
         window.location.reload();
       }, 3000);
@@ -238,16 +237,15 @@ const NotificationPage = () => {
       );
 
       if (!response.ok) throw new Error("Form submission failed");
-      toast.success("✅ Form submitted successfully!");
+      toast.success("Form submitted successfully!");
       setTimeout(() => {
         navigate("/");
       }, 3000);
-    
+
       setTimeout(() => {
         window.location.reload();
       }, 3000);
-    
-       
+
       setShowFormModal(false);
       setFormData({ name: "", message: "" });
     } catch (err) {
@@ -256,7 +254,6 @@ const NotificationPage = () => {
     }
   };
 
-  
   //(**Polling & Initialization**)every 30s, refresh notifications and counts for current tab
   useEffect(() => {
     if (accessToken) {
@@ -358,7 +355,10 @@ const NotificationPage = () => {
                             Reject
                           </button>
                           <button
-                            onClick={() => handleAcceptRequired(notif._id)}
+                            onClick={() => {
+                              setActiveNotifId(notif._id); // track which notif is being processed
+                              setShowFormModal(true); // open the form modal
+                            }}
                             className="text-sm bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                           >
                             Accept
@@ -377,28 +377,33 @@ const NotificationPage = () => {
       {/* Modal */}
       {showFormModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-semibold mb-4">Submit Form</h3>
-            <form onSubmit={handleSubmitForm} className="space-y-4">
+          <div className="bg-slate-200 border-slate-400 rounded-2xl  w-full max-w-md max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50">
+            <h3 className="text-2xl font-bold text-center text-red-600 font-serif">
+              Eligibility Form
+            </h3>
+            <form
+              onSubmit={handleSubmitForm}
+              className="space-y-5 text-sm sm:text-base"
+            >
               <input
                 type="number"
-                placeholder="What is your age?"
+                placeholder="Your age"
                 value={formData.age}
                 onChange={(e) =>
                   setFormData({ ...formData, age: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
 
               <input
                 type="text"
-                placeholder="What is your current weight (in kg)?"
+                placeholder="Current weight (kg)"
                 value={formData.weight}
                 onChange={(e) =>
                   setFormData({ ...formData, weight: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
 
@@ -407,10 +412,10 @@ const NotificationPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, hadRecentIllness: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 <option value="">--Had illness in the last 7 days?--</option>
-                <option value="No"> No</option>
+                <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
 
@@ -420,7 +425,7 @@ const NotificationPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, onMedication: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               />
 
               <select
@@ -428,10 +433,10 @@ const NotificationPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, recentSurgery: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 <option value="">--Surgery in past 6 months?--</option>
-                <option value="No"> No</option>
+                <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
 
@@ -440,10 +445,10 @@ const NotificationPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, alcoholUse: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 <option value="">--Alcohol in last 24 hours?--</option>
-                <option value="No"> No</option>
+                <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
 
@@ -452,10 +457,10 @@ const NotificationPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, chronicDiseases: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 <option value="">--Any chronic diseases?--</option>
-                <option value="No"> No</option>
+                <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
 
@@ -464,21 +469,20 @@ const NotificationPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, covidExposure: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 <option value="">--Exposed to COVID-19 recently?--</option>
-                <option value="No"> No</option>
+                <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
 
               <input
                 type="date"
-                placeholder="Last blood donation date"
                 value={formData.lastDonationDate}
                 onChange={(e) =>
                   setFormData({ ...formData, lastDonationDate: e.target.value })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               />
 
               <select
@@ -489,39 +493,57 @@ const NotificationPage = () => {
                     currentlyPregnant: e.target.value,
                   })
                 }
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 <option value="">--Currently pregnant?--</option>
-                <option value="No"> No</option>
-                <option value="Yes">Yes</option>
-              </select>
-
-              <select
-                value={formData.consent}
-                onChange={(e) =>
-                  setFormData({ ...formData, consent: e.target.value })
-                }
-                className="w-full p-2 border rounded"
-                required
-              >
-                <option value="">
-                  --Do you give consent to donate blood?--
-                </option>
                 <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
 
-              <div className="flex justify-end gap-4">
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="consent"
+                  checked={formData.consent === "Yes"}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      consent: e.target.checked ? "Yes" : "No",
+                    })
+                  }
+                  className="w-5 h-5 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                  required
+                />
+                <label
+                  htmlFor="consent"
+                  className="text-sm text-black font-bold"
+                >
+                  I give my consent to donate blood.
+                </label>
+              </div>
+
+              <div className="flex justify-between pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowFormModal(false)}
-                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                  onClick={() => {
+                    handleRejectionRequired(activeNotifId); // reject only if Cancel clicked
+                    setShowFormModal(false);
+                    setActiveNotifId(null);
+                  }}
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black font-serif rounded-lg transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleFormSubmit(); // handle your form data
+                    handleAcceptRequired(activeNotifId); // now accept the notif
+                    setShowFormModal(false);
+                    setActiveNotifId(null);
+                  }}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-serif rounded-lg transition"
                 >
                   Submit
                 </button>
