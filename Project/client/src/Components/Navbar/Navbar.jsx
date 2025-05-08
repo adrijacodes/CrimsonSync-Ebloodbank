@@ -2,7 +2,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { checkTokenValidity } from "../utils/Auth"; 
 import { FiLogOut } from "react-icons/fi";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
@@ -26,11 +25,6 @@ const Navbar = () => {
 
     // Function to fetch notifications
     const fetchNotifications = async () => {
-    const isValid = checkTokenValidity();   // Check if token is still valid
-    if (!isValid) {
-      navigate("/login");
-      return;
-    }
       try {
         const response = await axios.get(
           "http://localhost:8001/api/notifications/search?status=active",
@@ -64,7 +58,7 @@ const Navbar = () => {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [location, accessToken, isLoggedIn, navigate]);
+  }, [location, accessToken, isLoggedIn]);
 
   const handleLogout = async () => {
     if (!accessToken || !role) {
@@ -93,20 +87,20 @@ const Navbar = () => {
       toast.success("Logged out successfully!");
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Logout failed.";
+
+      // Handle expired JWT and navigate to login
+      if (errorMsg.toLowerCase().includes("jwt expired")) {
+        toast.info("Session expired. Please login again.");
+        navigate("/");
+      } else {
+        toast.error(errorMsg);
+        console.error("Logout error:", error);
+        return;
+      }
+    } finally {
+      localStorage.clear();
+      navigate("/login");
     }
-    //   // Handle expired JWT and navigate to login
-    //   if (errorMsg.toLowerCase().includes("jwt expired")) {
-    //     toast.info("Session expired. Please login again.");
-    //     navigate("/");
-    //   } else {
-    //     toast.error(errorMsg);
-    //     console.error("Logout error:", error);
-    //     return;
-    //   }
-    // } finally {
-    //   localStorage.clear();
-    //   navigate("/login");
-    // }
   };
 
   return (

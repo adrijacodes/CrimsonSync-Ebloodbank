@@ -21,7 +21,6 @@ const NotificationPage = () => {
   const navigate = useNavigate();
 
   const [showFormModal, setShowFormModal] = useState(false);
-  const [activeNotifId, setActiveNotifId] = useState(null);
   const [formData, setFormData] = useState({
     age: "",
     weight: "",
@@ -132,7 +131,7 @@ const NotificationPage = () => {
     setMarkingAsRead(id);
     try {
       const response = await fetch(
-        `http://localhost:8001/api/notifications/${id}`,
+        ` http://localhost:8001/api/notifications/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -174,13 +173,13 @@ const NotificationPage = () => {
       fetchNotifications(filterRef.current);
       fetchCounts();
       toast.success("❌ Notification is Rejected :(");
-      // setTimeout(() => {
-      //   navigate("/");
-      // }, 3000);
-
       setTimeout(() => {
-        window.location.reload();
+        navigate("/");
       }, 3000);
+
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 3000);
     } catch (error) {
       console.error("Error processing action:", error);
     }
@@ -194,7 +193,7 @@ const NotificationPage = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: ` Bearer ${accessToken}`,
           },
           body: JSON.stringify({ status: "accepted" }),
         }
@@ -222,8 +221,6 @@ const NotificationPage = () => {
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     try {
-      console.log(formData);
-      console.log(currentNotificationId);
       const response = await fetch(
         `http://localhost:8001/api/blood-requests/eligibility-form/${currentNotificationId}`,
         {
@@ -237,24 +234,38 @@ const NotificationPage = () => {
       );
 
       if (!response.ok) throw new Error("Form submission failed");
-      toast.success("Form submitted successfully!");
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      // Update the notification status locally
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n._id === currentNotificationId ? { ...n, status: "accepted" } : n
+        )
+      );
 
+      toast.success("✅ Form submitted successfully!");
       setShowFormModal(false);
-      setFormData({ name: "", message: "" });
+      setFormData({
+        age: "",
+        weight: "",
+        hadRecentIllness: "",
+        onMedication: "",
+        recentSurgery: "",
+        alcoholUse: "",
+        chronicDiseases: "",
+        covidExposure: "",
+        lastDonationDate: "",
+        currentlyPregnant: "",
+        consent: "",
+      });
+
+      fetchCounts(); // Optional: to refresh counts
     } catch (err) {
       toast.error("❌ Failed to submit form.");
       console.error(err);
     }
   };
 
-  //(**Polling & Initialization**)every 30s, refresh notifications and counts for current tab
+  //(*Polling & Initialization*)every 30s, refresh notifications and counts for current tab
   useEffect(() => {
     if (accessToken) {
       fetchNotifications(filter);
@@ -355,10 +366,7 @@ const NotificationPage = () => {
                             Reject
                           </button>
                           <button
-                            onClick={() => {
-                              setActiveNotifId(notif._id); // track which notif is being processed
-                              setShowFormModal(true); // open the form modal
-                            }}
+                            onClick={() => handleAcceptRequired(notif._id)}
                             className="text-sm bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                           >
                             Accept
@@ -392,6 +400,8 @@ const NotificationPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, age: e.target.value })
                 }
+                min={18}
+                max={65}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
@@ -526,24 +536,24 @@ const NotificationPage = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    handleRejectionRequired(activeNotifId); // reject only if Cancel clicked
                     setShowFormModal(false);
-                    setActiveNotifId(null);
+                    setNotifications((prev) =>
+                      prev.map((n) =>
+                        n._id === currentNotificationId
+                          ? { ...n, status: "rejected" }
+                          : n
+                      )
+                    );
+                    toast.info("❌ Form was cancelled and marked as rejected.");
+                    fetchCounts(); // Optional
                   }}
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black font-serif rounded-lg transition"
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black rounded-lg transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleFormSubmit(); // handle your form data
-                    handleAcceptRequired(activeNotifId); // now accept the notif
-                    setShowFormModal(false);
-                    setActiveNotifId(null);
-                  }}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-serif rounded-lg transition"
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
                 >
                   Submit
                 </button>
