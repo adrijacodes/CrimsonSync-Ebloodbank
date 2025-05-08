@@ -13,6 +13,7 @@ export const createBloodRequest = AsyncHandler(async (req, res, next) => {
   const { city, bloodType } = req.body;
   const recipient = req.user;
   const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+//console.log(city,bloodType);
 
 
   if (!city || !bloodType) {
