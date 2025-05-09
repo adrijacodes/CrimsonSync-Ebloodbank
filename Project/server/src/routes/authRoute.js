@@ -12,9 +12,10 @@ import {
   updateAvailability,
   deleteUser,
   updateBloodType,
+  getUserDonationHistory,
 } from "../controllers/authcontroller.js";
 import verifyUserToken from "../middlewares/auth.middleware.js";
-import verifyUserToken1 from "../middlewares/userAuth.middlewares.js"; 
+import verifyUserToken1 from "../middlewares/userAuth.middlewares.js";
 import {
   adminRolecheck,
   userRolecheck,
@@ -30,7 +31,12 @@ router.post("/logout", verifyUserToken1, userRolecheck, userLogout);
 
 // get user profile route
 router.get("/profile", verifyUserToken1, userRolecheck, getUserProfile);
-
+router.get(
+  "/profile/blood-activity",
+  verifyUserToken1,
+  userRolecheck,
+  getUserDonationHistory
+);
 // update user routes
 router.put(
   "/profile/update-location",

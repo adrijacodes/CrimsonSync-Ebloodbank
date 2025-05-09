@@ -13,8 +13,7 @@ export const createBloodRequest = AsyncHandler(async (req, res, next) => {
   const { city, bloodType } = req.body;
   const recipient = req.user;
   const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-//console.log(city,bloodType);
-
+  //console.log(city,bloodType);
 
   if (!city || !bloodType) {
     throw new ApiError(400, "City and Blood Type are required fields.");
@@ -40,7 +39,9 @@ export const createBloodRequest = AsyncHandler(async (req, res, next) => {
     });
 
     await bloodRequest.save({ session });
-
+    await User.findByIdAndUpdate(recipient._id, {
+      $push: { userBloodDonationHistory: bloodRequest._id },
+    });
     const potentialDonors = await User.find({
       _id: { $ne: recipient._id },
       bloodType,
@@ -57,14 +58,13 @@ export const createBloodRequest = AsyncHandler(async (req, res, next) => {
       isDonor: true,
     });
     console.log(potentialDonors);
-    
+
     if (potentialDonors.length === 0) {
       throw new ApiError(
         404,
         `No eligible donors found for blood type ${bloodType} in ${city}.`
       );
     }
-    
 
     const recipientNotification = new Notification({
       user: recipient._id,
@@ -102,19 +102,21 @@ export const createBloodRequest = AsyncHandler(async (req, res, next) => {
           true
         )
       );
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-    
-      console.error("Error creating blood request or sending notifications:", error);
-    
-      if (error instanceof ApiError) {
-        throw error; 
-      }
-    
-      throw new ApiError(500, "An error occurred while processing your request.");
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error(
+      "Error creating blood request or sending notifications:",
+      error
+    );
+
+    if (error instanceof ApiError) {
+      throw error;
     }
-    
+
+    throw new ApiError(500, "An error occurred while processing your request.");
+  }
 });
 
 // eligibility form submission

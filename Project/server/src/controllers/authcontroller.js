@@ -6,7 +6,8 @@ import ApiError from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import AsyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
-
+import BloodRequestModel from "../models/bloodRequestModel.js";
+import EligibilityForm from "../models/eligibilityFormModel.js";
 // User Registration
 
 export const registerUser = AsyncHandler(async (req, res, next) => {
@@ -73,7 +74,7 @@ export const registerUser = AsyncHandler(async (req, res, next) => {
 export const loginUser = AsyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   // checking for insufficient data
-  if (!email || !password) throw ApiError(400, "All fields required!");
+  if (!email || !password) throw new ApiError(400, "All fields required!");
 
   const user = await User.findOne({ email });
   if (!user) {
@@ -100,7 +101,7 @@ export const loginUser = AsyncHandler(async (req, res, next) => {
   delete userResponse.updatedAt;
 
   return res
-    .status(201)
+    .status(200)
     .json(
       new ApiResponse(
         { UserInfo: userResponse, accessToken: token },
@@ -317,7 +318,7 @@ export const updatePassword = AsyncHandler(async (req, res) => {
 
 export const updateAvailability = AsyncHandler(async (req, res) => {
   const { availability } = req.body;
-console.log( availability);
+  console.log(availability);
   const validDays = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
 
   if (
@@ -394,4 +395,79 @@ export const deleteUser = AsyncHandler(async (req, res, next) => {
   return res
     .status(200)
     .json(new ApiResponse({}, "User deleted successfully.", true));
+});
+
+//get user blood donation history as a donor and as a recipient
+
+export const getUserDonationHistory = AsyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  // 1. As Donor – fetch all requests where user is the donor
+  const asDonor = await BloodRequestModel.find({ donor: userId })
+    .populate({
+      path: "recipient",
+      select: "name email username",
+      model: "User",
+    })
+    .select("-__v -createdAt -updatedAt");
+
+  // 2. As Recipient – categorize into pending, fulfilled, and cancelled
+  const recipientRequests = await BloodRequestModel.find({
+    recipient: userId,
+  })
+    .populate({
+      path: "donor",
+      select: "name email bloodType username -_id",
+      model: User,
+    })
+    .select("-__v -createdAt -updatedAt -recipient");
+
+  const recipientHistory = {
+    pending: [],
+    fulfilled: [],
+    cancelled: [],
+  };
+  //console.log(recipientRequests);
+
+  // Add eligibility form data only if status is fulfilled
+  for (const req of recipientRequests) {
+    // console.log(req);
+
+    if (req.status === "fulfilled" && req.eligibilityForm) {
+      //console.log("entering");
+      // console.log(req.eligibilityForm);
+      const formId = req.eligibilityForm;
+      const form = await EligibilityForm.findById(formId).select(
+        "-__v -createdAt -updatedAt -_id -donor -bloodRequest"
+      );
+      //console.log(form);
+
+      recipientHistory.fulfilled.push({
+        ...req._doc,
+        eligibilityFormData: form,
+      });
+    } else {
+      recipientHistory[req.status]?.push(req);
+    }
+  }
+  const RecipientBloodRequestData = {
+    ...recipientHistory,
+    fulfilled: recipientHistory.fulfilled.map((item) => {
+      const obj = item.toObject?.() || item; 
+      delete obj.eligibilityForm; 
+      return obj;
+    }),
+  };
+  
+  
+  return res.status(200).json(
+    new ApiResponse(
+      {
+        DonorHistory: asDonor,
+        RecipientHistory: recipientHistory,
+      },
+      "Donation history retrieved successfully.",
+      true
+    )
+  );
 });

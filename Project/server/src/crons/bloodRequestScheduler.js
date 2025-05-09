@@ -4,7 +4,7 @@ import Notification from "../models/notificationsModel.js";
 import User from "../models/userModel.js";
 import EligibilityForm from "../models/eligibilityFormModel.js";
 
-cron.schedule("*/2 * * * *", async () => {
+cron.schedule("*/3 * * * *", async () => {
   try {
     console.log("Cron job triggered to process pending blood requests.");
 
@@ -19,7 +19,7 @@ cron.schedule("*/2 * * * *", async () => {
       });
 
       let selectedDonor = null;
-
+      let form;
       for (let donorForm of eligibleDonors) {
         const { formData, donor, _id: formId } = donorForm;
         const isEligible = checkEligibility(formData);
@@ -31,6 +31,7 @@ cron.schedule("*/2 * * * *", async () => {
           });
 
           selectedDonor = donor;
+          form = formId;
           break;
         } else {
           await EligibilityForm.findByIdAndUpdate(formId, {
@@ -47,7 +48,11 @@ cron.schedule("*/2 * * * *", async () => {
 
       const updatedRequest = await BloodRequest.findOneAndUpdate(
         { _id: bloodID, status: "pending" },
-        { status: "fulfilled", donor: selectedDonor._id },
+        {
+          status: "fulfilled",
+          donor: selectedDonor._id,
+          eligibilityForm: form,
+        },
         { new: true }
       );
 
@@ -70,20 +75,15 @@ cron.schedule("*/2 * * * *", async () => {
         $push: { userBloodDonationHistory: bloodID },
       });
 
-      // Update recipient
-      await User.findByIdAndUpdate(recipient, {
-        $push: { userBloodRequestHistory: bloodID },
-      });
-
       const rejectedForms = await EligibilityForm.find({
         bloodRequest: bloodID,
         donor: { $ne: selectedDonor },
         healthStatus: { $ne: "Ineligible" },
       });
       console.log("rejected Forms");
-      
+
       console.log(rejectedForms);
- 
+
       await EligibilityForm.updateMany(
         {
           bloodRequest: bloodID,
@@ -104,6 +104,7 @@ cron.schedule("*/2 * * * *", async () => {
       await sendCancellationNotification(
         bloodID,
         city,
+        bloodType,
         selectedDonor._id,
         recipient
       );
@@ -156,23 +157,38 @@ async function sendCancellationNotification(
   selectedDonorId,
   recipientId
 ) {
-  const content = `Thank you for accepting the blood donation request (Blood Type: ${bloodType}) in ${city}. However, another eligible donor has already been selected. We appreciate your willingness to help and hope you'll stay available for future opportunities.`;
+  try {
+    const content = `Thank you for accepting the blood donation request (Blood Type: ${bloodType}) in ${city}. However, another eligible donor has already been selected. We appreciate your willingness to help and hope you'll stay available for future opportunities.`;
 
-  // const searchUsers = await Notification.find({
-  //   bloodRequestId: bloodID,
-  //   status: "accepted",
-  //   user: { $nin: [selectedDonorId, recipientId] },
-  // });
+    // Search for all users who accepted the request, excluding selected donor and recipient
+    const searchUsers = await Notification.find({
+      bloodRequestId: bloodID,
+      status: "accepted",
+      user: { $nin: [selectedDonorId, recipientId] },
+    });
+    console.log("logging the searchUsers");
+    
+    console.log(searchUsers);
 
-  // for (let notification of searchUsers) {
-  //   await Notification.create({
-  //     user: notification.user,
-  //     bloodRequestId: bloodID,
-  //     message: content,
-  //     type: "info",
-  //     status: "active",
-  //   });
-  // }
+    // Create notification objects in bulk
+    const notifications = searchUsers.map((notification) => ({
+      user: notification.user,
+      bloodRequestId: bloodID,
+      message: content,
+      type: "info",
+      status: "active",
+    }));
+
+    if (notifications.length > 0) {
+      // Insert all notifications in one go for better performance
+      await Notification.insertMany(notifications);
+      console.log("Cancellation notifications sent successfully!");
+    } else {
+      console.log("No users to notify.");
+    }
+  } catch (error) {
+    console.error("Error sending cancellation notifications:", error);
+  }
 }
 
 async function cancelOtherNotifications(
