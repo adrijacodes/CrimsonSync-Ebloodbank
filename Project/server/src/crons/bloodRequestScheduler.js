@@ -71,9 +71,8 @@ cron.schedule("*/2 * * * * ", async () => {
 
       await User.findByIdAndUpdate(selectedDonor._id, {
         $set: { lastBloodDonationDate: new Date() },
-        $push: { userBloodDonationHistory: bloodID }
+        $push: { userBloodDonationHistory: bloodID },
       });
-      
 
       // Notify rejected donors
       const rejectedForms = await EligibilityForm.find({
@@ -117,6 +116,7 @@ cron.schedule("*/2 * * * * ", async () => {
             status: "cancelled",
             type: "info",
             message:
+              message +
               "A suitable donor has already been found for this blood request.",
           },
         }
