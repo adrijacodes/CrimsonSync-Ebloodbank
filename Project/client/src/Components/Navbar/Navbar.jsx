@@ -2,15 +2,16 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
 import { FiLogOut } from "react-icons/fi";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
+import { HiMenu, HiX } from "react-icons/hi";
 
 const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0); // state for notifications count
+  const [notificationCount, setNotificationCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,7 +25,6 @@ const Navbar = () => {
 
     let intervalId;
 
-    // Function to fetch notifications
     const fetchNotifications = async () => {
       try {
         const response = await axios.get(
@@ -35,27 +35,24 @@ const Navbar = () => {
             },
           }
         );
-        console.log(response.data.data.count); // Debugging log to check response
-        setNotificationCount(response.data.data.count); // Update notification count
+        setNotificationCount(response.data.data.count);
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
     };
 
-    // Polling every 3 seconds if logged in
     if (accessToken && isLoggedIn) {
-      fetchNotifications(); // Initial call to fetch notifications
+      fetchNotifications();
       intervalId = setInterval(() => {
         const stillLoggedIn = localStorage.getItem("loggedIn");
         if (stillLoggedIn !== "true") {
-          clearInterval(intervalId); // Stop polling when logged out
+          clearInterval(intervalId);
         } else {
-          fetchNotifications(); // Continue polling for new notifications
+          fetchNotifications();
         }
       }, 3000);
     }
 
-    // Cleanup the interval when the component is unmounted or logged out
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
@@ -84,12 +81,9 @@ const Navbar = () => {
           },
         }
       );
-
       toast.success("Logged out successfully!");
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Logout failed.";
-
-      // Handle expired JWT and navigate to login
       if (errorMsg.toLowerCase().includes("jwt expired")) {
         toast.info("Session expired. Please login again.");
         navigate("/");
@@ -104,39 +98,53 @@ const Navbar = () => {
     }
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
-    <header className="bg-red-600 shadow-md">
-      <div className="flex items-center justify-between max-w-7xl mx-auto px-4 py-3">
+    <header className="bg-red-600 shadow-md sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
         {/* Logo */}
         <Link to="/" className="text-white text-2xl font-bold">
           Crimson<span className="font-normal">Sync</span>
         </Link>
 
-        {/* Centered Nav */}
-        <nav className="flex-1">
-          <ul className="flex justify-center items-center space-x-6 text-white font-semibold">
-            <Link to="/">
-              <li className="hover:underline">Home</li>
-            </Link>
-            <Link to="/About">
-              <li className="hover:underline">About</li>
-            </Link>
-            <Link to="/faq">
-              <li className="hover:underline">FAQ&apos;s</li>
-            </Link>
-            <Link to="/how-it-works">
-              <li className="hover:underline">How It Works</li>
-            </Link>
+        {/* Hamburger Menu */}
+        <button
+          onClick={toggleMenu}
+          className="text-white text-3xl md:hidden focus:outline-none"
+        >
+          {isMenuOpen ? <HiX /> : <HiMenu />}
+        </button>
 
+        {/* Navigation Links */}
+        <nav
+          className={`${
+            isMenuOpen ? "block" : "hidden"
+          } md:flex md:items-center w-full md:w-auto absolute md:static left-0 top-full md:top-auto bg-red-600 md:bg-transparent z-40 md:z-auto transition-all duration-300 ease-in-out`}
+        >
+          <ul className="flex flex-col md:flex-row items-center md:space-x-6 text-white font-semibold p-4 md:p-0">
+            <Link to="/" onClick={() => setIsMenuOpen(false)}>
+              <li className="hover:underline py-2 md:py-0">Home</li>
+            </Link>
+            <Link to="/About" onClick={() => setIsMenuOpen(false)}>
+              <li className="hover:underline py-2 md:py-0">About</li>
+            </Link>
+            <Link to="/faq" onClick={() => setIsMenuOpen(false)}>
+              <li className="hover:underline py-2 md:py-0">FAQ&apos;s</li>
+            </Link>
+            <Link to="/how-it-works" onClick={() => setIsMenuOpen(false)}>
+              <li className="hover:underline py-2 md:py-0">How It Works</li>
+            </Link>
             {!accessToken && (
-              <Link to="/register">
-                <li className="hover:underline">Register/Login</li>
+              <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                <li className="hover:underline py-2 md:py-0">Register/Login</li>
               </Link>
             )}
-
             {accessToken && role === "Admin" && (
-              <Link to="/admin-dashboard">
-                <li className="hover:underline">Admin Dashboard</li>
+              <Link to="/admin-dashboard" onClick={() => setIsMenuOpen(false)}>
+                <li className="hover:underline py-2 md:py-0">Admin Dashboard</li>
               </Link>
             )}
           </ul>
@@ -188,5 +196,6 @@ const Navbar = () => {
     </header>
   );
 };
+
 
 export default Navbar;

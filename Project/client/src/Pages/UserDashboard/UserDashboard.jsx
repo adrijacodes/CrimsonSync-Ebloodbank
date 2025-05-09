@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [activeHistoryTab, setActiveHistoryTab] = useState("received");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+
   const [bloodRequests, setBloodRequests] = useState([]);
   const navigate = useNavigate();
   const days = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
@@ -60,19 +61,69 @@ const Dashboard = () => {
   // Fetch Blood Requests
   const fetchBloodRequests = async () => {
     try {
-      const res = await fetch("http://localhost:8001/api/blood/requests", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        "http://localhost:8001/api/auth/user/profile/blood-activity",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to fetch blood requests");
 
       const { data } = await res.json();
-      setBloodRequests(data);
+      const donorHistory = data.DonorHistory || [];
+      const recipientHistory = data.RecipientHistory || {
+        pending: [],
+        fulfilled: [],
+        cancelled: [],
+      };
+
+      const parsedRequests = [
+        ...donorHistory.map((entry) => ({
+          type: "donated",
+          status: entry.status,
+          city: entry.city,
+          bloodType: entry.bloodType,
+          day: entry.day,
+          id: entry._id,
+        })),
+        ...recipientHistory.fulfilled.map((entry) => ({
+          type: "received",
+          status: entry.status,
+          city: entry.city,
+          bloodType: entry.bloodType,
+          day: entry.day,
+          id: entry._id,
+          donor: entry.donor,
+          eligibility: entry.eligibilityFormData,
+        })),
+        ...recipientHistory.pending.map((entry) => ({
+          type: "received",
+          status: entry.status,
+          city: entry.city,
+          bloodType: entry.bloodType,
+          day: entry.day,
+          id: entry._id,
+          donor: entry.donor,
+          eligibility: entry.eligibilityFormData,
+        })),
+        ...recipientHistory.cancelled.map((entry) => ({
+          type: "received",
+          status: "cancelled",
+          city: entry.city,
+          bloodType: entry.bloodType,
+          day: entry.day,
+          id: entry._id,
+          donor: entry.donor,
+          eligibility: entry.eligibilityFormData,
+        })),
+      ];
+
+      setBloodRequests(parsedRequests);
     } catch (err) {
       console.error("Error fetching blood requests:", err);
-      //showMessage("Failed to load blood requests.");
     }
   };
 
@@ -286,9 +337,13 @@ const Dashboard = () => {
       >
         <RxAvatar size={97} className="text-black" />
         <div>
-          <h2 className="text-2xl font-semibold font-serif text-red-600">{user.name}</h2>
+          <h2 className="text-2xl font-semibold font-serif text-red-600">
+            {user.name}
+          </h2>
           <p className="text-sm text-gray-600 font-serif">{user.email}</p>
-          <p className="text-sm text-gray-600 font-serif">Username: {user.username}</p>
+          <p className="text-sm text-gray-600 font-serif">
+            Username: {user.username}
+          </p>
           <div className="flex items-center gap-2">
             <p className="text-sm text-gray-600 font-serif">
               Location:{" "}
@@ -489,9 +544,78 @@ const Dashboard = () => {
         <ul>
           {filteredRequests.length > 0 ? (
             filteredRequests.map((request, index) => (
-              <li key={index} className="mb-4">
-                <p>{request.name}</p>
-                <p>{request.message}</p>
+              <li key={index} className="mb-4 border-b pb-2">
+                <p className="font-semibold">
+                  Status: <span className="capitalize">{request.status}</span>
+                </p>
+                <p>City: {request.city}</p>
+                <p>Blood Type: {request.bloodType}</p>
+                <p>Preferred Day: {request.day}</p>
+                {request.donor && (
+                  <div className="mt-2 p-4 rounded-lg bg-gray-50 shadow-sm">
+                    <p className="font-semibold">
+                      Donor: {request.donor.name} ({request.donor.username})
+                    </p>
+                    <p>Email: {request.donor.email}</p>
+                    <p className="mt-2 font-semibold">
+                      Eligibility Status: {request.eligibility?.healthStatus}
+                    </p>
+
+                    {/* Display formData */}
+                    {request.eligibility?.formData && (
+                      <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-gray-700">
+                        <p>
+                          <span className="font-medium">Age:</span>{" "}
+                          {request.eligibility.formData.age}
+                        </p>
+                        <p>
+                          <span className="font-medium">Weight:</span>{" "}
+                          {request.eligibility.formData.weight}
+                        </p>
+                        <p>
+                          <span className="font-medium">Recent Illness:</span>{" "}
+                          {request.eligibility.formData.hadRecentIllness}
+                        </p>
+                        <p>
+                          <span className="font-medium">On Medication:</span>{" "}
+                          {request.eligibility.formData.onMedication || "No"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Recent Surgery:</span>{" "}
+                          {request.eligibility.formData.recentSurgery}
+                        </p>
+                        <p>
+                          <span className="font-medium">Alcohol Use:</span>{" "}
+                          {request.eligibility.formData.alcoholUse}
+                        </p>
+                        <p>
+                          <span className="font-medium">Chronic Diseases:</span>{" "}
+                          {request.eligibility.formData.chronicDiseases}
+                        </p>
+                        <p>
+                          <span className="font-medium">Covid Exposure:</span>{" "}
+                          {request.eligibility.formData.covidExposure}
+                        </p>
+                        <p>
+                          <span className="font-medium">
+                            Last Donation Date:
+                          </span>{" "}
+                          {request.eligibility.formData.lastDonationDate}
+                        </p>
+                        <p>
+                          <span className="font-medium">
+                            Currently Pregnant:
+                          </span>{" "}
+                          {request.eligibility.formData.currentlyPregnant}
+                        </p>
+                        <p>
+                          <span className="font-medium">Consent Given:</span>{" "}
+                          {request.eligibility.formData.consent}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </li>
             ))
           ) : (
@@ -513,7 +637,7 @@ const Dashboard = () => {
           Delete Account
         </button>
       </motion.div>
-    <ToastContainer />
+      <ToastContainer />
     </div>
   );
 };
