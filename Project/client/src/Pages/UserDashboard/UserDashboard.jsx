@@ -286,11 +286,11 @@ const Dashboard = () => {
       >
         <RxAvatar size={97} className="text-black" />
         <div>
-          <h2 className="text-2xl font-semibold text-red-600">{user.name}</h2>
-          <p className="text-sm text-gray-600">{user.email}</p>
-          <p className="text-sm text-gray-600">Username: {user.username}</p>
+          <h2 className="text-2xl font-semibold font-serif text-red-600">{user.name}</h2>
+          <p className="text-sm text-gray-600 font-serif">{user.email}</p>
+          <p className="text-sm text-gray-600 font-serif">Username: {user.username}</p>
           <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 font-serif">
               Location:{" "}
               {isEditingLocation ? (
                 <>
@@ -508,7 +508,7 @@ const Dashboard = () => {
       >
         <button
           onClick={handleDeleteAccount}
-          className="bg-red-600 py-2 px-4 rounded text-white "
+          className="bg-red-600 hover:bg-red-700 py-2 px-4 rounded-full text-xl text-white font-serif"
         >
           Delete Account
         </button>
