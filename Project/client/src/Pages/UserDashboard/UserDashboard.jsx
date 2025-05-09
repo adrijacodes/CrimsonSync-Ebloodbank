@@ -467,7 +467,7 @@ const Dashboard = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <h2 className="text-xl font-serif text-red-600 font-semibold mb-4">Blood Donation Request </h2>
+        <h2 className="text-xl font-serif text-red-600 font-semibold mb-4">Blood Donation History </h2>
         <ul>
           {bloodRequests.length > 0 ? (
             bloodRequests.map((request, index) => (

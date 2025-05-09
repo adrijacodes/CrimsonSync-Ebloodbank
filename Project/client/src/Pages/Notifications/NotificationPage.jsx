@@ -141,7 +141,7 @@ const NotificationPage = () => {
     setMarkingAsRead(id);
     try {
       const response = await fetch(
-        `http://localhost:8001/api/notifications/${id}`,
+        ` http://localhost:8001/api/notifications/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -183,13 +183,13 @@ const NotificationPage = () => {
       fetchNotifications(filterRef.current);
       fetchCounts();
       toast.success("❌ Notification is Rejected :(");
-      // setTimeout(() => {
-      //   navigate("/");
-      // }, 3000);
-
       setTimeout(() => {
-        window.location.reload();
+        navigate("/");
       }, 3000);
+
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 3000);
     } catch (error) {
       console.error("Error processing action:", error);
     }
@@ -203,7 +203,7 @@ const NotificationPage = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: ` Bearer ${accessToken}`,
           },
           body: JSON.stringify({ status: "accepted" }),
         }
@@ -231,8 +231,6 @@ const NotificationPage = () => {
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     try {
-      console.log(formData);
-      console.log(currentNotificationId);
       const response = await fetch(
         `http://localhost:8001/api/blood-requests/eligibility-form/${currentNotificationId}`,
         {
@@ -252,7 +250,21 @@ const NotificationPage = () => {
       }, 3000);
 
       setShowFormModal(false);
-      setFormData({ name: "", message: "" });
+      setFormData({
+        age: "",
+        weight: "",
+        hadRecentIllness: "",
+        onMedication: "",
+        recentSurgery: "",
+        alcoholUse: "",
+        chronicDiseases: "",
+        covidExposure: "",
+        lastDonationDate: "",
+        currentlyPregnant: "",
+        consent: "",
+      });
+
+      fetchCounts(); // Optional: to refresh counts
     } catch (err) {
       toast.error("❌ Failed to submit form.");
       console.error(err);
@@ -358,8 +370,8 @@ const NotificationPage = () => {
                   ? "bg-red-50 border-red-300"
                   : "bg-red-100 border-red-500",
                 cancelled: notif.isRead
-                  ? "bg-yellow-50 border-yellow-300"
-                  : "bg-yellow-100 border-yellow-500",
+                  ? "bg-purple-50 border-purple-300"
+                  : "bg-purple-100 border-purple-500",
               };
 
               return (
@@ -386,7 +398,7 @@ const NotificationPage = () => {
                         </button>
                       )}
 
-                    {notif.status === "action_required" && (
+                    {notif.type === "action_required" && (
                       <div className="flex gap-4 ml-4">
                         {notif.status === "rejected" ? (
                           <span className="text-lg font-bold text-red-600">
@@ -440,6 +452,8 @@ const NotificationPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, age: e.target.value })
                 }
+                min={18}
+                max={65}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
@@ -548,20 +562,27 @@ const NotificationPage = () => {
                 <option value="Yes">Yes</option>
               </select>
 
-              <select
-                value={formData.consent}
-                onChange={(e) =>
-                  setFormData({ ...formData, consent: e.target.value })
-                }
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                required
-              >
-                <option value="">
-                  --Do you give consent to donate blood?--
-                </option>
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="consent"
+                  checked={formData.consent === "Yes"}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      consent: e.target.checked ? "Yes" : "No",
+                    })
+                  }
+                  className="w-5 h-5 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                  required
+                />
+                <label
+                  htmlFor="consent"
+                  className="text-sm text-black font-bold"
+                >
+                  I give my consent to donate blood.
+                </label>
+              </div>
 
               <div className="flex justify-between pt-4">
                 <button
