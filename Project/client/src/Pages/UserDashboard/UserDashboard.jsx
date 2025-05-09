@@ -14,12 +14,17 @@ const Dashboard = () => {
   const [updatedCity, setUpdatedCity] = useState("");
   const [updatedState, setUpdatedState] = useState("");
   const [activeTab, setActiveTab] = useState("donor");
+  const [activeHistoryTab, setActiveHistoryTab] = useState("received");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [bloodRequests, setBloodRequests] = useState([]);
   const navigate = useNavigate();
   const days = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
   const token = localStorage.getItem("token");
+  // Filter blood requests based on the selected history tab ('received' or 'donated')
+  const filteredRequests = bloodRequests.filter(
+    (req) => req.type.toLowerCase() === activeHistoryTab
+  );
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -67,7 +72,7 @@ const Dashboard = () => {
       setBloodRequests(data);
     } catch (err) {
       console.error("Error fetching blood requests:", err);
-      showMessage("Failed to load blood requests.");
+      //showMessage("Failed to load blood requests.");
     }
   };
 
@@ -75,7 +80,7 @@ const Dashboard = () => {
     fetchBloodRequests();
   }, []);
 
-// Save Location 
+  // Save Location
   const handleSaveLocation = async () => {
     const response = await fetch(
       "http://localhost:8001/api/auth/user/profile/update-location",
@@ -104,7 +109,7 @@ const Dashboard = () => {
 
     setIsEditingLocation(false);
   };
-// Donor Status
+  // Donor Status
   const handleSaveDonorSettings = async () => {
     try {
       const response = await fetch(
@@ -131,7 +136,7 @@ const Dashboard = () => {
       showMessage("Something went wrong while updating donor status.");
     }
   };
-// Save Availability
+  // Save Availability
   const handleSaveAvailability = async () => {
     const token = localStorage.getItem("token");
 
@@ -165,7 +170,7 @@ const Dashboard = () => {
       showMessage("Failed to update availability.");
     }
   };
-// Save BloodType
+  // Save BloodType
   const handleSaveBloodType = async () => {
     try {
       const response = await fetch(
@@ -192,7 +197,7 @@ const Dashboard = () => {
       showMessage("Something went wrong while updating blood type.");
     }
   };
-// Password Change
+  // Password Change
   const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword) {
       return showMessage("Fill in both fields.");
@@ -447,49 +452,68 @@ const Dashboard = () => {
         )}
       </motion.div>
 
-      {/* Delete Account */}
+      {/* Blood Donation History */}
       <motion.div
         className="bg-white p-6 rounded-lg shadow-md mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <h2 className="text-xl font-serif text-red-600 font-semibold mb-4">
+          Blood Donation History
+        </h2>
+        {/* Tabs */}
+        <div className="flex mb-4">
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              activeHistoryTab === "received"
+                ? "bg-red-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setActiveHistoryTab("received")}
+          >
+            Received Blood
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg ml-2 ${
+              activeHistoryTab === "donated"
+                ? "bg-red-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setActiveHistoryTab("donated")}
+          >
+            Donated Blood
+          </button>
+        </div>
+
+        {/* Filtered List */}
+        <ul>
+          {filteredRequests.length > 0 ? (
+            filteredRequests.map((request, index) => (
+              <li key={index} className="mb-4">
+                <p>{request.name}</p>
+                <p>{request.message}</p>
+              </li>
+            ))
+          ) : (
+            <p>No {activeHistoryTab} blood requests available.</p>
+          )}
+        </ul>
+      </motion.div>
+
+      {/* Delete Account */}
+      <motion.div
+        className="bg-white p-6 rounded-lg shadow-md mb-6  flex justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
         <button
           onClick={handleDeleteAccount}
-          className="bg-red-600 py-2 px-4 rounded text-white"
+          className="bg-red-600 py-2 px-4 rounded text-white "
         >
           Delete Account
         </button>
       </motion.div>
-
-      {/* Blood Requests */}
-      <motion.div
-        className="bg-white p-6 rounded-lg shadow-md mb-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
-        <h2 className="text-xl font-serif text-red-600 font-semibold mb-4">Blood Donation History </h2>
-        <ul>
-          {bloodRequests.length > 0 ? (
-            bloodRequests.map((request, index) => (
-              <li key={index} className="mb-4">
-                <p>{request.name}</p>
-                <p>{request.message}</p>
-                <button className="bg-red-500 py-1 px-4 rounded text-white">
-                  Accept
-                </button>
-                <button className="bg-gray-500 py-1 px-4 rounded text-white ml-2">
-                  Reject
-                </button>
-              </li>
-            ))
-          ) : (
-            <p>No blood requests available.</p>
-          )}
-        </ul>
-      </motion.div>
-
-
-      <ToastContainer />
+    <ToastContainer />
     </div>
   );
 };
