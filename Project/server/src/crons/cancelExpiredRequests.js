@@ -10,7 +10,7 @@ const cancelExpiredRequests = () => {
       status: "pending",
       createdAt: { $lte: twelveHoursAgo },
     });
-
+    
     for (const request of expiredRequests) {
       request.status = "cancelled";
       await request.save();
