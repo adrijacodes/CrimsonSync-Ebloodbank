@@ -1,21 +1,14 @@
 import cron from "node-cron";
 import BloodRequest from "../models/bloodRequestModel.js";
-import EligibilityForm from "../models/eligibilityFormModel.js";
 import Notification from "../models/notificationsModel.js";
 import User from "../models/userModel.js";
-import mongoose from "mongoose";
+import EligibilityForm from "../models/eligibilityFormModel.js";
 
-// Run cron job every 30secs/2min for testing (change to "*/15 * * * *" for production)
-cron.schedule("*/2 * * * * ", async () => {
+cron.schedule("*/2 * * * *", async () => {
   try {
     console.log("Cron job triggered to process pending blood requests.");
 
-    const [pendingRequests, pendingCount] = await Promise.all([
-      BloodRequest.find({ status: "pending" }),
-      BloodRequest.countDocuments({ status: "pending" }),
-    ]);
-
-    console.log(`Found ${pendingCount} pending blood requests.`);
+    const pendingRequests = await BloodRequest.find({ status: "pending" });
 
     for (const request of pendingRequests) {
       const { _id: bloodID, bloodType, city, recipient } = request;
@@ -24,16 +17,13 @@ cron.schedule("*/2 * * * * ", async () => {
       const eligibleDonors = await EligibilityForm.find({
         bloodRequest: bloodID,
       });
-      console.log(eligibleDonors);
 
       let selectedDonor = null;
 
       for (let donorForm of eligibleDonors) {
         const { formData, donor, _id: formId } = donorForm;
-        // console.log(donorForm);
-
         const isEligible = checkEligibility(formData);
-        console.log(isEligible);
+        console.log(`Eligibility for donor ${donor}: ${isEligible}`);
 
         if (isEligible) {
           await EligibilityForm.findByIdAndUpdate(formId, {
@@ -41,8 +31,6 @@ cron.schedule("*/2 * * * * ", async () => {
           });
 
           selectedDonor = donor;
-          console.log("selected donor:", selectedDonor._id);
-
           break;
         } else {
           await EligibilityForm.findByIdAndUpdate(formId, {
@@ -57,72 +45,68 @@ cron.schedule("*/2 * * * * ", async () => {
         continue;
       }
 
-      // Send selection notification to donor and recipient
-      await sendNotification(selectedDonor, bloodID, request);
+      const updatedRequest = await BloodRequest.findOneAndUpdate(
+        { _id: bloodID, status: "pending" },
+        { status: "fulfilled", donor: selectedDonor._id },
+        { new: true }
+      );
 
-      // Mark the request as fulfilled
-      await BloodRequest.findByIdAndUpdate(bloodID, {
-        status: "fulfilled",
-        donor: selectedDonor._id,
-      });
+      if (!updatedRequest) {
+        console.log("Request already fulfilled. Skipping.");
+        continue;
+      }
 
-      // Update last donation date
-      console.log(selectedDonor._id);
+      await sendSelectionNotifications(
+        selectedDonor,
+        recipient,
+        bloodID,
+        city,
+        bloodType
+      );
 
+      // Update donor
       await User.findByIdAndUpdate(selectedDonor._id, {
         $set: { lastBloodDonationDate: new Date() },
         $push: { userBloodDonationHistory: bloodID },
       });
 
-      // Notify rejected donors
+      // Update recipient
+      await User.findByIdAndUpdate(recipient, {
+        $push: { userBloodRequestHistory: bloodID },
+      });
+
       const rejectedForms = await EligibilityForm.find({
         bloodRequest: bloodID,
         donor: { $ne: selectedDonor },
         healthStatus: { $ne: "Ineligible" },
       });
+      console.log("rejected Forms");
+      
+      console.log(rejectedForms);
 
-      // Mark all other donors as ineligible
       await EligibilityForm.updateMany(
         {
-          donor: { $ne: selectedDonor },
           bloodRequest: bloodID,
+          donor: { $ne: selectedDonor },
           healthStatus: { $ne: "Ineligible" },
         },
-        {
-          $set: { healthStatus: "Ineligible" },
-        }
+        { $set: { healthStatus: "Ineligible" } }
       );
 
-      // Update notification status for pending notifications related to the same bloodID
-      const toBeRejectedNotifications = await Notification.find({
-        bloodRequest: bloodID,
-        status: "active",
-        user: { $nin: [selectedDonor._id, recipient] },
-      });
-
-      console.log(
-        "Notifications to be marked as rejected:",
-        toBeRejectedNotifications
+      // Cancel and thank rejected donors
+      await cancelOtherNotifications(
+        bloodID,
+        selectedDonor._id,
+        recipient,
+        bloodType,
+        city
       );
-
-      await Notification.updateMany(
-        {
-          bloodRequestId: bloodID,
-          // status: "seen",
-          user: { $nin: [selectedDonor._id, recipient] }, // exclude selected donor & recipient
-        },
-        {
-          $set: {
-            status: "cancelled",
-            type: "info",
-            message:
-              message +
-              "A suitable donor has already been found for this blood request.",
-          },
-        }
+      await sendCancellationNotification(
+        bloodID,
+        city,
+        selectedDonor._id,
+        recipient
       );
-
-      await sendCancellationNotification(rejectedForms, city, bloodType);
     }
 
     console.log("Finished processing all pending blood requests.");
@@ -131,14 +115,12 @@ cron.schedule("*/2 * * * * ", async () => {
   }
 });
 
-// ---------------------------------------------
-
+/*Other Helper Functions */
 function checkEligibility(formData) {
   const formDataObj = Object.fromEntries(formData);
 
   return (
     Number(formDataObj.age) >= 18 &&
-    // Number(formDataObj.weight) >= 50 &&
     formDataObj.hadRecentIllness === "No" &&
     !formDataObj.onMedication &&
     formDataObj.recentSurgery === "No" &&
@@ -150,47 +132,96 @@ function checkEligibility(formData) {
   );
 }
 
-async function sendNotification(donor, bloodID, request) {
-  const donorContent = `You have been selected for a blood donation request Blood Type: ${request.bloodType} in ${request.city}. Check Blood donation tab for further details`;
-  const recipientContent = `A donor has been found for your blood request. Check Blood donation tab for donor details`;
+async function sendSelectionNotifications(
+  donor,
+  recipient,
+  bloodID,
+  city,
+  bloodType
+) {
+  const donorContent = `You have been selected for a blood donation request Blood Type: ${bloodType} in ${city}. Check Blood donation tab for further details.`;
+  const recipientContent = `A donor has been found for your blood request. Check Blood donation tab for donor details.`;
 
-  await Notification.create({
-    user: donor,
-    bloodRequestId: bloodID,
-    message: donorContent,
-    type: "info",
-    status: "active",
-  });
-
-  await Notification.create({
-    user: request.recipient,
-    bloodRequestId: bloodID,
-    message: recipientContent,
-    type: "info",
-    status: "active",
-  });
+  await Promise.all([
+    maybeNotify(donor, bloodID, donorContent),
+    donor.toString() !== recipient.toString() &&
+      maybeNotify(recipient, bloodID, recipientContent),
+  ]);
 }
 
-async function sendIneligibilityNotification(donor, bloodID) {
-  const content = `Unfortunately, you are not eligible for the blood donation request.`;
-
-  await Notification.create({
-    user: donor,
-    message: content,
-    bloodRequestId: bloodID,
-    type: "info",
-    status: "active",
-  });
-}
-
-async function sendCancellationNotification(rejectedForms, city, bloodType) {
+async function sendCancellationNotification(
+  bloodID,
+  city,
+  bloodType,
+  selectedDonorId,
+  recipientId
+) {
   const content = `Thank you for accepting the blood donation request (Blood Type: ${bloodType}) in ${city}. However, another eligible donor has already been selected. We appreciate your willingness to help and hope you'll stay available for future opportunities.`;
 
-  for (let form of rejectedForms) {
+  // const searchUsers = await Notification.find({
+  //   bloodRequestId: bloodID,
+  //   status: "accepted",
+  //   user: { $nin: [selectedDonorId, recipientId] },
+  // });
+
+  // for (let notification of searchUsers) {
+  //   await Notification.create({
+  //     user: notification.user,
+  //     bloodRequestId: bloodID,
+  //     message: content,
+  //     type: "info",
+  //     status: "active",
+  //   });
+  // }
+}
+
+async function cancelOtherNotifications(
+  bloodID,
+  selectedDonorId,
+  recipientId,
+  bloodType,
+  city
+) {
+  const cancelMessage = `A blood request for ${bloodType} in the city ${city} was sent. However, a suitable donor has already been found for this blood request.`;
+
+  const cancelledNotifications = await Notification.find({
+    bloodRequestId: bloodID,
+    status: "active",
+    user: { $nin: [selectedDonorId, recipientId] },
+  });
+
+  console.log("Logging the cancelled notifications:", cancelledNotifications);
+
+  const result = await Notification.updateMany(
+    {
+      bloodRequestId: bloodID,
+      status: "active",
+      user: { $nin: [selectedDonorId, recipientId] },
+    },
+    {
+      $set: {
+        status: "cancelled",
+        type: "info",
+        message: cancelMessage,
+      },
+    }
+  );
+
+  console.log("Notifications cancelled:", result.modifiedCount);
+}
+
+async function maybeNotify(userId, bloodID, message) {
+  const exists = await Notification.findOne({
+    user: userId,
+    bloodRequestId: bloodID,
+    message,
+  });
+
+  if (!exists) {
     await Notification.create({
-      user: form.donor,
-      bloodRequestId: form.bloodRequest,
-      message: content,
+      user: userId,
+      bloodRequestId: bloodID,
+      message,
       type: "info",
       status: "active",
     });
