@@ -41,7 +41,7 @@ cron.schedule("*/2 * * * * ", async () => {
           });
 
           selectedDonor = donor;
-          console.log(selectedDonor._id);
+          console.log("selected donor:", selectedDonor._id);
 
           break;
         } else {
