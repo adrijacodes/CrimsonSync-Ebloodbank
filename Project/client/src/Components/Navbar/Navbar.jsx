@@ -6,6 +6,7 @@ import { FiLogOut } from "react-icons/fi";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
 import { HiMenu, HiX } from "react-icons/hi";
+import logoImage from '../../assets/logoimage.png';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -81,22 +82,22 @@ const Navbar = () => {
           },
         }
       );
+
       toast.success("Logged out successfully!");
-    } catch (error) {
-      const errorMsg = error.response?.data?.message || "Logout failed.";
-      if (errorMsg.toLowerCase().includes("jwt expired")) {
-        toast.info("Session expired. Please login again.");
-        navigate("/");
-      } else {
-        toast.error(errorMsg);
-        console.error("Logout error:", error);
-        return;
-      }
-    } finally {
-      localStorage.clear();
-      navigate("/login");
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || "Logout failed.";
+// handeling jwt
+    if (errorMsg.toLowerCase().includes("jwt expired")) {
+      toast.info("Session expired. Please login again.");
+    } else {
+      toast.error(errorMsg);
+      console.error("Logout error:", error);
     }
-  };
+  } finally {
+    localStorage.clear();
+    navigate("/login");
+  }
+};
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -105,9 +106,14 @@ const Navbar = () => {
   return (
     <header className="bg-red-600 shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
-        {/* Logo */}
-        <Link to="/" className="text-white text-2xl font-bold">
-          Crimson<span className="font-normal">Sync</span>
+        <Link
+          to="/"
+          className="flex items-center  text-white text-2xl font-bold"
+        >
+          <img src={logoImage} alt="CrimsonSync Logo" className="w-8 h-8 rounded-full" />
+          <span>
+            Crimson<span className="font-normal">Sync</span>
+          </span>
         </Link>
 
         {/* Hamburger Menu */}
@@ -144,7 +150,9 @@ const Navbar = () => {
             )}
             {accessToken && role === "Admin" && (
               <Link to="/admin-dashboard" onClick={() => setIsMenuOpen(false)}>
-                <li className="hover:underline py-2 md:py-0">Admin Dashboard</li>
+                <li className="hover:underline py-2 md:py-0">
+                  Admin Dashboard
+                </li>
               </Link>
             )}
           </ul>
@@ -196,6 +204,5 @@ const Navbar = () => {
     </header>
   );
 };
-
 
 export default Navbar;
