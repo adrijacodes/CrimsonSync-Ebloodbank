@@ -270,7 +270,7 @@ const HomePage = () => {
         </div>
       </motion.div>
       THis is my chat component
-      <ChatComponent />
+      {/* <ChatComponent /> */}
     </div>
   );
 };
