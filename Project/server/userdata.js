@@ -362,52 +362,87 @@
 // ];
 // for just adding data
 //Pair 12 - O+ | Indore | FRI, SAT
-export const userdata=[{
-  name: "Sneha Kulkarni",
-  email: "sneha25@example.com",
-  password: "hashedpassword22",
-  bloodType: "O+",
-  location: { city: "Indore", state: "Madhya Pradesh" },
-  isDonor: true,
-  isRecipient: false,
-  role: "member",
-  availability: ["FRI", "SAT"]
-},
-{
-  name: "Vivek Jain",
-  email: "vivekl@example.com",
-  password: "hashedpassword23",
-  bloodType: "O+",
-  location: { city: "Indore", state: "Madhya Pradesh" },
-  isDonor: true,
-  isRecipient: true,
-  role: "member",
-  availability: ["FRI", "SAT"]
-},{
-  name: "Divya Nair",
-  email: "divyas@example.com",
-  password: "hashedpassword24",
-  bloodType: "A-",
-  location: { city: "Kochi", state: "Kerala" },
-  isDonor: true,
-  isRecipient: false,
-  role: "member",
-  availability: ["WED", "FRI"]
-},
-//Pair 13 - A- | Kochi | WED, FRI
-{
-  name: "Nikhil Menon",
-  email: "nikhilplays@example.com",
-  password: "hashedpassword25",
-  bloodType: "A-",
-  location: { city: "Kochi", state: "Kerala" },
-  isDonor: true,
-  isRecipient: true,
-  role: "member",
-  availability: ["WED", "FRI"]
-}
+// export const userdata=[{
+//   name: "Sneha Kulkarni",
+//   email: "sneha25@example.com",
+//   password: "hashedpassword22",
+//   bloodType: "O+",
+//   location: { city: "Indore", state: "Madhya Pradesh" },
+//   isDonor: true,
+//   isRecipient: false,
+//   role: "member",
+//   availability: ["FRI", "SAT"]
+// },
+// {
+//   name: "Vivek Jain",
+//   email: "vivekl@example.com",
+//   password: "hashedpassword23",
+//   bloodType: "O+",
+//   location: { city: "Indore", state: "Madhya Pradesh" },
+//   isDonor: true,
+//   isRecipient: true,
+//   role: "member",
+//   availability: ["FRI", "SAT"]
+// },{
+//   name: "Divya Nair",
+//   email: "divyas@example.com",
+//   password: "hashedpassword24",
+//   bloodType: "A-",
+//   location: { city: "Kochi", state: "Kerala" },
+//   isDonor: true,
+//   isRecipient: false,
+//   role: "member",
+//   availability: ["WED", "FRI"]
+// },
+// //Pair 13 - A- | Kochi | WED, FRI
+// {
+//   name: "Nikhil Menon",
+//   email: "nikhilplays@example.com",
+//   password: "hashedpassword25",
+//   bloodType: "A-",
+//   location: { city: "Kochi", state: "Kerala" },
+//   isDonor: true,
+//   isRecipient: true,
+//   role: "member",
+//   availability: ["WED", "FRI"]
+// }
 
-]
+// ]
+export const userdata = [
+  {
+    name: "Alia Bhatt",
+    email: "alia.bhatt@example.com",
+    password: "hashedpassword29",
+    bloodType: "AB+",
+    location: { city: "Kanpur", state: "Uttar Pradesh" },
+    isDonor: true,
+    isRecipient: false,
+    role: "member",
+    availability: ["MON", "SAT"],
+  },
+  {
+    name: "Kriti Sanon",
+    email: "kriti.sanon@example.com",
+    password: "hashedpassword30",
+    bloodType: "AB+",
+    location: { city: "Kanpur", state: "Uttar Pradesh" },
+    isDonor: true,
+    isRecipient: true,
+    role: "member",
+    availability: ["TUES", "SAT"],
+  },
+  {
+    name: "Kiara Advani",
+    email: "kiara.advani@example.com",
+    password: "hashedpassword31",
+    bloodType: "AB+",
+    location: { city: "Kanpur", state: "Uttar Pradesh" },
+    isDonor: false,
+    isRecipient: true,
+    role: "member",
+    availability: ["WED", "SUN"],
+  },
+];
 
 // event dummy data
 // export const eventData = [

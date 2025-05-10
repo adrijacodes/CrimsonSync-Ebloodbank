@@ -69,7 +69,7 @@ export const createBloodRequest = AsyncHandler(async (req, res, next) => {
     const recipientNotification = new Notification({
       user: recipient._id,
       bloodRequestId: bloodRequest._id,
-      message: `Your blood request for type ${bloodType} in ${city} has been submitted. We are actively looking for a donor. You will be notified once a match is found or if the request is fulfilled. Please Wait`,
+      message: `Your blood request for type ${bloodType} in ${city} has been submitted. We are actively looking for a donor. You will be notified once a match is found or if the request is fulfilled. Please Wait!`,
       type: "info",
       status: "active",
       isSeen: false,

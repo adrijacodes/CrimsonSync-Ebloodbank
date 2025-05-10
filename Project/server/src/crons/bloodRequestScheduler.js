@@ -4,7 +4,7 @@ import Notification from "../models/notificationsModel.js";
 import User from "../models/userModel.js";
 import EligibilityForm from "../models/eligibilityFormModel.js";
 
-cron.schedule("*/1 * * * *", async () => {
+cron.schedule("*/2 * * * *", async () => {
   try {
     console.log("Cron job triggered to process pending blood requests.");
 
