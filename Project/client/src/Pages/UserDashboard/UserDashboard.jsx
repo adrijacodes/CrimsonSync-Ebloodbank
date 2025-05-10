@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import { RxAvatar } from "react-icons/rx";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +10,7 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [donorEnabled, setDonorEnabled] = useState(false);
+  const [detailsVisibility, setDetailsVisibility] = useState({});
   const [availability, setAvailability] = useState([]);
   const [bloodType, setBloodType] = useState("O+");
   const [updatedCity, setUpdatedCity] = useState("");
@@ -17,16 +19,24 @@ const Dashboard = () => {
   const [activeHistoryTab, setActiveHistoryTab] = useState("received");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
   const [bloodRequests, setBloodRequests] = useState([]);
   const navigate = useNavigate();
   const days = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
   const token = localStorage.getItem("token");
+  const handleToggleDetails = (index) => {
+    // Toggle the visibility of the details for the given request index
+    setDetailsVisibility((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index], // Toggle the specific index
+    }));
+  };
   // Filter blood requests based on the selected history tab ('received' or 'donated')
   const filteredRequests = bloodRequests.filter(
     (req) => req.type.toLowerCase() === activeHistoryTab
   );
-
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -88,6 +98,8 @@ const Dashboard = () => {
           bloodType: entry.bloodType,
           day: entry.day,
           id: entry._id,
+          recipient: entry.recipient, // full recipient object
+          //eligibility: entry.eligibilityForm,
         })),
         ...recipientHistory.fulfilled.map((entry) => ({
           type: "received",
@@ -540,30 +552,44 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Filtered List */}
-        <ul>
+        {/* Filtered List for donor and recipient*/}
+        <ul className="space-y-4">
           {filteredRequests.length > 0 ? (
             filteredRequests.map((request, index) => (
-              <li key={index} className="mb-4 border-b pb-2">
+              <li
+                key={index}
+                className="p-4 rounded-lg shadow-md bg-white hover:bg-gray-50 border border-gray-200 transition-all duration-200"
+              >
+                <div className="mb-2 text-lg font-bold font-serif text-red-600">
+                  Request {index + 1}
+                </div>
                 <p className="font-semibold">
                   Status: <span className="capitalize">{request.status}</span>
                 </p>
-                <p>City: {request.city}</p>
-                <p>Blood Type: {request.bloodType}</p>
-                <p>Preferred Day: {request.day}</p>
-                {request.donor && (
-                  <div className="mt-2 p-4 rounded-lg bg-gray-50 shadow-sm">
-                    <p className="font-semibold">
+                <p className="font-serif">City: {capitalizeFirstLetter(request.city)}</p>
+                <p className="font-serif">Blood Type: {request.bloodType}</p>
+                <p className="font-serif">Preferred Day: {request.day}</p>
+
+                {/* Info Button to toggle details */}
+                <button
+                  className="mt-2 text-blue-500 hover:underline"
+                  onClick={() => handleToggleDetails(index)} // Toggle specific request's details
+                >
+                  {detailsVisibility[index] ? "Hide Details" : "Show Details"}
+                </button>
+
+                {/* Donor Info */}
+                {detailsVisibility[index] && request.donor && (
+                  <div className="mt-4 p-4 rounded-lg bg-blue-50 shadow-inner">
+                    <p className="font-semibold font-serif">
                       Donor: {request.donor.name} ({request.donor.username})
                     </p>
-                    <p>Email: {request.donor.email}</p>
-                    <p className="mt-2 font-semibold">
+                    <p className="font-serif">Email: {request.donor.email}</p>
+                    <p className="mt-2 font-semibold font-serif">
                       Eligibility Status: {request.eligibility?.healthStatus}
                     </p>
-
-                    {/* Display formData */}
                     {request.eligibility?.formData && (
-                      <div className="grid grid-cols-2 gap-4 mt-2 text-sm text-gray-700">
+                      <div className="grid grid-cols-2 gap-3 mt-2 text-sm text-gray-700 font-serif">
                         <p>
                           <span className="font-medium">Age:</span>{" "}
                           {request.eligibility.formData.age}
@@ -616,10 +642,23 @@ const Dashboard = () => {
                     )}
                   </div>
                 )}
+
+                {/* Recipient Info */}
+                {detailsVisibility[index] && request.recipient && (
+                  <div className="mt-4 p-4 rounded-lg bg-green-50 shadow-inner">
+                    <p className="font-semibold font-serif">
+                      Recipient: {request.recipient.name} (
+                      {request.recipient.username})
+                    </p>
+                    <p className="font-serif">Email: {request.recipient.email}</p>
+                  </div>
+                )}
               </li>
             ))
           ) : (
-            <p>No {activeHistoryTab} blood requests available.</p>
+            <p className="text-center text-gray-500">
+              No blood request records found.
+            </p>
           )}
         </ul>
       </motion.div>
