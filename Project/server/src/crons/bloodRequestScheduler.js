@@ -4,7 +4,7 @@ import Notification from "../models/notificationsModel.js";
 import User from "../models/userModel.js";
 import EligibilityForm from "../models/eligibilityFormModel.js";
 
-cron.schedule("*/3 * * * *", async () => {
+cron.schedule("*/1 * * * *", async () => {
   try {
     console.log("Cron job triggered to process pending blood requests.");
 
@@ -35,9 +35,16 @@ cron.schedule("*/3 * * * *", async () => {
           break;
         } else {
           await EligibilityForm.findByIdAndUpdate(formId, {
-            healthStatus: "Ineligible",
+            healthStatus: "Cancelled",
           });
-          await sendIneligibilityNotification(donor, bloodID);
+          try {
+            await sendIneligibilityNotification(donor, bloodID, bloodType);
+          } catch (err) {
+            console.error(
+              `Failed to send ineligibility notification to donor ${donor}:`,
+              err
+            );
+          }
         }
       }
 
@@ -75,20 +82,11 @@ cron.schedule("*/3 * * * *", async () => {
         $push: { userBloodDonationHistory: bloodID },
       });
 
-      const rejectedForms = await EligibilityForm.find({
-        bloodRequest: bloodID,
-        donor: { $ne: selectedDonor },
-        healthStatus: { $ne: "Ineligible" },
-      });
-      console.log("rejected Forms");
-
-      console.log(rejectedForms);
-
       await EligibilityForm.updateMany(
         {
           bloodRequest: bloodID,
           donor: { $ne: selectedDonor },
-          healthStatus: { $ne: "Ineligible" },
+          healthStatus: { $ne: ["Ineligible", "Cancelled"] },
         },
         { $set: { healthStatus: "Ineligible" } }
       );
@@ -100,13 +98,6 @@ cron.schedule("*/3 * * * *", async () => {
         recipient,
         bloodType,
         city
-      );
-      await sendCancellationNotification(
-        bloodID,
-        city,
-        bloodType,
-        selectedDonor._id,
-        recipient
       );
     }
 
@@ -150,47 +141,6 @@ async function sendSelectionNotifications(
   ]);
 }
 
-async function sendCancellationNotification(
-  bloodID,
-  city,
-  bloodType,
-  selectedDonorId,
-  recipientId
-) {
-  try {
-    const content = `Thank you for accepting the blood donation request (Blood Type: ${bloodType}) in ${city}. However, another eligible donor has already been selected. We appreciate your willingness to help and hope you'll stay available for future opportunities.`;
-
-    // Search for all users who accepted the request, excluding selected donor and recipient
-    const searchUsers = await Notification.find({
-      bloodRequestId: bloodID,
-      status: "accepted",
-      user: { $nin: [selectedDonorId, recipientId] },
-    });
-    console.log("logging the searchUsers");
-    
-    console.log(searchUsers);
-
-    // Create notification objects in bulk
-    const notifications = searchUsers.map((notification) => ({
-      user: notification.user,
-      bloodRequestId: bloodID,
-      message: content,
-      type: "info",
-      status: "active",
-    }));
-
-    if (notifications.length > 0) {
-      // Insert all notifications in one go for better performance
-      await Notification.insertMany(notifications);
-      console.log("Cancellation notifications sent successfully!");
-    } else {
-      console.log("No users to notify.");
-    }
-  } catch (error) {
-    console.error("Error sending cancellation notifications:", error);
-  }
-}
-
 async function cancelOtherNotifications(
   bloodID,
   selectedDonorId,
@@ -227,6 +177,25 @@ async function cancelOtherNotifications(
 }
 
 async function maybeNotify(userId, bloodID, message) {
+  const exists = await Notification.findOne({
+    user: userId,
+    bloodRequestId: bloodID,
+    message,
+  });
+
+  if (!exists) {
+    await Notification.create({
+      user: userId,
+      bloodRequestId: bloodID,
+      message,
+      type: "info",
+      status: "active",
+    });
+  }
+}
+async function sendIneligibilityNotification(userId, bloodID, bloodType) {
+  const message = `Thank you for showing interest in donating for blood request ${bloodType}, but based on your eligibility form, you are currently ineligible.`;
+
   const exists = await Notification.findOne({
     user: userId,
     bloodRequestId: bloodID,

@@ -14,7 +14,7 @@ const eligibilityFormSchema = new mongoose.Schema(
     },
     healthStatus: {
       type: String,
-      enum: ["Eligible", "Not Eligible", "Pending"], 
+      enum: ["Eligible", "Ineligible", "Pending","Cancelled"], 
       default: "Pending",
     },
     formData: {
