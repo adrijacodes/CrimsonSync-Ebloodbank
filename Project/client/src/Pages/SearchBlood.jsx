@@ -30,9 +30,10 @@ const SearchBlood = () => {
       );
 
       const data = await response.json();
-      
+
       if (!response.ok) {
-        
+        // console.log(data.message);
+
         throw new Error(data.message || "Failed to fetch donors");
       }
 
@@ -43,12 +44,17 @@ const SearchBlood = () => {
         }, 3000);
       }
     } catch (error) {
-      
-      console.error("Error:", error);
-      toast.error(error.message || "Something went wrong");
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
+      if (error.message == "jwt malformed") {
+        toast.error("Session expired.Please login again!!");
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
+      } else {
+        toast.error(error.message || "Something went wrong");
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      }
     }
   };
 
