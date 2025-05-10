@@ -401,15 +401,21 @@ export const deleteUser = AsyncHandler(async (req, res, next) => {
 
 export const getUserDonationHistory = AsyncHandler(async (req, res) => {
   const userId = req.user._id;
+  console.log(userId);
 
   // 1. As Donor – fetch all requests where user is the donor
+  const don = await BloodRequestModel.find({ donor: userId });
+  //console.log(don);
+
   const asDonor = await BloodRequestModel.find({ donor: userId })
     .populate({
       path: "recipient",
       select: "name email username",
-      model: "User",
+      model: User,
     })
     .select("-__v -createdAt -updatedAt");
+
+  console.log(asDonor);
 
   // 2. As Recipient – categorize into pending, fulfilled, and cancelled
   const recipientRequests = await BloodRequestModel.find({
@@ -453,13 +459,12 @@ export const getUserDonationHistory = AsyncHandler(async (req, res) => {
   const RecipientBloodRequestData = {
     ...recipientHistory,
     fulfilled: recipientHistory.fulfilled.map((item) => {
-      const obj = item.toObject?.() || item; 
-      delete obj.eligibilityForm; 
+      const obj = item.toObject?.() || item;
+      delete obj.eligibilityForm;
       return obj;
     }),
   };
-  
-  
+
   return res.status(200).json(
     new ApiResponse(
       {
