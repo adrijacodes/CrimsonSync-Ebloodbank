@@ -410,7 +410,7 @@ export const getUserDonationHistory = AsyncHandler(async (req, res) => {
   const asDonor = await BloodRequestModel.find({ donor: userId })
     .populate({
       path: "recipient",
-      select: "name email username",
+      select: "name email username -_id",
       model: User,
     })
     .select("-__v -createdAt -updatedAt");
