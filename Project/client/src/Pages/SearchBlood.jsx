@@ -12,6 +12,13 @@ const SearchBlood = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const accessToken = localStorage.getItem("token");
+   if (!accessToken) {
+  toast.error("Session expired. Please login again!");
+  setTimeout(() => {
+    navigate("/login"); // if using react-router
+  }, 2000); // 2 second delay so user sees the toast
+}
+
 
     try {
       const response = await fetch(
@@ -45,7 +52,7 @@ const SearchBlood = () => {
       }
     } catch (error) {
       if (error.message == "jwt malformed") {
-        toast.error("Session expired.Please login again!!");
+       // toast.error("Session expired.Please login again!!");
         setTimeout(() => {
           navigate("/login");
         }, 3000);
