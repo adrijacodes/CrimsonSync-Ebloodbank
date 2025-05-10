@@ -64,65 +64,68 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-contain bg-center" style={{ backgroundImage: "url('../src/assets/blood2.jpg')" }}>
-      <div className="flex items-center justify-center h-[100vh]">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-slate-200 border-slate-400 p-8 rounded-3xl shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50"
-        >
-          <h2 className="text-2xl font-bold mb-4 text-center">Create Account</h2>
+    <div className="relative min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('../src/assets/blood2.jpg')" }}>
+  <div className="absolute inset-0  opacity-10 z-0"></div>
 
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
-          />
+  <div className="relative z-10 flex items-center justify-center h-[100vh]">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white/60 backdrop-blur-md border border-red-500 p-8 rounded-3xl shadow-2xl"
+    >
+      <h2 className="text-2xl font-bold mb-4 text-center">Create Account</h2>
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
-          />
+      <input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
+      />
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
-          />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
+      />
 
-          <select
-            name="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
-          >
-            <option value="">--Select Role--</option>
-            <option value="Admin">Admin</option>
-            <option value="User">User</option>
-          </select>
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
+      />
 
-          <button
-            type="submit"
-            className="bg-red-500 text-white w-full py-2 rounded"
-          >
-            Sign Up
-          </button>
+      <select
+        name="role"
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
+      >
+        <option value="">--Select Role--</option>
+        <option value="Admin">Admin</option>
+        <option value="User">User</option>
+      </select>
 
-          <div className="flex justify-center gap-2 mt-5">
-            <p className="text-red-600">Already have an account?</p>
-            <Link to="/login">
-              <span className="text-blue-700">Sign In</span>
-            </Link>
-          </div>
-        </form>
+      <button
+        type="submit"
+        className="bg-red-500 text-white w-full py-2 rounded"
+      >
+        Sign Up
+      </button>
+
+      <div className="flex justify-center gap-2 mt-5">
+        <p className="text-red-600">Already have an account?</p>
+        <Link to="/login">
+          <span className="text-blue-700">Sign In</span>
+        </Link>
       </div>
-    </div>
+    </form>
+  </div>
+</div>
+
   );
 };
 

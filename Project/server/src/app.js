@@ -9,7 +9,7 @@ import eventRoutes from "./routes/eventRoutes.js";
 import adminRoutes from "./routes/adminAuthRoutes.js";
 import cancelExpiredRequests from "./crons/cancelExpiredRequests.js";
 import { checkAndCancelExpiredRequests } from "./crons/cancelExpiredRequests.js";
-import "./crons/bloodRequestScheduler.js"
+//import "./crons/bloodRequestScheduler.js"
 
 const app = express();
 

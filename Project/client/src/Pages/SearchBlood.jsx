@@ -56,16 +56,17 @@ const SearchBlood = () => {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center"
+      className="relative min-h-screen bg-cover bg-center"
       style={{ backgroundImage: `url(${bloodImage})` }}
     >
-      <div className="flex flex-col items-center justify-start min-h-screen pt-20 px-4">
+      <div className="absolute inset-0 bg-black opacity-40 z-0"></div>
+      <div className=" relative z-10 flex flex-col items-center justify-start min-h-screen pt-20 px-4">
         <form
           onSubmit={handleSubmit}
-          className="bg-slate-200 border-slate-400 p-8 rounded-3xl shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50 w-full max-w-3xl"
+          className="bg-white/60 backdrop-blur-md border border-red-500 p-8 rounded-3xl shadow-lg  w-full max-w-3xl"
         >
           <div className="mb-6">
-            <label className="block mb-2 text-center text-xl font-serif">
+            <label className="block mb-2 text-center text-2xl font-serif">
               Choose Your Blood Type
             </label>
             <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">

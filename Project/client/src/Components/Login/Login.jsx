@@ -65,11 +65,12 @@ const Login = () => {
   
 
   return (
-    <div className="min-h-screen bg-contain bg-center" style={{ backgroundImage: "url('../src/assets/blood2.jpg')" }}>
-      <div className="flex items-center justify-center h-[100vh]">
+    <div className="relative min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('../src/assets/blood2.jpg')" }}>
+       <div className="absolute inset-0 bg-black opacity-40 z-0"></div>
+      <div className="relative z-10 flex items-center justify-center h-[100vh]">
         <form
           onSubmit={handleSubmit}
-          className="bg-slate-200 border-slate-400 p-8 rounded-3xl shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50"
+          className="bg-white/60 backdrop-blur-md border border-red-500 p-8 rounded-3xl shadow-2xl"
         >
           <h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
 
