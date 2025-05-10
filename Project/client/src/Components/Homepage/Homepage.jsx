@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CountUp from "react-countup";
+import ChatComponent from "../ChatComponent/ChatComponent";
 import { Link, useNavigate } from "react-router-dom";
 import { SlMagnifier } from "react-icons/sl";
 import { BiDonateBlood } from "react-icons/bi";
@@ -268,6 +269,8 @@ const HomePage = () => {
           ))}
         </div>
       </motion.div>
+      THis is my chat component
+      <ChatComponent />
     </div>
   );
 };

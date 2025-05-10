@@ -24,6 +24,7 @@ mongoose.connect(mongodburl)
 const seedDb = async () => {
   try {
  //  await User.deleteMany({}); 
+   // await User.deleteMany({}); 
 
    
     const hashedData = await Promise.all(userdata.map(async (user) => {

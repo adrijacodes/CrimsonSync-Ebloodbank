@@ -13,6 +13,8 @@ import "./crons/bloodRequestScheduler.js";
 import {
   pendingAcceptedBloodRequestCancellation,
   pendingFormsCancellation,
+  startCronJob,
+  cancelCancelledRequestNotifications,
 } from "./crons/pendingScheduler.js";
 
 const app = express();
@@ -39,6 +41,8 @@ cancelExpiredRequests();
 checkAndCancelExpiredRequests();
 pendingAcceptedBloodRequestCancellation();
 pendingFormsCancellation();
+startCronJob();
+cancelCancelledRequestNotifications;
 
 app.use((err, req, res, next) => {
   if (err instanceof ApiError) {
