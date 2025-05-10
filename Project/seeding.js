@@ -23,6 +23,7 @@ mongoose.connect(mongodburl)
 
 const seedDb = async () => {
   try {
+ //  await User.deleteMany({}); 
    // await User.deleteMany({}); 
 
    
