@@ -65,55 +65,65 @@ const Login = () => {
   
 
   return (
-    <div className="relative min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('../src/assets/blood2.jpg')" }}>
-       <div className="absolute inset-0 bg-black opacity-40 z-0"></div>
-      <div className="relative z-10 flex items-center justify-center h-[100vh]">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white/60 backdrop-blur-md border border-red-500 p-8 rounded-3xl shadow-2xl"
-        >
-          <h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
+    <div
+  className="relative min-h-screen flex items-center justify-center"
+  style={{
+    backgroundImage: "url('/src/assets/bg2.jpeg')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}
+>
+  <div className="absolute inset-0 bg-black opacity-30 z-0"></div>
 
-          <input
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-            type="email"
-            placeholder="Email"
-            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
-          />
+  <div className="relative z-10 w-[90%] max-w-md bg-white/20 backdrop-blur-lg rounded-3xl  p-8  border border-white border-opacity-30 
+             shadow-[0_0_15px_rgba(255,255,255,0.2)] ring-1 ring-white/20">
+    <h2 className="text-3xl font-bold text-red-500 text-center mb-6">LogIn</h2>
 
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            type="password"
-            placeholder="Password"
-            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
-          />
+    <form onSubmit={handleSubmit} className="space-y-4 ">
+      <input
+        onChange={(e) => setEmail(e.target.value)}
+        value={email}
+        type="email"
+        placeholder="Email"
+        className="w-full p-3 rounded-full bg-white/70 text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white"
+      />
 
-          <select
-            name="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="block w-full p-2 mb-4 border focus:outline-none focus:ring-2 focus:ring-black rounded-3xl"
-          >
-            <option value="">--Select Role--</option>
-            <option value="Admin">Admin</option>
-            <option value="User">User</option>
-          </select>
+      <input
+        onChange={(e) => setPassword(e.target.value)}
+        value={password}
+        type="password"
+        placeholder="Password"
+        className="w-full p-3 rounded-full bg-white/70 text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white"
+      />
 
-          <button type="submit" className="bg-red-500 text-white w-full py-2 rounded">
-            Login
-          </button>
+      <select
+        name="role"
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        className="w-full p-3 rounded-full bg-white/70 text-black focus:outline-none focus:ring-2 focus:ring-white"
+      >
+        <option value="">-- Select Role --</option>
+        <option value="Admin">Admin</option>
+        <option value="User">User</option>
+      </select>
 
-          <div className="flex justify-center gap-2 mt-5">
-            <p className="text-red-600">New Here?</p>
-            <Link to={"/Register"}>
-              <span className="text-blue-700">Register</span>
-            </Link>
-          </div>
-        </form>
+      <button
+        type="submit"
+        className="w-full bg-red-400 text-white font-bold py-3 rounded-xl hover:bg-red-500 transition"
+      >
+        Login
+      </button>
+
+      <div className="text-center mt-4 text-white">
+        New here?{" "}
+        <Link to="/Register" className="text-purple-950 underline">
+          Register
+        </Link>
       </div>
-    </div>
+    </form>
+  </div>
+</div>
+
   );
 };
 

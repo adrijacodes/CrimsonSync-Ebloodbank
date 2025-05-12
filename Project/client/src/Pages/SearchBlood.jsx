@@ -13,9 +13,9 @@ const SearchBlood = () => {
     e.preventDefault();
     const accessToken = localStorage.getItem("token");
    if (!accessToken) {
-  toast.error("Session expired. Please login again!");
+  toast.error(" Please Create a Account or Login to use Search Blood!");
   setTimeout(() => {
-    navigate("/login"); // if using react-router
+    navigate("/login"); 
   }, 2000); // 2 second delay so user sees the toast
 }
 
