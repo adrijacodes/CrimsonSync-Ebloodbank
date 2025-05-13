@@ -13,7 +13,7 @@ const SearchBlood = () => {
     e.preventDefault();
     const accessToken = localStorage.getItem("token");
    if (!accessToken) {
-  toast.error("Session expired. Please login again!");
+  toast.error("Please Login to request blood!!");
   setTimeout(() => {
     navigate("/login"); // if using react-router
   }, 2000); // 2 second delay so user sees the toast
