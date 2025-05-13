@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CountUp from "react-countup";
-import ChatComponent from "../ChatComponent/ChatComponent";
 import { Link, useNavigate } from "react-router-dom";
 import { SlMagnifier } from "react-icons/sl";
 import { BiDonateBlood } from "react-icons/bi";
 import woman from "../../assets/woman.png";
 import man from "../../assets/man.png";
 import human from "../../assets/human.png";
+import ChatBot from "../ChatBot/ChatBot";
 import pedro from "../../assets/Pedro.jpg";
 import mona from "../../assets/mona.jpeg";
 import sofia from "../../assets/sofia.jpg";
@@ -269,8 +269,7 @@ const HomePage = () => {
           ))}
         </div>
       </motion.div>
-      THis is my chat component
-      <ChatComponent />
+      <ChatBot/>
     </div>
   );
 };

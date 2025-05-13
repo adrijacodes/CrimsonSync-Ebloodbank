@@ -24,6 +24,7 @@ import AdminProfile from "./Pages/AdminProfile";
 
 import "react-toastify/dist/ReactToastify.css";
 import NotificationPage from "./Pages/Notifications/NotificationPage";
+import ChatBot from "./Components/ChatBot/ChatBot";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -62,6 +63,7 @@ const AppWrapper = () => {
           <Route path="/search-admin" element={<AdminSearch />} />
           <Route path="/admin-profile" element={<AdminProfile />} />
           <Route path="/notification" element={<NotificationPage/>} />
+          <Route path="/chatbot" element={<ChatBot/>} />
         </Routes>
       </div>
 
