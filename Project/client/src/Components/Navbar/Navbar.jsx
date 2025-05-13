@@ -6,7 +6,7 @@ import { FiLogOut } from "react-icons/fi";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
 import { HiMenu, HiX } from "react-icons/hi";
-import logoImage from '../../assets/logoimage.png';
+import logoImage from "../../assets/logoimage.png";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -84,20 +84,24 @@ const Navbar = () => {
       );
 
       toast.success("Logged out successfully!");
-  } catch (error) {
-    const errorMsg = error.response?.data?.message || "Logout failed.";
-// handeling jwt
-    if (errorMsg.toLowerCase().includes("jwt expired")) {
-      toast.info("Session expired. Please login again.");
-    } else {
-      toast.error(errorMsg);
-      console.error("Logout error:", error);
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Logout failed.";
+      
+      // handel expired jwt
+      if (
+        errorMsg.toLowerCase().includes("jwt expired") ||
+        error.response?.status === 401
+      ) {
+        toast.info("Your session has expired. Please login to continue");
+      } else {
+        toast.error(errorMsg);
+        console.error("Logout error:", error);
+      }
+    } finally {
+      localStorage.clear();
+      navigate("/login");
     }
-  } finally {
-    localStorage.clear();
-    navigate("/login");
-  }
-};
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -110,7 +114,11 @@ const Navbar = () => {
           to="/"
           className="flex items-center  text-white text-2xl font-bold"
         >
-          <img src={logoImage} alt="CrimsonSync Logo" className="w-8 h-8 rounded-full" />
+          <img
+            src={logoImage}
+            alt="CrimsonSync Logo"
+            className="w-8 h-8 rounded-full"
+          />
           <span>
             Crimson<span className="font-normal">Sync</span>
           </span>
