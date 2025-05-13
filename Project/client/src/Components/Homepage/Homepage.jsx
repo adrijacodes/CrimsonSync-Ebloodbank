@@ -269,8 +269,7 @@ const HomePage = () => {
           ))}
         </div>
       </motion.div>
-      THis is my chat component
-      {/* <ChatComponent /> */}
+      
     </div>
   );
 };
