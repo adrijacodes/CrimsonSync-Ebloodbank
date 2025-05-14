@@ -10,7 +10,7 @@ const predefinedQuestions = [
   },
   {
     question: "How do I register as a blood donor?",
-    answer: "Sign up on CrimsonSync and enable your donor status with blood type and email information in your profile."
+    answer: "Sign up/Login on CrimsonSync and enable your donor status with blood type and email information in your profile."
   },
   {
     question: "How can I make a blood request?",

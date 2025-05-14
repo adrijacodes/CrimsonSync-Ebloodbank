@@ -6,7 +6,7 @@ import EligibilityForm from "../models/eligibilityFormModel.js";
 //Cancels accepted eligibility forms if someone else has fulfilled the blood request.
 
 function pendingAcceptedBloodRequestCancellation() {
-  cron.schedule("*/2 * * * *", async () => {
+  cron.schedule("*/3 * * * *", async () => {
     console.log("Running scheduled job to check accepted eligibility forms...");
 
     try {

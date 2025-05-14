@@ -35,7 +35,7 @@ cron.schedule("*/2 * * * *", async () => {
           break;
         } else {
           await EligibilityForm.findByIdAndUpdate(formId, {
-            healthStatus: "Cancelled",
+            healthStatus: "Ineligible",
           });
           try {
             await sendIneligibilityNotification(donor, bloodID, bloodType);
@@ -88,7 +88,7 @@ cron.schedule("*/2 * * * *", async () => {
           donor: { $ne: selectedDonor },
           healthStatus: { $ne: ["Ineligible", "Cancelled"] },
         },
-        { $set: { healthStatus: "Ineligible" } }
+        { $set: { healthStatus: "Cancelled" } }
       );
 
       // Cancel and thank rejected donors
@@ -109,7 +109,19 @@ cron.schedule("*/2 * * * *", async () => {
 
 /*Other Helper Functions */
 function checkEligibility(formData) {
+  console.log("entering");
+  
   const formDataObj = Object.fromEntries(formData);
+console.log(formDataObj.lastDonationDate);
+
+  // 3-month date check
+  const lastDonationDate = new Date(formDataObj.lastDonationDate);
+  const currentDate = new Date();
+
+  const threeMonthsLater = new Date(lastDonationDate);
+  threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+  console.log(threeMonthsLater);
+  
 
   return (
     Number(formDataObj.age) >= 18 &&
@@ -120,9 +132,11 @@ function checkEligibility(formData) {
     formDataObj.chronicDiseases === "No" &&
     formDataObj.covidExposure === "No" &&
     formDataObj.currentlyPregnant === "No" &&
-    formDataObj.consent === "Yes"
+    formDataObj.consent === "Yes" &&
+    currentDate >= threeMonthsLater
   );
 }
+
 
 async function sendSelectionNotifications(
   donor,
