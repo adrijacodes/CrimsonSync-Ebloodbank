@@ -216,59 +216,53 @@ const HomePage = () => {
       </motion.div>
 
       {/* Developer Carousel / About the Creators */}
+     {/* Developer Carousel / About the Creators */}
+<motion.div
+  className="py-10 px-4"
+  variants={sectionVariants}
+  initial="hidden"
+  animate="visible"
+  transition={{ duration: 0.8, delay: 0.6 }}
+>
+  <h2 className="text-4xl text-center font-bold font-serif mb-8">
+    Meet the Creators
+  </h2>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 place-items-center">
+    {[
+      {
+        name: "Aindrila Dutta",
+        role: "Backend & API Developer",
+        image: woman,
+        vision:
+          "By designing efficient APIs and optimizing server-side processes, we ensure that CrimsonSync operates smoothly, even during peak demand, helping save lives when it matters most.",
+      },
+      {
+        name: "Adrija Gowri",
+        role: "Frontend Developer",
+        image: human,
+        vision:
+          "Building responsive and engaging interfaces that empower users to connect quickly and easily, saving lives when it matters the most.",
+      },
+    ].map((dev, idx) => (
       <motion.div
-        className="py-10 px-4"
-        variants={sectionVariants}
-        initial="hidden"
-        animate="visible"
-        transition={{ duration: 0.8, delay: 0.6 }}
+        key={idx}
+        className="bg-gray-100 rounded-xl shadow-md p-6 text-center"
+        variants={itemVariants}
       >
-        <h2 className="text-4xl text-center font-bold font-serif mb-8">
-          Meet the Creators
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center">
-          {[
-            {
-              name: "Aindrila Dutta",
-              role: "Backend & API Developer",
-              image: woman,
-              vision:
-                "By designing efficient APIs and optimizing server-side processes, we ensure that CrimsonSync operates smoothly, even during peak demand, helping save lives when it matters most.",
-            },
-            {
-              name: "Adrija Gowri",
-              role: "Lead Frontend Developer",
-              image: human,
-              vision:
-                "Building responsive and engaging interfaces that empower users to connect quickly and easily, saving lives when it matters the most.",
-            },
-            {
-              name: "Debjit Dey",
-              role: "Frontend Developer",
-              image: man,
-              vision:
-                "Creating intuitive and seamless user experiences to ensure that every interaction with CrimsonSync is as impactful as the lives we aim to save.",
-            },
-          ].map((dev, idx) => (
-            <motion.div
-              key={idx}
-              className="bg-gray-100 rounded-xl shadow-md p-6 text-center"
-              variants={itemVariants}
-            >
-              <img
-                src={dev.image}
-                alt={dev.name}
-                className="w-24 h-24 mx-auto rounded-full mb-4"
-              />
-              <h3 className="text-2xl font-bold text-red-600">{dev.name}</h3>
-              <p className="text-sm font-medium text-gray-600 mb-2">
-                {dev.role}
-              </p>
-              <p className="italic text-gray-700">"{dev.vision}"</p>
-            </motion.div>
-          ))}
-        </div>
+        <img
+          src={dev.image || "/default-avatar.png"}
+          alt={`Photo of ${dev.name}, ${dev.role}`}
+          className="w-24 h-24 mx-auto rounded-full mb-4 object-cover"
+        />
+        <h3 className="text-2xl font-bold text-red-600">{dev.name}</h3>
+        <p className="text-sm font-medium text-gray-600 mb-2">{dev.role}</p>
+        <p className="italic text-gray-700">"{dev.vision}"</p>
       </motion.div>
+    ))}
+  </div>
+</motion.div>
+
       <ChatBot/>
     </div>
   );
