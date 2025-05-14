@@ -187,9 +187,7 @@ const NotificationPage = () => {
         navigate("/");
       }, 3000);
 
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 3000);
+     
     } catch (error) {
       console.error("Error processing action:", error);
     }
@@ -302,7 +300,7 @@ const NotificationPage = () => {
           )}
         </h2>
         {/* Tabs */}
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-4 sm:mb-6">
           {["all", "active", "seen", "accepted", "rejected", "cancelled"].map(
             (tab) => {
               const isActive = filter === tab;
