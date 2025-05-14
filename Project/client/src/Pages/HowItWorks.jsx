@@ -1,27 +1,35 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import collage from '../assets/collage.jpg';
+import col1 from '../assets/col1.jpg';
 import col2 from '../assets/col2.jpg';
+import col3 from '../assets/col3.jpg';
+import col4 from '../assets/col4.jpg';
+import col5 from '../assets/col5.jpg';
 const steps = [
   {
     title: "Step 1: Register or Log In",
-    description: "Create an account or log in using your email or Google credentials to access the platform.",
-    image: collage
+    description: "Create an account or log in using your email  to access the platform.",
+    image: col1
   },
   {
-    title: "Step 2: Submit a Request or Enable Donor Mode",
-    description: "To request blood, fill out the blood request form. To donate, enable 'Donor Mode' in your profile and fill out the donor form.",
-    image: "/images/form-fill.gif"
-  },
-  {
-    title: "Step 3: Search for Donors or Blood Donation Events",
+    title: "Step 2: Search for Donors or Blood Donation Events",
     description: "Requesters can search for available donors based on blood type and urgency. You can also find upcoming blood donation camps/events in your area.",
     image: col2
   },
   {
-    title: "Step 4: Get Matched and Confirm Donation",
+    title: "Step 3: Notification sent to Recipient and Donor",
+    description: "Requesters can search for available donors based on blood type and urgency. You can also find upcoming blood donation camps/events in your area.",
+    image: col3
+  },
+  {
+    title: "Step 4: Get Matched and Profile view",
     description: "Once a potential donor or event is found, you will be automatically matched. Confirm your donation or request based on the availability.",
-    image: "/images/match-donor.gif"
+    image: col4
+  },
+  {
+    title: "Step 5: Search for nearby events",
+    description: "Easily explore blood donation events happening near you.",
+    image: col5
   }
 ];
 
