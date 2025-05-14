@@ -49,6 +49,14 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 
 ![FAQ](screenshots/faq.png)
 
+### 🚀 How Does It Work?
+
+CrimsonSync is designed to make blood donation and request processes simple and efficient. Here’s a step-by-step guide to how it works.
+
+![How Does It Work1](screenshots/how1.png)
+![How Does It Work2](screenshots/how2.png)
+![How Does It Work3](screenshots/how3.png)
+
 ### 🔎 Search Features
 
 #### 📍 Search Blood
@@ -109,7 +117,7 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 
 #### 📈 Dashboard Overview
 
-![Admin Dashboard](screenshots/admin dash.png)
+![Admin Dashboard](screenshots/dashboard.png)
 - The admin dashboard provides a comprehensive overview of the system, including key metrics such as total users, donation events, and overall statistics.
 
 #### 👥 User Management
