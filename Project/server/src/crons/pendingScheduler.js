@@ -3,212 +3,156 @@ import BloodRequest from "../models/bloodRequestModel.js";
 import Notification from "../models/notificationsModel.js";
 import EligibilityForm from "../models/eligibilityFormModel.js";
 
-//Cancels accepted eligibility forms if someone else has fulfilled the blood request.
-
-function pendingAcceptedBloodRequestCancellation() {
+// CRON JOB 1: Cancel accepted eligibility if another donor fulfilled it
+function cancelAcceptedEligibilityIfFulfilled() {
   cron.schedule("*/3 * * * *", async () => {
-    console.log("Running scheduled job to check accepted eligibility forms...");
+    console.log("Running: Check accepted eligibility forms...");
 
     try {
-      const eligibleForms = await EligibilityForm.find({
+      const ineligibleForms = await EligibilityForm.find({
         healthStatus: "Ineligible",
       });
 
-      for (let form of eligibleForms) {
+      for (const form of ineligibleForms) {
         const { bloodRequest, donor: formDonor } = form;
-
         const bloodReq = await BloodRequest.findById(bloodRequest);
-        const notif = await Notification.findOne({
-          bloodRequestId: bloodRequest,
-          status: "accepted",
-          user: formDonor,
-        });
 
-        if (!bloodReq || !notif) continue;
+        if (!bloodReq || bloodReq.status !== "fulfilled") continue;
 
-        // If someone else fulfilled the request
-        if (
-          bloodReq.status === "fulfilled" &&
-          bloodReq.donor.toString() !== formDonor.toString()
-        ) {
-          // Check if info notification already exists for this user and request
-          const existingInfo = await Notification.findOne({
+        // Ensure someone else fulfilled it
+        if (bloodReq.donor.toString() !== formDonor.toString()) {
+          const existingNotif = await Notification.findOne({
             user: formDonor,
             bloodRequestId: bloodRequest,
             type: "info",
           });
 
-          if (!existingInfo) {
-            const content = `Thank you for accepting the blood donation request (Blood Type: ${bloodReq.bloodType}) in ${bloodReq.city}. However, another eligible donor has already been selected. We appreciate your willingness to help and hope you'll stay available for future opportunities.`;
+          if (!existingNotif) {
+            const message = `Thank you for accepting the blood donation request (Blood Type: ${bloodReq.bloodType}) in ${bloodReq.city}. However, another eligible donor has already been selected. We appreciate your willingness to help and hope you'll stay available for future opportunities.`;
 
             await Notification.create({
               user: formDonor,
               bloodRequestId: bloodRequest,
-              message: content,
+              message,
               type: "info",
               status: "active",
             });
+
+            console.log(`Info notification sent to donor ${formDonor}`);
           }
         }
       }
     } catch (error) {
-      console.error("Error in cron job (eligible form check):", error);
+      console.error("Error in eligibility check:", error);
     }
   });
 }
 
-//Marks pending eligibility forms as ineligible if the request has already been fulfilled.
-
-function pendingFormsCancellation() {
+// CRON JOB 2: Mark pending eligibility forms as ineligible if request is fulfilled
+function cancelPendingFormsIfRequestFulfilled() {
   cron.schedule("*/1 * * * *", async () => {
-    console.log("Running scheduled job to check pending eligibility forms...");
+    console.log("Running: Check pending eligibility forms...");
 
     try {
-      const pendingForms = await EligibilityForm.find({
-        healthStatus: "Pending",
-      });
-      console.log(pendingForms);
-      
-      for (let form of pendingForms) {
-        const { _id, bloodRequest } = form;
+      const pendingForms = await EligibilityForm.find({ healthStatus: "Pending" });
 
-        const bloodReq = await BloodRequest.findById(bloodRequest);
-        if (!bloodReq) continue;
-
-        if (bloodReq.status === "fulfilled") {
-          await EligibilityForm.findByIdAndUpdate(_id, {
+      await Promise.all(pendingForms.map(async (form) => {
+        const bloodReq = await BloodRequest.findById(form.bloodRequest);
+        if (bloodReq && bloodReq.status === "fulfilled") {
+          await EligibilityForm.findByIdAndUpdate(form._id, {
             healthStatus: "Ineligible",
           });
-          console.log(`Form ${_id} marked as ineligible`);
+          console.log(`Form ${form._id} marked as Ineligible`);
         }
-      }
+      }));
     } catch (error) {
-      console.error("Error in cron job (pending form check):", error);
-    }
-  });
-}
-// start a cron function  find fullfilled bloodrequests and check if a active notification of the id is present if present then show the below logic
-function startCronJob() {
-  cron.schedule("*/1 * * * *", async () => {
-    console.log("Running scheduled job to check fulfilled blood requests...");
-
-    try {
-      // Find all fulfilled blood requests
-      const fulfilledRequests = await BloodRequest.find({
-        status: "fulfilled",
-      });
-
-      // Loop through each fulfilled blood request
-      for (let request of fulfilledRequests) {
-        const { _id, bloodType, city, donor, recipient } = request;
-
-        // Call the function to cancel other notifications
-        await cancelOtherNotifications(
-          _id,
-          donor.toString(),
-          recipient.toString(),
-          bloodType,
-          city
-        );
-      }
-    } catch (error) {
-      console.error("Error in cron job:", error);
+      console.error("Error in pending form check:", error);
     }
   });
 }
 
-// Function to cancel notifications for non-selected users
-async function cancelOtherNotifications(
-  bloodID,
-  selectedDonorId,
-  recipientId,
-  bloodType,
-  city
-) {
-  const cancelMessage = `A blood request for ${bloodType} in the city ${city} was sent. However, a suitable donor has already been found for this blood request.`;
+// CRON JOB 3: Cancel notifications of other users once a blood request is fulfilled
+// function cancelNotificationsForUnselectedDonors() {
+//   cron.schedule("*/1 * * * *", async () => {
+//     console.log("Running: Check fulfilled blood requests...");
 
-  try {
-    // Find active notifications for the blood request, excluding selected donor and recipient
-    const cancelledNotifications = await Notification.find({
-      bloodRequestId: bloodID,
-      status: "active",
-      user: { $nin: [selectedDonorId, recipientId] },
-    });
+//     try {
+//       const fulfilledRequests = await BloodRequest.find({ status: "fulfilled" });
 
-    if (cancelledNotifications.length === 0) {
-      console.log("No notifications to cancel for this blood request.");
-      return;
-    }
+//       for (const request of fulfilledRequests) {
+//         const { _id, bloodType, city, donor, recipient } = request;
 
-    console.log("Logging the cancelled notifications:", cancelledNotifications);
+//         const activeNotifs = await Notification.find({
+//           bloodRequestId: _id,
+//           status: "active",
+//           user: { $nin: [donor.toString(), recipient.toString()] },
+//         });
 
-    // Update the notifications to cancelled
-    const result = await Notification.updateMany(
-      {
-        bloodRequestId: bloodID,
-        status: "active",
-        user: { $nin: [selectedDonorId, recipientId] },
-      },
-      {
-        $set: {
-          status: "cancelled",
-          type: "info",
-          message: cancelMessage,
-        },
-      }
-    );
+//         if (activeNotifs.length > 0) {
+//           const cancelMessage = `A blood request for ${bloodType} in ${city} was sent. However, a suitable donor has already been found for this blood request.`;
 
-    console.log(`${result.modifiedCount} notifications cancelled.`);
-  } catch (error) {
-    console.error("Error in canceling notifications:", error);
-  }
-}
+//           await Notification.updateMany(
+//             { _id: { $in: activeNotifs.map(n => n._id) } },
+//             {
+//               $set: {
+//                 status: "cancelled",
+//                 type: "info",
+//                 message: cancelMessage,
+//               },
+//             }
+//           );
 
-function cancelCancelledRequestNotifications() {
+//           console.log(`${activeNotifs.length} notifications cancelled for request ${_id}`);
+//         }
+//       }
+//     } catch (error) {
+//       console.error("Error in cancelOtherNotifications cron:", error);
+//     }
+//   });
+// }
+
+// CRON JOB 4: Cancel active notifications if blood request itself was cancelled
+function cancelNotificationsForCancelledRequests() {
   cron.schedule("*/1 * * * *", async () => {
-    console.log("Running scheduled job to check cancelled blood requests...");
+    console.log("Running: Check cancelled blood requests...");
 
     try {
       const cancelledRequests = await BloodRequest.find({ status: "cancelled" });
 
-      for (let request of cancelledRequests) {
+      for (const request of cancelledRequests) {
         const { _id: bloodRequestId, bloodType, city } = request;
 
         const activeNotifs = await Notification.find({
           bloodRequestId,
-          status: "active"
+          status: "active",
         });
 
-        if (activeNotifs.length === 0) continue;
+        if (activeNotifs.length > 0) {
+          const cancelMessage = `The blood request for ${bloodType} in ${city} has been cancelled. Thank you for your willingness to help. We hope you'll stay available for future opportunities.`;
 
-        const cancelMessage = `The blood request for ${bloodType} in ${city} has been cancelled. Thank you for your willingness to help. We hope you'll stay available for future opportunities.`;
+          await Notification.updateMany(
+            { _id: { $in: activeNotifs.map(n => n._id) } },
+            {
+              $set: {
+                status: "cancelled",
+                type: "info",
+                message: cancelMessage,
+              },
+            }
+          );
 
-        await Notification.updateMany(
-          {
-            bloodRequestId,
-            status: "active",
-          },
-          {
-            $set: {
-              status: "cancelled",
-              type: "info",
-              message: cancelMessage,
-            },
-          }
-        );
-
-        console.log(`Cancelled notifications for blood request ${bloodRequestId}`);
+          console.log(`Cancelled ${activeNotifs.length} notifications for request ${bloodRequestId}`);
+        }
       }
     } catch (error) {
-      console.error("Error in cron job (cancelled request notification):", error);
+      console.error("Error in cancelled request notification cron:", error);
     }
   });
 }
 
-
 export {
-  cancelCancelledRequestNotifications,
-  pendingAcceptedBloodRequestCancellation,
-  pendingFormsCancellation,
-  startCronJob,
+  cancelAcceptedEligibilityIfFulfilled,
+  cancelPendingFormsIfRequestFulfilled,
+  // cancelNotificationsForUnselectedDonors,
+  cancelNotificationsForCancelledRequests,
 };

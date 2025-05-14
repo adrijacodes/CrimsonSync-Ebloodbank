@@ -11,10 +11,10 @@ import cancelExpiredRequests from "./crons/cancelExpiredRequests.js";
 import { checkAndCancelExpiredRequests } from "./crons/cancelExpiredRequests.js";
 import "./crons/bloodRequestScheduler.js";
 import {
-  pendingAcceptedBloodRequestCancellation,
-  pendingFormsCancellation,
-  startCronJob,
-  cancelCancelledRequestNotifications,
+  cancelAcceptedEligibilityIfFulfilled,
+  cancelPendingFormsIfRequestFulfilled,
+  // cancelNotificationsForUnselectedDonors,
+  cancelNotificationsForCancelledRequests,
 } from "./crons/pendingScheduler.js";
 
 const app = express();
@@ -39,10 +39,10 @@ app.use((req, res, next) => {
 });
 cancelExpiredRequests();
 checkAndCancelExpiredRequests();
-pendingAcceptedBloodRequestCancellation();
-pendingFormsCancellation();
-startCronJob();
-cancelCancelledRequestNotifications;
+ cancelAcceptedEligibilityIfFulfilled,
+  cancelPendingFormsIfRequestFulfilled,
+  // cancelNotificationsForUnselectedDonors,
+  cancelNotificationsForCancelledRequests,
 
 app.use((err, req, res, next) => {
   if (err instanceof ApiError) {

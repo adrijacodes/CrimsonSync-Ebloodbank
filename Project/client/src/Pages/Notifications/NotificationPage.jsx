@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import NotificationSound from "../../assets/Sound/notificationsound.mp3";
-import UseTokenHandler from "../../Hooks/UseTokenHandler.jsx";
 
 const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
@@ -20,8 +19,7 @@ const NotificationPage = () => {
   const [markingAsRead, setMarkingAsRead] = useState(null);
   const [previousActiveCount, setPreviousActiveCount] = useState(0);
   const navigate = useNavigate();
-  const { handleTokenExpiry } = UseTokenHandler();
-  
+
   const [showFormModal, setShowFormModal] = useState(false);
   const [formData, setFormData] = useState({
     age: "",
@@ -58,42 +56,44 @@ const NotificationPage = () => {
         "notifications/search?status=seen",
         "notifications/search?status=accepted",
         "notifications/search?status=rejected",
-        "notifications/search?status=cancelled",
+        "notifications/search?status=cancelled", // Added
       ];
-  
-      const responses = await Promise.all(
+      const [
+        allRes,
+        activeRes,
+        seenRes,
+        acceptedRes,
+        rejectedRes,
+        cancelledRes,
+      ] = await Promise.all(
         urls.map((url) =>
           fetch(`http://localhost:8001/api/${url}`, {
             headers: { Authorization: `Bearer ${accessToken}` },
           })
         )
       );
-  
-      for (const res of responses) {
-        if (!res.ok) {
-          const error = new Error("Failed to fetch");
-          error.response = { status: res.status, data: await res.json() };
-          throw error;
-        }
-      }
-  
-      const [
-        allData,
-        activeData,
-        seenData,
-        acceptedData,
-        rejectedData,
-        cancelledData,
-      ] = await Promise.all(responses.map((res) => res.json()));
-  
+      const [allData, activeData, seenData, acceptedData, rejectedData] =
+        await Promise.all([
+          allRes.json(),
+          activeRes.json(),
+          seenRes.json(),
+          acceptedRes.json(),
+          rejectedRes.json(),
+          cancelledRes.json(), // Discarded
+        ]);
+
       const activeCount = activeData.data?.notifications?.length || 0;
       const seenCount = seenData.data?.notifications?.length || 0;
-  
+
       if (activeCount > previousActiveCount) {
-        toast.info(`🔔 You have ${activeCount - previousActiveCount} new notification(s)!`);
+        toast.info(
+          `🔔 You have ${
+            activeCount - previousActiveCount
+          } new notification(s)!`
+        );
         playNotificationSound();
       }
-  
+
       setPreviousActiveCount(activeCount);
       setCounts({
         all: allData.data?.notifications?.length || 0,
@@ -101,12 +101,12 @@ const NotificationPage = () => {
         seen: seenCount,
         accepted: acceptedData.data?.notifications?.length || 0,
         rejected: rejectedData.data?.notifications?.length || 0,
+        // Not adding cancelled count here
       });
-    } catch (error) {
-      handleTokenExpiry(error); // ✅ centralized session error handler
+    } catch (err) {
+      console.error("Error fetching counts:", err);
     }
   };
-  
 
   // Fetch and display filtered notification list based on selected tab
   const fetchNotifications = async (status = "all") => {
@@ -116,32 +116,26 @@ const NotificationPage = () => {
         status === "all"
           ? "http://localhost:8001/api/notifications"
           : `http://localhost:8001/api/notifications/search?status=${status}`;
-  
+
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-  
+
+      if (!response.ok) throw new Error("Failed to fetch notifications");
+
       const data = await response.json();
-  
-      if (!response.ok) {
-        const error = new Error(data.message || "Failed to fetch notifications");
-        error.response = { status: response.status, data };
-        throw error;
-      }
-  
       setNotifications(
         Array.isArray(data.data) ? data.data : data.data.notifications || []
       );
     } catch (error) {
-      handleTokenExpiry(error); // ✅ use hook for session expiration
+      console.error("Error fetching notifications:", error);
       setNotifications([]);
     } finally {
       setLoading(false);
     }
   };
-  
   // Update notification status to "seen" and refresh list + counts
   const markAsRead = async (id) => {
     setMarkingAsRead(id);
@@ -288,7 +282,7 @@ const NotificationPage = () => {
       }, 20000);
       return () => clearInterval(interval);
     }
-  }, [accessToken, handleTokenExpiry]);
+  }, [accessToken]);
 
   // Ensure filterRef always matches the latest selected tab, for polling to work
   useEffect(() => {
