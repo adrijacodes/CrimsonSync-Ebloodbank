@@ -433,20 +433,20 @@ export const getUserDonationHistory = AsyncHandler(async (req, res) => {
     fulfilled: [],
     cancelled: [],
   };
-  //console.log(recipientRequests);
+  console.log(recipientRequests);
 
   // Add eligibility form data only if status is fulfilled
   for (const req of recipientRequests) {
-    // console.log(req);
+    console.log(req);
 
     if (req.status === "fulfilled" && req.eligibilityForm) {
-      //console.log("entering");
-      // console.log(req.eligibilityForm);
+      console.log("entering");
+      console.log(req.eligibilityForm);
       const formId = req.eligibilityForm;
       const form = await EligibilityForm.findById(formId).select(
         "-__v -createdAt -updatedAt -_id -donor -bloodRequest"
       );
-      //console.log(form);
+      console.log(form);
 
       recipientHistory.fulfilled.push({
         ...req._doc,

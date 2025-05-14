@@ -3,21 +3,28 @@ import { useNavigate } from "react-router-dom";
 import bloodImage from "../assets/blood2.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
+
 const SearchBlood = () => {
   const [location, setLocation] = useState("");
   const [selectedBloodType, setSelectedBloodType] = useState("");
-
   const navigate = useNavigate();
+  const { handleTokenExpiry } = UseTokenHandler();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const accessToken = localStorage.getItem("token");
-   if (!accessToken) {
-  toast.error("Please Login to request blood!!");
-  setTimeout(() => {
-    navigate("/login"); // if using react-router
-  }, 2000); // 2 second delay so user sees the toast
-}
+    if (!accessToken) {
+      toast.error("Please create an account or login to use Search Blood!", {
+        autoClose: 3000,
+        pauseOnHover: true,
+      });
+    
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+      return; 
+    }
 
 
     try {
@@ -39,9 +46,9 @@ const SearchBlood = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // console.log(data.message);
-
-        throw new Error(data.message || "Failed to fetch donors");
+        const error = new Error(data.message || "Failed to fetch donors");
+        error.response = { status: response.status, data };
+        throw error;
       }
 
       if (data.message) {
@@ -50,18 +57,9 @@ const SearchBlood = () => {
           navigate("/");
         }, 3000);
       }
-    } catch (error) {
-      if (error.message == "jwt malformed") {
-       // toast.error("Session expired.Please login again!!");
-        setTimeout(() => {
-          navigate("/login");
-        }, 3000);
-      } else {
-        toast.error(error.message || "Something went wrong");
-        setTimeout(() => {
-          navigate("/");
-        }, 3000);
-      }
+    }  catch (error) {
+      handleTokenExpiry(error);
+      
     }
   };
 
@@ -69,16 +67,17 @@ const SearchBlood = () => {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center"
+      className="relative min-h-screen bg-cover bg-center"
       style={{ backgroundImage: `url(${bloodImage})` }}
     >
-      <div className="flex flex-col items-center justify-start min-h-screen pt-20 px-4">
+      <div className="absolute inset-0 bg-black opacity-40 z-0"></div>
+      <div className=" relative z-10 flex flex-col items-center justify-start min-h-screen pt-20 px-4">
         <form
           onSubmit={handleSubmit}
-          className="bg-slate-200 border-slate-400 p-8 rounded-3xl shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50 w-full max-w-3xl"
+          className="bg-white/60 backdrop-blur-md border border-red-500 p-8 rounded-3xl shadow-lg  w-full max-w-3xl"
         >
           <div className="mb-6">
-            <label className="block mb-2 text-center text-xl font-serif">
+            <label className="block mb-2 text-center text-2xl font-serif">
               Choose Your Blood Type
             </label>
             <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">

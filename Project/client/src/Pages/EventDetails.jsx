@@ -59,7 +59,7 @@ const EventDetails = () => {
       {/* Content */}
       <div className="p-8 space-y-6">
         <motion.h1
-          className="text-3xl sm:text-4xl font-semibold text-gray-900"
+          className="text-3xl sm:text-4xl font-semibold font-serif text-gray-900"
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -67,7 +67,7 @@ const EventDetails = () => {
           {eventName}
         </motion.h1>
 
-        <div className="space-y-2 text-gray-700 text-lg">
+        <div className="space-y-2 text-gray-700 font-serif text-lg">
           <motion.p
             className="flex items-center gap-2"
             initial={{ x: -10, opacity: 0 }}
@@ -100,7 +100,7 @@ const EventDetails = () => {
         </div>
 
         <motion.div
-          className="text-gray-800 leading-relaxed"
+          className="text-gray-800 font-serif leading-relaxed"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}

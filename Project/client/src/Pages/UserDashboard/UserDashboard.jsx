@@ -1,26 +1,44 @@
 import React, { useEffect, useState } from "react";
+
 import { RxAvatar } from "react-icons/rx";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import UseTokenHandler from "../../Hooks/UseTokenHandler.jsx";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [donorEnabled, setDonorEnabled] = useState(false);
+  const [detailsVisibility, setDetailsVisibility] = useState({});
   const [availability, setAvailability] = useState([]);
   const [bloodType, setBloodType] = useState("O+");
   const [updatedCity, setUpdatedCity] = useState("");
   const [updatedState, setUpdatedState] = useState("");
   const [activeTab, setActiveTab] = useState("donor");
+  const [activeHistoryTab, setActiveHistoryTab] = useState("received");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [bloodRequests, setBloodRequests] = useState([]);
   const navigate = useNavigate();
   const days = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
   const token = localStorage.getItem("token");
-
+  const { handleTokenExpiry } =UseTokenHandler(); // handleTokenExpiry call
+  const handleToggleDetails = (index) => {
+    // Toggle the visibility of the details for the given request index
+    setDetailsVisibility((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index], // Toggle the specific index
+    }));
+  };
+  // Filter blood requests based on the selected history tab ('received' or 'donated')
+  const filteredRequests = bloodRequests.filter(
+    (req) => req.type.toLowerCase() === activeHistoryTab
+  );
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -30,7 +48,12 @@ const Dashboard = () => {
           },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch profile");
+        if (!res.ok) {
+          const errorData = await res.json();
+          const error = new Error(errorData?.message || "Failed to fetch profile");
+          error.response = { status: res.status, data: errorData };
+          throw error;
+        }
 
         const { data } = await res.json();
         const userData = data.UserInfo[0];
@@ -41,12 +64,12 @@ const Dashboard = () => {
         setDonorEnabled(userData.isDonor || false);
         setAvailability(userData.availability || []);
       } catch (err) {
-        console.error(err);
+        handleTokenExpiry(err); //handel expired token and redirect 
       }
     };
 
     fetchUserProfile();
-  }, [token]);
+  }, [token ,handleTokenExpiry]);
 
   const showMessage = (msg, duration = 3000) => {
     toast(msg, { autoClose: duration });
@@ -55,19 +78,71 @@ const Dashboard = () => {
   // Fetch Blood Requests
   const fetchBloodRequests = async () => {
     try {
-      const res = await fetch("http://localhost:8001/api/blood/requests", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        "http://localhost:8001/api/auth/user/profile/blood-activity",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to fetch blood requests");
 
       const { data } = await res.json();
-      setBloodRequests(data);
+      const donorHistory = data.DonorHistory || [];
+      const recipientHistory = data.RecipientHistory || {
+        pending: [],
+        fulfilled: [],
+        cancelled: [],
+      };
+
+      const parsedRequests = [
+        ...donorHistory.map((entry) => ({
+          type: "donated",
+          status: entry.status,
+          city: entry.city,
+          bloodType: entry.bloodType,
+          day: entry.day,
+          id: entry._id,
+          recipient: entry.recipient, // full recipient object
+          //eligibility: entry.eligibilityForm,
+        })),
+        ...recipientHistory.fulfilled.map((entry) => ({
+          type: "received",
+          status: entry.status,
+          city: entry.city,
+          bloodType: entry.bloodType,
+          day: entry.day,
+          id: entry._id,
+          donor: entry.donor,
+          eligibility: entry.eligibilityFormData,
+        })),
+        ...recipientHistory.pending.map((entry) => ({
+          type: "received",
+          status: entry.status,
+          city: entry.city,
+          bloodType: entry.bloodType,
+          day: entry.day,
+          id: entry._id,
+          donor: entry.donor,
+          eligibility: entry.eligibilityFormData,
+        })),
+        ...recipientHistory.cancelled.map((entry) => ({
+          type: "received",
+          status: "cancelled",
+          city: entry.city,
+          bloodType: entry.bloodType,
+          day: entry.day,
+          id: entry._id,
+          donor: entry.donor,
+          eligibility: entry.eligibilityFormData,
+        })),
+      ];
+
+      setBloodRequests(parsedRequests);
     } catch (err) {
       console.error("Error fetching blood requests:", err);
-      showMessage("Failed to load blood requests.");
     }
   };
 
@@ -75,7 +150,7 @@ const Dashboard = () => {
     fetchBloodRequests();
   }, []);
 
-// Save Location 
+  // Save Location
   const handleSaveLocation = async () => {
     const response = await fetch(
       "http://localhost:8001/api/auth/user/profile/update-location",
@@ -104,7 +179,7 @@ const Dashboard = () => {
 
     setIsEditingLocation(false);
   };
-// Donor Status
+  // Donor Status
   const handleSaveDonorSettings = async () => {
     try {
       const response = await fetch(
@@ -131,7 +206,7 @@ const Dashboard = () => {
       showMessage("Something went wrong while updating donor status.");
     }
   };
-// Save Availability
+  // Save Availability
   const handleSaveAvailability = async () => {
     const token = localStorage.getItem("token");
 
@@ -165,7 +240,7 @@ const Dashboard = () => {
       showMessage("Failed to update availability.");
     }
   };
-// Save BloodType
+  // Save BloodType
   const handleSaveBloodType = async () => {
     try {
       const response = await fetch(
@@ -192,7 +267,7 @@ const Dashboard = () => {
       showMessage("Something went wrong while updating blood type.");
     }
   };
-// Password Change
+  // Password Change
   const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword) {
       return showMessage("Fill in both fields.");
@@ -281,11 +356,15 @@ const Dashboard = () => {
       >
         <RxAvatar size={97} className="text-black" />
         <div>
-          <h2 className="text-2xl font-semibold text-red-600">{user.name}</h2>
-          <p className="text-sm text-gray-600">{user.email}</p>
-          <p className="text-sm text-gray-600">Username: {user.username}</p>
+          <h2 className="text-2xl font-semibold font-serif text-red-600">
+            {user.name}
+          </h2>
+          <p className="text-sm text-gray-600 font-serif">{user.email}</p>
+          <p className="text-sm text-gray-600 font-serif">
+            Username: {user.username}
+          </p>
           <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 font-serif">
               Location:{" "}
               {isEditingLocation ? (
                 <>
@@ -447,48 +526,163 @@ const Dashboard = () => {
         )}
       </motion.div>
 
-      {/* Delete Account */}
+      {/* Blood Donation History */}
       <motion.div
         className="bg-white p-6 rounded-lg shadow-md mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <h2 className="text-xl font-serif text-red-600 font-semibold mb-4">
+          Blood Donation History
+        </h2>
+        {/* Tabs */}
+        <div className="flex mb-4">
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              activeHistoryTab === "received"
+                ? "bg-red-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setActiveHistoryTab("received")}
+          >
+            Received Blood
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg ml-2 ${
+              activeHistoryTab === "donated"
+                ? "bg-red-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setActiveHistoryTab("donated")}
+          >
+            Donated Blood
+          </button>
+        </div>
+
+        {/* Filtered List for donor and recipient*/}
+        <ul className="space-y-4">
+          {filteredRequests.length > 0 ? (
+            filteredRequests.map((request, index) => (
+              <li
+                key={index}
+                className="p-4 rounded-lg shadow-md bg-white hover:bg-gray-50 border border-gray-200 transition-all duration-200"
+              >
+                <div className="mb-2 text-lg font-bold font-serif text-red-600">
+                  Request {index + 1}
+                </div>
+                <p className="font-semibold">
+                  Status: <span className="capitalize">{request.status}</span>
+                </p>
+                <p className="font-serif">City: {capitalizeFirstLetter(request.city)}</p>
+                <p className="font-serif">Blood Type: {request.bloodType}</p>
+                <p className="font-serif">Preferred Day: {request.day}</p>
+
+                {/* Info Button to toggle details */}
+                <button
+                  className="mt-2 text-blue-500 hover:underline"
+                  onClick={() => handleToggleDetails(index)} // Toggle specific request's details
+                >
+                  {detailsVisibility[index] ? "Hide Details" : "Show Details"}
+                </button>
+
+                {/* Donor Info */}
+                {detailsVisibility[index] && request.donor && (
+                  <div className="mt-4 p-4 rounded-lg bg-blue-50 shadow-inner">
+                    <p className="font-semibold font-serif">
+                      Donor: {request.donor.name} ({request.donor.username})
+                    </p>
+                    <p className="font-serif">Email: {request.donor.email}</p>
+                    <p className="mt-2 font-semibold font-serif">
+                      Eligibility Status: {request.eligibility?.healthStatus}
+                    </p>
+                    {request.eligibility?.formData && (
+                      <div className="grid grid-cols-2 gap-3 mt-2 text-sm text-gray-700 font-serif">
+                        <p>
+                          <span className="font-medium">Age:</span>{" "}
+                          {request.eligibility.formData.age}
+                        </p>
+                        <p>
+                          <span className="font-medium">Weight:</span>{" "}
+                          {request.eligibility.formData.weight}
+                        </p>
+                        <p>
+                          <span className="font-medium">Recent Illness:</span>{" "}
+                          {request.eligibility.formData.hadRecentIllness}
+                        </p>
+                        <p>
+                          <span className="font-medium">On Medication:</span>{" "}
+                          {request.eligibility.formData.onMedication || "No"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Recent Surgery:</span>{" "}
+                          {request.eligibility.formData.recentSurgery}
+                        </p>
+                        <p>
+                          <span className="font-medium">Alcohol Use:</span>{" "}
+                          {request.eligibility.formData.alcoholUse}
+                        </p>
+                        <p>
+                          <span className="font-medium">Chronic Diseases:</span>{" "}
+                          {request.eligibility.formData.chronicDiseases}
+                        </p>
+                        <p>
+                          <span className="font-medium">Covid Exposure:</span>{" "}
+                          {request.eligibility.formData.covidExposure}
+                        </p>
+                        <p>
+                          <span className="font-medium">
+                            Last Donation Date:
+                          </span>{" "}
+                          {request.eligibility.formData.lastDonationDate}
+                        </p>
+                        <p>
+                          <span className="font-medium">
+                            Currently Pregnant:
+                          </span>{" "}
+                          {request.eligibility.formData.currentlyPregnant}
+                        </p>
+                        <p>
+                          <span className="font-medium">Consent Given:</span>{" "}
+                          {request.eligibility.formData.consent}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Recipient Info */}
+                {detailsVisibility[index] && request.recipient && (
+                  <div className="mt-4 p-4 rounded-lg bg-green-50 shadow-inner">
+                    <p className="font-semibold font-serif">
+                      Recipient: {request.recipient.name} (
+                      {request.recipient.username})
+                    </p>
+                    <p className="font-serif">Email: {request.recipient.email}</p>
+                  </div>
+                )}
+              </li>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">
+              No blood request records found.
+            </p>
+          )}
+        </ul>
+      </motion.div>
+
+      {/* Delete Account */}
+      <motion.div
+        className="bg-white p-6 rounded-lg shadow-md mb-6  flex justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
         <button
           onClick={handleDeleteAccount}
-          className="bg-red-600 py-2 px-4 rounded text-white"
+          className="bg-red-600 hover:bg-red-700 py-2 px-4 rounded-full text-xl text-white font-serif"
         >
           Delete Account
         </button>
       </motion.div>
-
-      {/* Blood Requests */}
-      <motion.div
-        className="bg-white p-6 rounded-lg shadow-md mb-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
-        <h2 className="text-xl font-serif text-red-600 font-semibold mb-4">Blood Donation History </h2>
-        <ul>
-          {bloodRequests.length > 0 ? (
-            bloodRequests.map((request, index) => (
-              <li key={index} className="mb-4">
-                <p>{request.name}</p>
-                <p>{request.message}</p>
-                <button className="bg-red-500 py-1 px-4 rounded text-white">
-                  Accept
-                </button>
-                <button className="bg-gray-500 py-1 px-4 rounded text-white ml-2">
-                  Reject
-                </button>
-              </li>
-            ))
-          ) : (
-            <p>No blood requests available.</p>
-          )}
-        </ul>
-      </motion.div>
-
-
       <ToastContainer />
     </div>
   );

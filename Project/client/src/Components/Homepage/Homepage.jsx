@@ -130,9 +130,9 @@ const HomePage = () => {
         <div className="flex gap-12 justify-center mb-6">
           <Link to="/SearchBlood">
             <button
-              className={`flex items-center gap-2 px-10 py-6 rounded-full text-2xl font-itim transition ${
+              className={`flex items-center gap-2 px-10 py-6 rounded-full text-2xl  transition ${
                 activeTab === "blood"
-                  ? "bg-red-600 text-white shadow-lg font-serif"
+                  ? "bg-red-600 hover:bg-red-700 text-white shadow-lg font-serif"
                   : "bg-gray-200 text-gray-800 font-serif"
               }`}
               onClick={() => setActiveTab("blood")}
@@ -142,10 +142,10 @@ const HomePage = () => {
             </button>
           </Link>
           <button
-            className={`flex items-center gap-2 px-10 py-6 rounded-full text-2xl font-itim transition ${
+            className={`flex items-center gap-2 px-10 py-6 rounded-full text-2xl  transition ${
               activeTab === "event"
                 ? "bg-red-600 text-white shadow-lg font-serif"
-                : "bg-gray-200 text-gray-800 font-serif"
+                : "bg-gray-100 hover:bg-gray-300 shadow-lg  text-gray-800 font-serif"
             }`}
             onClick={() => {
               setActiveTab("event");
