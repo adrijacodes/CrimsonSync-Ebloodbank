@@ -42,11 +42,11 @@ export const checkAndCancelExpiredRequests = async () => {
   // for production
   const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
   // For testing purpose
-  const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+ // const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
 
   const expiredRequests = await BloodRequest.find({
     status: "pending",
-    createdAt: { $lte: fifteenMinutesAgo },
+    createdAt: { $lte: twelveHoursAgo },
   });
 
   for (const request of expiredRequests) {
