@@ -32,13 +32,41 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 ![Home 2](screenshots/home2.png)
 
 
-### 🔍 Search Donor
+#### 🔐 Register Page
 
-![Search](screenshots/search.png)
+![Register](screenshots/register.png)
 
-### 🩸 Request Blood
+#### 🔑 Login Page
 
-![Request](screenshots/request.png)
+![Login](screenshots/login.png)
+
+### ℹ️ About & FAQ
+
+#### 🧾 About Us Page
+
+![About Us](screenshots/aboutus.png)
+
+#### ❓ FAQ Page
+
+![FAQ](screenshots/faq.png)
+
+
+### 🔎 Search Features
+
+#### 📍 Search Blood
+
+![Search Blood](screenshots/searchblood.png)
+
+#### 📅 Search Events
+
+![Search Events](screenshots/events.png)
+
+### 📅 View Events
+
+#### 🗓️ Event Listings
+
+![View Events](screenshots/viewevent.png)
+
 
 ### 🔔 Notifications
 
