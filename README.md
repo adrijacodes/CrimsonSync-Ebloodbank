@@ -23,6 +23,26 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 - **Database**: MongoDB
 - **Authentication**: JWT
 
+## 📸 Screenshots
+
+### 🏠 Home Page
+
+![Home 1](Screenshots/home.png)  
+![Home 2](Screenshots/home1.png)  
+![Home 3](Screenshots/home2.png)
+
+### 🔍 Search Donor
+
+![Search](screenshots/search.png)
+
+### 🩸 Request Blood
+
+![Request](screenshots/request.png)
+
+### 🔔 Notifications
+
+![Notifications](screenshots/notifications.png)
+
 
 ## 🚀 Future Enhancements
 
