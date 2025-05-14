@@ -17,6 +17,7 @@ cron.schedule("*/3 * * * *", async () => {
 
       const eligibleDonors = await EligibilityForm.find({
         bloodRequest: bloodID,
+        // healthStatus: { $nin: ["Ineligible"] },
       });
 
       let selectedDonor = null;
@@ -36,8 +37,10 @@ cron.schedule("*/3 * * * *", async () => {
           selectedDonor = donor;
           form = formId;
           break;
-        } else {
+        } 
+        else {
           await sendIneligibilityNotification(donor, bloodID, bloodType);
+          continue;
         }
       }
 
@@ -118,10 +121,9 @@ function checkEligibility(formData) {
     lastDonationDate,
   } = formDataObj;
 
-
   const lastDate = new Date(lastDonationDate);
   console.log(lastDonationDate);
-  
+
   if (isNaN(lastDate.getTime())) {
     console.warn("⚠️ Invalid lastDonationDate:", lastDonationDate);
     return false;
