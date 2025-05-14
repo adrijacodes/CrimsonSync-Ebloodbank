@@ -105,6 +105,63 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 
 - **Donor Notification**: "You have successfully confirmed the donation."
 
+### 👑 Admin Functionalities
+
+#### 📈 Dashboard Overview
+
+![Admin Dashboard](screenshots/admin dash.png)
+- The admin dashboard provides a comprehensive overview of the system, including key metrics such as total users, donation events, and overall statistics.
+
+#### 👥 User Management
+
+##### View Users
+
+![View Users](screenshots/userlist.png)
+- Admins can view a list of all registered users.
+
+##### Search Users
+
+![Search Users](screenshots/usersearch.png)
+- Admins can search users by various parameters such as name, username, or role(donor/recipient).
+
+---
+
+#### 🧑‍💼 Admin Management
+
+##### View Admins
+
+![View Admins](screenshots/adminlist.png)
+- Admins can view a list of all other admins.
+
+##### Search Admins
+
+![Search Admins](screenshots/adminsearch.png)
+- Admins can search for other admins based on their username or email.
+
+---
+
+#### 📅 Event Management
+
+##### Create New Event
+
+![Create Event](screenshots/newevent.png)
+- Admins can create new donation events by providing details such as date, location, and venue requirements.
+
+##### View Events by City and Year (Chart)
+
+![View Events](screenshots/stats.png)
+- Admins can view events by city and year using an interactive chart for better insights.
+
+---
+
+### 👤 Admin Profile
+
+#### 🛠️ Admin Profile Details
+
+![Admin Profile](screenshots/adminprofile.png)
+- Admins can view and update their profile details like username, email, and contact information.
+
+
 ## 🚀 Future Enhancements
 
 - 💬 **Real-time Chat** – Enable real-time chat-based communication between matched users for better coordination.
