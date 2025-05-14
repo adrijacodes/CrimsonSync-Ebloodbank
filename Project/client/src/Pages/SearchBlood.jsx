@@ -3,21 +3,28 @@ import { useNavigate } from "react-router-dom";
 import bloodImage from "../assets/blood2.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
+
 const SearchBlood = () => {
   const [location, setLocation] = useState("");
   const [selectedBloodType, setSelectedBloodType] = useState("");
-
   const navigate = useNavigate();
+  const { handleTokenExpiry } = UseTokenHandler();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const accessToken = localStorage.getItem("token");
-   if (!accessToken) {
-  toast.error(" Please Create a Account or Login to use Search Blood!");
-  setTimeout(() => {
-    navigate("/login"); 
-  }, 2000); // 2 second delay so user sees the toast
-}
+    if (!accessToken) {
+      toast.error("Please create an account or login to use Search Blood!", {
+        autoClose: 3000,
+        pauseOnHover: true,
+      });
+    
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+      return; 
+    }
 
 
     try {
@@ -39,9 +46,9 @@ const SearchBlood = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // console.log(data.message);
-
-        throw new Error(data.message || "Failed to fetch donors");
+        const error = new Error(data.message || "Failed to fetch donors");
+        error.response = { status: response.status, data };
+        throw error;
       }
 
       if (data.message) {
@@ -50,18 +57,9 @@ const SearchBlood = () => {
           navigate("/");
         }, 3000);
       }
-    } catch (error) {
-      if (error.message == "jwt malformed") {
-       // toast.error("Session expired.Please login again!!");
-        setTimeout(() => {
-          navigate("/login");
-        }, 3000);
-      } else {
-        toast.error(error.message || "Something went wrong");
-        setTimeout(() => {
-          navigate("/");
-        }, 3000);
-      }
+    }  catch (error) {
+      handleTokenExpiry(error);
+      
     }
   };
 

@@ -114,11 +114,6 @@ const Navbar = () => {
           to="/"
           className="flex items-center  text-white text-2xl font-bold"
         >
-          <img
-            src={logoImage}
-            alt="CrimsonSync Logo"
-            className="w-8 h-8 rounded-full"
-          />
           <span>
             Crimson<span className="font-normal">Sync</span>
           </span>

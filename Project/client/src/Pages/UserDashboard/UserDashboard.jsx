@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import UseTokenHandler from "../../Hooks/UseTokenHandler.jsx";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -23,6 +24,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const days = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
   const token = localStorage.getItem("token");
+  const { handleTokenExpiry } =UseTokenHandler(); // handleTokenExpiry call
   const handleToggleDetails = (index) => {
     // Toggle the visibility of the details for the given request index
     setDetailsVisibility((prevState) => ({
@@ -46,7 +48,12 @@ const Dashboard = () => {
           },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch profile");
+        if (!res.ok) {
+          const errorData = await res.json();
+          const error = new Error(errorData?.message || "Failed to fetch profile");
+          error.response = { status: res.status, data: errorData };
+          throw error;
+        }
 
         const { data } = await res.json();
         const userData = data.UserInfo[0];
@@ -57,12 +64,12 @@ const Dashboard = () => {
         setDonorEnabled(userData.isDonor || false);
         setAvailability(userData.availability || []);
       } catch (err) {
-        console.error(err);
+        handleTokenExpiry(err); //handel expired token and redirect 
       }
     };
 
     fetchUserProfile();
-  }, [token]);
+  }, [token ,handleTokenExpiry]);
 
   const showMessage = (msg, duration = 3000) => {
     toast(msg, { autoClose: duration });
