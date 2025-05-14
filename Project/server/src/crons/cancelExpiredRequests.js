@@ -46,7 +46,7 @@ export const checkAndCancelExpiredRequests = async () => {
 
   const expiredRequests = await BloodRequest.find({
     status: "pending",
-    createdAt: { $lte: twelveHoursAgo },
+    createdAt: { $lte: fifteenMinutesAgo },
   });
 
   for (const request of expiredRequests) {
