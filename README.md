@@ -27,9 +27,10 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 
 ### 🏠 Home Page
 
-![Home ](screenshots/home.png)  
-![Home 1](Screenshots/home1.png)  
-![Home 2](Screenshots/home2.png)
+![Home](screenshots/home.png)  
+![Home 1](screenshots/home1.png)  
+![Home 2](screenshots/home2.png)
+
 
 ### 🔍 Search Donor
 
