@@ -53,9 +53,9 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 
 CrimsonSync is designed to make blood donation and request processes simple and efficient. Here’s a step-by-step guide to how it works.
 
-![How Does It Work1](screenshots/how1.png)
-![How Does It Work2](screenshots/how2.png)
-![How Does It Work3](screenshots/how3.png)
+![How Does It Work1](screenshots/how1.jpg)
+![How Does It Work2](screenshots/how2.jpg)
+![How Does It Work3](screenshots/how3.jpg)
 
 ### 🔎 Search Features
 
