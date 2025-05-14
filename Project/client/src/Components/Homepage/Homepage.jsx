@@ -226,7 +226,7 @@ const HomePage = () => {
         <h2 className="text-4xl text-center font-bold font-serif mb-8">
           Meet the Creators
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center items-center">
           {[
             {
               name: "Aindrila Dutta",
@@ -237,18 +237,12 @@ const HomePage = () => {
             },
             {
               name: "Adrija Gowri",
-              role: "Lead Frontend Developer",
+              role: "Frontend Developer",
               image: human,
               vision:
                 "Building responsive and engaging interfaces that empower users to connect quickly and easily, saving lives when it matters the most.",
             },
-            {
-              name: "Debjit Dey",
-              role: "Frontend Developer",
-              image: man,
-              vision:
-                "Creating intuitive and seamless user experiences to ensure that every interaction with CrimsonSync is as impactful as the lives we aim to save.",
-            },
+            
           ].map((dev, idx) => (
             <motion.div
               key={idx}
