@@ -31,7 +31,6 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 ![Home 1](screenshots/home1.png)  
 ![Home 2](screenshots/home2.png)
 
-
 #### 🔐 Register Page
 
 ![Register](screenshots/register.png)
@@ -50,7 +49,6 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 
 ![FAQ](screenshots/faq.png)
 
-
 ### 🔎 Search Features
 
 #### 📍 Search Blood
@@ -67,11 +65,45 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 
 ![View Events](screenshots/viewevent.png)
 
+### 👤 User Profile
+
+#### 🩸 Profile Details & Blood Donation History
+
+![User Profile](screenshots/profile.png)
+![Recipient History](screenshots/profile1.png)
+![Donation History](screenshots/profile2.png)
+
+- **Recipient History**: List of blood requests made by the user as a recipient.
+- **Donor History**: List of past donations made by the user.
+- **Personal Details**: Information like name, username,location, contact info, etc.
+
+---
 
 ### 🔔 Notifications
 
-![Notifications](screenshots/notifications.png)
+#### 📩 After Recipient Sends Request
 
+![After Request Sent](screenshots/notif.png)
+
+- **Recipient Notification**: "Your blood request has been successfully submitted."
+
+#### 👀 After Donor Views Request
+
+![After Request Viewed](screenshots/notif1.png)
+
+- **Donor Notification**: "You have a new blood request. Please review the details."
+
+#### ✅ After Donor Accepts Request
+
+![After Request Accepted](screenshots/notif3.png)
+
+- **Recipient Notification**: "Your blood request has been accepted. Donor details are now available."
+
+#### 💌 After Recipient Receives Confirmation
+
+![After Confirmation](screenshots/notif2.png)
+
+- **Donor Notification**: "You have successfully confirmed the donation."
 
 ## 🚀 Future Enhancements
 
@@ -81,8 +113,6 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 - 📱 **Mobile App** – A companion app for real-time notifications and on-the-go access.
 - 🗺️ **Map-Based Event Visualization** – Display donation camps and event locations using interactive maps.
 - 📤 **Email/SMS Notification Integration** – Notify users about critical blood needs via external communication channels.
-
-
 
 ## 📬 Contact
 
