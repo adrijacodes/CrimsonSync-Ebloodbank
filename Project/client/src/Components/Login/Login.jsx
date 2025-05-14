@@ -116,7 +116,7 @@ const Login = () => {
 
       <div className="text-center mt-4 text-white">
         New here?{" "}
-        <Link to="/Register" className="text-purple-950 underline">
+        <Link to="/register" className="text-purple-950 underline">
           Register
         </Link>
       </div>
