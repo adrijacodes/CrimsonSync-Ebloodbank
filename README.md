@@ -6,6 +6,25 @@
 
 Every registered user in CrimsonSync can act as a **recipient and/or donor**, eliminating the need for separate roles. With a built-in **notification system**, users are alerted instantly about matching requests or upcoming events based on their city.
 
+## 📋 Table of Contents
+
+1. [Overview](#overview)
+2. [Key Features](#key-features)
+3. [Tech Stack](#tech-stack)
+4. [Screenshots](#screenshots)
+   1. [Home Page](#home-page)
+   2. [Register & Login Pages](#register--login-pages)
+   3. [About & FAQ](#about--faq)
+   4. [How Does It Work](#how-does-it-work)
+   5. [Search Features](#search-features)
+   6. [User Profile](#user-profile)
+   7. [Notifications](#notifications)
+   8. [Admin Functionalities](#admin-functionalities)
+5. [Future Enhancements](#future-enhancements)
+6. [Contact](#contact)
+
+---
+
 ## 🌟 Key Features
 
 - 🧬 **Blood Type & City Matching** – Instantly find or be matched with users having a compatible blood type in the same city.
@@ -22,6 +41,8 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 - **Backend**: Node.js + Express.js
 - **Database**: MongoDB
 - **Authentication**: JWT
+
+---
 
 ## 📸 Screenshots
 
@@ -53,8 +74,8 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 
 CrimsonSync is designed to make blood donation and request processes simple and efficient. Here’s a step-by-step guide to how it works.
 
-![How Does It Work1](screenshots/how1.jpg)
-![How Does It Work2](screenshots/how2.jpg)
+![How Does It Work1](screenshots/how1.jpg)  
+![How Does It Work2](screenshots/how2.jpg)  
 ![How Does It Work3](screenshots/how3.jpg)
 
 ### 🔎 Search Features
@@ -77,13 +98,13 @@ CrimsonSync is designed to make blood donation and request processes simple and 
 
 #### 🩸 Profile Details & Blood Donation History
 
-![User Profile](screenshots/profile.png)
-![Recipient History](screenshots/profile1.png)
+![User Profile](screenshots/profile.png)  
+![Recipient History](screenshots/profile1.png)  
 ![Donation History](screenshots/profile2.png)
 
 - **Recipient History**: List of blood requests made by the user as a recipient.
 - **Donor History**: List of past donations made by the user.
-- **Personal Details**: Information like name, username,location, contact info, etc.
+- **Personal Details**: Information like name, username, location, contact info, etc.
 
 ---
 
@@ -130,7 +151,7 @@ CrimsonSync is designed to make blood donation and request processes simple and 
 ##### Search Users
 
 ![Search Users](screenshots/usersearch.png)
-- Admins can search users by various parameters such as name, username, or role(donor/recipient).
+- Admins can search users by various parameters such as name, username, or role (donor/recipient).
 
 ---
 
@@ -169,6 +190,7 @@ CrimsonSync is designed to make blood donation and request processes simple and 
 ![Admin Profile](screenshots/adminprofile.png)
 - Admins can view and update their profile details like username, email, and contact information.
 
+---
 
 ## 🚀 Future Enhancements
 
@@ -181,8 +203,11 @@ CrimsonSync is designed to make blood donation and request processes simple and 
 
 ## 📬 Contact
 
-> 📧 Email: [your_email@example.com]  
-> 🧑 Maintainer: [Your Name or Team Name]
+> 📧 Email: [aindriladutta392@gmail.com]  
+> 🧑 Maintainer: Aindrila Dutta  
+
+> 📧 Email: [adtani.gowri@gmail.com]  
+> 🧑 Maintainer: Adrija Gowri
 
 ---
 
