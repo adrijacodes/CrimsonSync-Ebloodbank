@@ -621,7 +621,7 @@ export const userdata = [
     isRecipient: true,
     role: "member",
     availability: ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"],
-  },
+  }, 
   {
     name: "Sharanya Iyer",
     email: "sharanya.iyer@example.com",
