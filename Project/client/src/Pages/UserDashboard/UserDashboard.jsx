@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import UseTokenHandler from "../../Hooks/UseTokenHandler.jsx";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -24,7 +23,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const days = ["MON", "TUES", "WED", "THURS", "FRI", "SAT", "SUN"];
   const token = localStorage.getItem("token");
-  const { handleTokenExpiry } =UseTokenHandler(); // handleTokenExpiry call
+
   const handleToggleDetails = (index) => {
     // Toggle the visibility of the details for the given request index
     setDetailsVisibility((prevState) => ({
@@ -48,12 +47,7 @@ const Dashboard = () => {
           },
         });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          const error = new Error(errorData?.message || "Failed to fetch profile");
-          error.response = { status: res.status, data: errorData };
-          throw error;
-        }
+        if (!res.ok) throw new Error("Failed to fetch profile");
 
         const { data } = await res.json();
         const userData = data.UserInfo[0];
@@ -64,12 +58,12 @@ const Dashboard = () => {
         setDonorEnabled(userData.isDonor || false);
         setAvailability(userData.availability || []);
       } catch (err) {
-        handleTokenExpiry(err); //handel expired token and redirect 
+        console.error(err);
       }
     };
 
     fetchUserProfile();
-  }, [token ,handleTokenExpiry]);
+  }, [token]);
 
   const showMessage = (msg, duration = 3000) => {
     toast(msg, { autoClose: duration });
@@ -573,7 +567,9 @@ const Dashboard = () => {
                 <p className="font-semibold">
                   Status: <span className="capitalize">{request.status}</span>
                 </p>
-                <p className="font-serif">City: {capitalizeFirstLetter(request.city)}</p>
+                <p className="font-serif">
+                  City: {capitalizeFirstLetter(request.city)}
+                </p>
                 <p className="font-serif">Blood Type: {request.bloodType}</p>
                 <p className="font-serif">Preferred Day: {request.day}</p>
 
@@ -657,7 +653,9 @@ const Dashboard = () => {
                       Recipient: {request.recipient.name} (
                       {request.recipient.username})
                     </p>
-                    <p className="font-serif">Email: {request.recipient.email}</p>
+                    <p className="font-serif">
+                      Email: {request.recipient.email}
+                    </p>
                   </div>
                 )}
               </li>
