@@ -29,7 +29,7 @@ Every registered user in CrimsonSync can act as a **recipient and/or donor**, el
 
 - 🧬 **Blood Type & City Matching** – Instantly find or be matched with users having a compatible blood type in the same city.
 - 📍 **Nearby Event Discovery** – View upcoming blood donation camps based on your city/location.
-- 🔔 **Notification-Based System** – Receive alerts for matching donation requests, blood availability, and upcoming events.
+- 🔔 **Notification-Based System** – Receive alerts for matching donation requests and blood availability.
 - 🔐 **Role-Agnostic User Model** – A single user profile can both request and donate blood.
 - 🧾 **Donation & Request History** – Track your donation and request history through a streamlined dashboard.
 - 🛡️ **Secure Login & Access Control** – Authentication powered by JWT with protected routes for sensitive data.
