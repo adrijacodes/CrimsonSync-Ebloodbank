@@ -13,7 +13,6 @@ import "./crons/bloodRequestScheduler.js";
 import {
   cancelAcceptedEligibilityIfFulfilled,
   cancelPendingFormsIfRequestFulfilled,
-  // cancelNotificationsForUnselectedDonors,
   cancelNotificationsForCancelledRequests,
 } from "./crons/pendingScheduler.js";
 
@@ -39,25 +38,23 @@ app.use((req, res, next) => {
 });
 cancelExpiredRequests();
 checkAndCancelExpiredRequests();
- cancelAcceptedEligibilityIfFulfilled,
-  cancelPendingFormsIfRequestFulfilled,
-  // cancelNotificationsForUnselectedDonors,
-  cancelNotificationsForCancelledRequests,
+cancelAcceptedEligibilityIfFulfilled(),
+  cancelPendingFormsIfRequestFulfilled(),
+  cancelNotificationsForCancelledRequests(),
+  app.use((err, req, res, next) => {
+    if (err instanceof ApiError) {
+      return res.status(err.status).json({
+        success: false,
+        status: err.status,
+        message: err.message,
+      });
+    }
 
-app.use((err, req, res, next) => {
-  if (err instanceof ApiError) {
-    return res.status(err.status).json({
+    return res.status(500).json({
       success: false,
-      status: err.status,
-      message: err.message,
+      status: 500,
+      message: "Internal Server Error",
     });
-  }
-
-  return res.status(500).json({
-    success: false,
-    status: 500,
-    message: "Internal Server Error",
   });
-});
 
 export { app };

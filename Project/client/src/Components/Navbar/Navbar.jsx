@@ -6,7 +6,7 @@ import { FiLogOut } from "react-icons/fi";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
 import { HiMenu, HiX } from "react-icons/hi";
-import logoImage from "../../assets/logoimage.png";
+
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
