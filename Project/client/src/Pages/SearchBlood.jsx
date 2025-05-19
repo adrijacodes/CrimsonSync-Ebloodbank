@@ -26,7 +26,7 @@ const SearchBlood = () => {
       return; 
     }
 
- 
+
     try {
       const response = await fetch(
         "https://crimsonsync-ebloodbank.onrender.com/api/blood-requests/search-blood",
