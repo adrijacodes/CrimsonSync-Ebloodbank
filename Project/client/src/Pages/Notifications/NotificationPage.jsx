@@ -67,7 +67,7 @@ const NotificationPage = () => {
         cancelledRes,
       ] = await Promise.all(
         urls.map((url) =>
-          fetch(`http://localhost:8001/api/${url}`, {
+          fetch(`https://crimsonsync-ebloodbank.onrender.com/api/${url}`, {
             headers: { Authorization: `Bearer ${accessToken}` },
           })
         )
@@ -114,8 +114,8 @@ const NotificationPage = () => {
     try {
       const url =
         status === "all"
-          ? "http://localhost:8001/api/notifications"
-          : `http://localhost:8001/api/notifications/search?status=${status}`;
+          ? "https://crimsonsync-ebloodbank.onrender.com/api/notifications"
+          : `https://crimsonsync-ebloodbank.onrender.com/api/notifications/search?status=${status}`;
 
       const response = await fetch(url, {
         headers: {
@@ -141,7 +141,7 @@ const NotificationPage = () => {
     setMarkingAsRead(id);
     try {
       const response = await fetch(
-        ` http://localhost:8001/api/notifications/${id}`,
+        ` https://crimsonsync-ebloodbank.onrender.com/api/notifications/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -167,7 +167,7 @@ const NotificationPage = () => {
   const handleRejectionRequired = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:8001/api/notifications/reject/${id}`,
+        `https://crimsonsync-ebloodbank.onrender.com/api/notifications/reject/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -196,7 +196,7 @@ const NotificationPage = () => {
   const handleAcceptRequired = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:8001/api/notifications/accept/${id}`,
+        `https://crimsonsync-ebloodbank.onrender.com/api/notifications/accept/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -230,7 +230,7 @@ const NotificationPage = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:8001/api/blood-requests/eligibility-form/${currentNotificationId}`,
+        `https://crimsonsync-ebloodbank.onrender.com/api/blood-requests/eligibility-form/${currentNotificationId}`,
         {
           method: "POST",
           headers: {

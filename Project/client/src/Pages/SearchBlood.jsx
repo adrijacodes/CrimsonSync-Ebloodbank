@@ -29,7 +29,7 @@ const SearchBlood = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8001/api/blood-requests/search-blood",
+        "https://crimsonsync-ebloodbank.onrender.com/api/blood-requests/search-blood",
         {
           method: "POST",
           headers: {

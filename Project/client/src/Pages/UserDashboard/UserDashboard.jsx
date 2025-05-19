@@ -41,7 +41,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const res = await fetch("http://localhost:8001/api/auth/user/profile", {
+        const res = await fetch("https://crimsonsync-ebloodbank.onrender.com/api/auth/user/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -73,7 +73,7 @@ const Dashboard = () => {
   const fetchBloodRequests = async () => {
     try {
       const res = await fetch(
-        "http://localhost:8001/api/auth/user/profile/blood-activity",
+        "https://crimsonsync-ebloodbank.onrender.com/api/auth/user/profile/blood-activity",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -147,7 +147,7 @@ const Dashboard = () => {
   // Save Location
   const handleSaveLocation = async () => {
     const response = await fetch(
-      "http://localhost:8001/api/auth/user/profile/update-location",
+      "https://crimsonsync-ebloodbank.onrender.com/api/auth/user/profile/update-location",
       {
         method: "PUT",
         headers: {
@@ -177,7 +177,7 @@ const Dashboard = () => {
   const handleSaveDonorSettings = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-donor-status",
+        "https://crimsonsync-ebloodbank.onrender.com/api/auth/user/profile/update-donor-status",
         {
           method: "PATCH",
           headers: {
@@ -213,7 +213,7 @@ const Dashboard = () => {
     );
 
     const response = await fetch(
-      "http://localhost:8001/api/auth/user/profile/update-availability",
+      "https://crimsonsync-ebloodbank.onrender.com/api/auth/user/profile/update-availability",
       {
         method: "PATCH",
         headers: {
@@ -238,7 +238,7 @@ const Dashboard = () => {
   const handleSaveBloodType = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-blood-type",
+        "https://crimsonsync-ebloodbank.onrender.com/api/auth/user/profile/update-blood-type",
         {
           method: "PUT",
           headers: {
@@ -269,7 +269,7 @@ const Dashboard = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8001/api/auth/user/profile/update-password",
+        "https://crimsonsync-ebloodbank.onrender.com/api/auth/user/profile/update-password",
         {
           method: "PATCH",
           headers: {
@@ -304,7 +304,7 @@ const Dashboard = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "http://localhost:8001/api/auth/user/profile/delete",
+        "https://crimsonsync-ebloodbank.onrender.com/api/auth/user/profile/delete",
         {
           method: "DELETE",
           headers: {

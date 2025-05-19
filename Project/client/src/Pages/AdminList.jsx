@@ -12,7 +12,7 @@ const AdminList = () => {
         const accessToken = localStorage.getItem("token");
         console.log("Access token being sent:", accessToken);
 
-        const response = await fetch("http://localhost:8001/api/auth/admin/view-admins", {
+        const response = await fetch("https://crimsonsync-ebloodbank.onrender.com/api/auth/admin/view-admins", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
