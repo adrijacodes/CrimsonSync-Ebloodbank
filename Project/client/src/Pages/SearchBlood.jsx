@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import bloodImage from "../assets/blood2.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
+import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
 
 const SearchBlood = () => {
   const [location, setLocation] = useState("");
@@ -29,12 +29,12 @@ const SearchBlood = () => {
 
     try {
       const response = await fetch(
-        "https://crimsonsync-ebloodbank.onrender.com/api/blood-requests/search-blood",
+        "http://localhost:8001/api/blood-requests/search-blood",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: Bearer `${accessToken}`,
           },
           body: JSON.stringify({
             bloodType: selectedBloodType,
@@ -53,6 +53,7 @@ const SearchBlood = () => {
         setTimeout(() => {
           navigate("/");
         }, 3000);
+      
         throw error;
       }
 
@@ -73,7 +74,7 @@ const SearchBlood = () => {
   return (
     <div
       className="relative min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${bloodImage})` }}
+      style={{ backgroundImage: url(${bloodImage}) }}
     >
       <div className="absolute inset-0 bg-black opacity-40 z-0"></div>
       <div className=" relative z-10 flex flex-col items-center justify-start min-h-screen pt-20 px-4">
