@@ -9,7 +9,7 @@ const SearchBlood = () => {
   const [location, setLocation] = useState("");
   const [selectedBloodType, setSelectedBloodType] = useState("");
   const navigate = useNavigate();
-  const { handleTokenExpiry } = UseTokenHandler();
+  //const { handleTokenExpiry } = UseTokenHandler();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
