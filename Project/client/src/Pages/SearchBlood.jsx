@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import bloodImage from "../assets/blood2.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
- import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
+// import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
 
 const SearchBlood = () => {
   const [location, setLocation] = useState("");
@@ -54,7 +54,6 @@ const SearchBlood = () => {
           navigate("/");
         }, 3000);
         throw error;
-
       }
 
       if (data.message) {
@@ -65,8 +64,6 @@ const SearchBlood = () => {
       }
     }  catch (error) {
       handleTokenExpiry(error);
-    //  console.log(error);
-      
       
     }
   };
