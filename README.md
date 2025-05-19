@@ -178,7 +178,7 @@ CrimsonSync is designed to make blood donation and request processes simple and 
 
 ##### View Events by City and Year (Chart)
 
-![View Events](screenshots/stats.png)
+![View Events](screenshots/statsadmin.png)
 - Admins can view events by city and year using an interactive chart for better insights.
 
 ---
