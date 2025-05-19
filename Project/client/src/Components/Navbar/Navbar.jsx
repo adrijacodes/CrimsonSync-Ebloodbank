@@ -23,7 +23,7 @@ const Navbar = () => {
     const registered = localStorage.getItem("registered");
     const loggedIn = localStorage.getItem("loggedIn");
     setIsLoggedIn(loggedIn === "true");
-
+    setIsRegistered(registered==="true");
     let intervalId;
 
     const fetchNotifications = async () => {
