@@ -1,9 +1,9 @@
 import React from 'react';
-
+import blood2 from "../../assets/blood2.jpg"
 const About = () => {
   return (
      
-   <div className="min-h-screen bg-contain bg-center bg-opacity-20" style={{ backgroundImage: "url('../src/assets/blood2.jpg')" }}>
+   <div className="min-h-screen bg-contain bg-center bg-opacity-20" style={{ backgroundImage: `url(${blood2})` }}>
    <div className=" bg-slate-200 border-slate-400 rounded-lg shadow-lg p-6 text-center backdrop-filter backdrop-blur-sm bg-opacity-30">
      <h1 className="text-4xl font-bold font-serif text-gray-800 mb-5">About Us</h1>
      <p className="text-lg text-black font-serif font-semibold leading-relaxed">
