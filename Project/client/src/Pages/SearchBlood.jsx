@@ -29,7 +29,7 @@ const SearchBlood = () => {
  
     try {
       const response = await fetch(
-        "http://localhost:8001/api/blood-requests/search-blood",
+        "https://crimsonsync-ebloodbank.onrender.com/api/blood-requests/search-blood",
         {
           method: "POST",
           headers: {
@@ -48,12 +48,6 @@ const SearchBlood = () => {
       if (!response.ok) {
         const error = new Error(data.message || "Failed to fetch donors");
         error.response = { status: response.status, data };
-        toast.error(error.message);
-
-        setTimeout(() => {
-          navigate("/");
-        }, 3000);
-      
         throw error;
       }
 
