@@ -12,58 +12,78 @@ const SearchBlood = () => {
   //const { handleTokenExpiry } = UseTokenHandler();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const accessToken = localStorage.getItem("token");
-    if (!accessToken) {
-      toast.error("Please create an account or login to use Search Blood!", {
+  e.preventDefault();
+  const accessToken = localStorage.getItem("token");
+
+  if (!accessToken) {
+    toast.error("Please create an account or login to use Search Blood!", {
+      autoClose: 3000,
+      pauseOnHover: true,
+    });
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 3000);
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "https://crimsonsync-ebloodbank.onrender.com/api/blood-requests/search-blood",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          bloodType: selectedBloodType,
+          city: location,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // 🔴 Show error message from backend
+      toast.error(data.message || "Failed to fetch donors", {
         autoClose: 3000,
         pauseOnHover: true,
       });
-    
+
+      // 🔁 Redirect to homepage after delay
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 3000);
-      return; 
+      return;
     }
 
+    // ✅ Show success message
+    if (data.message) {
+      toast.success(data.message, {
+        autoClose: 3000,
+        pauseOnHover: true,
+      });
 
-    try {
-      const response = await fetch(
-        "https://crimsonsync-ebloodbank.onrender.com/api/blood-requests/search-blood",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            bloodType: selectedBloodType,
-            city: location,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        const error = new Error(data.message || "Failed to fetch donors");
-        error.response = { status: response.status, data };
-       // throw error;
-      }
-
-      if (data.message) {
-        toast.success(data.message);
-        setTimeout(() => {
-          navigate("/");
-        }, 3000);
-      }
-    }  catch (error) {
-      //handleTokenExpiry(error);
-      console.log(error);
-      
-      
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     }
-  };
+
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    toast.error("Unexpected error occurred. Please try again later.", {
+      autoClose: 3000,
+      pauseOnHover: true,
+    });
+
+    setTimeout(() => {
+      navigate("/");
+    }, 3000);
+  }
+};
+
 
   const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
