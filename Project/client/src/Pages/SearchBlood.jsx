@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import bloodImage from "../assets/blood2.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
+// import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
 
 const SearchBlood = () => {
   const [location, setLocation] = useState("");
@@ -48,7 +48,7 @@ const SearchBlood = () => {
       if (!response.ok) {
         const error = new Error(data.message || "Failed to fetch donors");
         error.response = { status: response.status, data };
-        throw error;
+       // throw error;
       }
 
       if (data.message) {
@@ -58,7 +58,9 @@ const SearchBlood = () => {
         }, 3000);
       }
     }  catch (error) {
-      handleTokenExpiry(error);
+      //handleTokenExpiry(error);
+      console.log(error);
+      
       
     }
   };
