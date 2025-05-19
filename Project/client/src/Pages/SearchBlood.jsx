@@ -48,6 +48,12 @@ const SearchBlood = () => {
       if (!response.ok) {
         const error = new Error(data.message || "Failed to fetch donors");
         error.response = { status: response.status, data };
+        toast.error(error.message);
+
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      
         throw error;
       }
 

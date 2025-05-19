@@ -7,7 +7,6 @@ import { BiSolidUserCircle } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
 import { HiMenu, HiX } from "react-icons/hi";
 
-
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
