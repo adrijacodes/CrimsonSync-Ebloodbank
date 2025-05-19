@@ -3,87 +3,73 @@ import { useNavigate } from "react-router-dom";
 import bloodImage from "../assets/blood2.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
+ import UseTokenHandler from "../Hooks/UseTokenHandler.jsx";
 
 const SearchBlood = () => {
   const [location, setLocation] = useState("");
   const [selectedBloodType, setSelectedBloodType] = useState("");
   const navigate = useNavigate();
-  //const { handleTokenExpiry } = UseTokenHandler();
+  const { handleTokenExpiry } = UseTokenHandler();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  const accessToken = localStorage.getItem("token");
+    e.preventDefault();
+    const accessToken = localStorage.getItem("token");
+    if (!accessToken) {
+      toast.error("Please create an account or login to use Search Blood!", {
+        autoClose: 3000,
+        pauseOnHover: true,
+      });
+    
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+      return; 
+    }
 
-  if (!accessToken) {
-    toast.error("Please create an account or login to use Search Blood!", {
-      autoClose: 3000,
-      pauseOnHover: true,
-    });
 
-    setTimeout(() => {
-      navigate("/login");
-    }, 3000);
-    return;
-  }
+    try {
+      const response = await fetch(
+        "https://crimsonsync-ebloodbank.onrender.com/api/blood-requests/search-blood",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            bloodType: selectedBloodType,
+            city: location,
+          }),
+        }
+      );
 
-  try {
-    const response = await fetch(
-      "https://crimsonsync-ebloodbank.onrender.com/api/blood-requests/search-blood",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          bloodType: selectedBloodType,
-          city: location,
-        }),
+      const data = await response.json();
+
+      if (!response.ok) {
+        const error = new Error(data.message || "Failed to fetch donors");
+        error.response = { status: response.status, data };
+        toast.error(error.message);
+
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+        throw error;
+
       }
-    );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      // 🔴 Show error message from backend
-      toast.error(data.message || "Failed to fetch donors", {
-        autoClose: 3000,
-        pauseOnHover: true,
-      });
-
-      // 🔁 Redirect to homepage after delay
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-      return;
+      if (data.message) {
+        toast.success(data.message);
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      }
+    }  catch (error) {
+      handleTokenExpiry(error);
+    //  console.log(error);
+      
+      
     }
-
-    // ✅ Show success message
-    if (data.message) {
-      toast.success(data.message, {
-        autoClose: 3000,
-        pauseOnHover: true,
-      });
-
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-    }
-
-  } catch (error) {
-    console.error("Unexpected error:", error);
-    toast.error("Unexpected error occurred. Please try again later.", {
-      autoClose: 3000,
-      pauseOnHover: true,
-    });
-
-    setTimeout(() => {
-      navigate("/");
-    }, 3000);
-  }
-};
-
+  };
 
   const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
