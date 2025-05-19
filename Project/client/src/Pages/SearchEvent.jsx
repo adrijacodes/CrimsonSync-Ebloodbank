@@ -21,7 +21,7 @@ const SearchEvent = () => {
     setSearchResult(null);
 
     try {
-      const apiUrl = `http://localhost:8001/api/events/search?city=${encodeURIComponent(
+      const apiUrl = `https://crimsonsync-ebloodbank.onrender.com/api/events/search?city=${encodeURIComponent(
         changedCity
       )}&filter=${category.toLowerCase()}`;
 

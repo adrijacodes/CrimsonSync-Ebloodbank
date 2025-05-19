@@ -21,7 +21,7 @@ const AdminSearch = () => {
 
     try {
       const accessToken = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8001/api/auth/admin/search-admins?searchTerm=${encodeURIComponent(searchTerm)}`, {
+      const response = await fetch(`https://crimsonsync-ebloodbank.onrender.com/api/auth/admin/search-admins?searchTerm=${encodeURIComponent(searchTerm)}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

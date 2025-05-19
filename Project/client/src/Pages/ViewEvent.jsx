@@ -25,7 +25,7 @@ const ViewEvent = () => {
       const role = localStorage.getItem("role");
       let apiUrl = "";
       if (role === "Admin") {
-        apiUrl = `http://localhost:8001/api/events/expiringEvents?city=${encodeURIComponent(
+        apiUrl = `https://crimsonsync-ebloodbank.onrender.com/api/events/expiringEvents?city=${encodeURIComponent(
           changedCity
         )}&filter=${category.toLowerCase()}`;
       }
