@@ -74,7 +74,7 @@ const SearchBlood = () => {
   return (
     <div
       className="relative min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: url(${bloodImage}) }}
+      style={{ backgroundImage: `url(${bloodImage})` }}
     >
       <div className="absolute inset-0 bg-black opacity-40 z-0"></div>
       <div className=" relative z-10 flex flex-col items-center justify-start min-h-screen pt-20 px-4">
