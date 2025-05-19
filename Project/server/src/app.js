@@ -18,7 +18,8 @@ import {
 
 const app = express();
 
-app.use(cors());
+app.use(cors({origin: 'https://crimsonsync-ebloodbank-1.onrender.com',
+  }));
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
