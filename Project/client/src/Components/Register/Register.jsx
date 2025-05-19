@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import bg2 from "../../assets/bg2.jpeg"
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,7 +66,7 @@ const Register = () => {
     <div
       className="relative min-h-screen flex items-center justify-center"
       style={{
-        backgroundImage: "url('/src/assets/bg2.jpeg')", 
+        backgroundImage: `url(${bg2})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
