@@ -20,7 +20,6 @@ const app = express();
 
 const allowedOrigins = [
   'https://crimsonsync-ebloodbank-1.onrender.com',
-  'https://crimson-sync-ebloodbank.vercel.app' 
 ];
 
 app.use(cors({
