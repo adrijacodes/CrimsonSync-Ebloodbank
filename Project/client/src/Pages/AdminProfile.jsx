@@ -40,7 +40,7 @@ const AdminProfile = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:8001/api/auth/admin/profile/update-password", {
+      const res = await fetch("https://crimsonsync-ebloodbank.onrender.com/api/auth/admin/profile/update-password", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -63,7 +63,7 @@ const AdminProfile = () => {
     if (!window.confirm("Are you sure you want to delete your admin account?")) return;
 
     try {
-      const res = await fetch("http://localhost:8001/api/auth/admin/profile/delete", {
+      const res = await fetch("https://crimsonsync-ebloodbank.onrender.com/api/auth/admin/profile/delete", {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
