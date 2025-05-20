@@ -7,29 +7,24 @@ import { BiSolidUserCircle } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
 import { HiMenu, HiX } from "react-icons/hi";
 
-
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
   const accessToken = localStorage.getItem("token");
   const role = localStorage.getItem("role");
+  const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+  const isRegistered = localStorage.getItem("registered") === "true";
 
   useEffect(() => {
-    const registered = localStorage.getItem("registered");
-    const loggedIn = localStorage.getItem("loggedIn");
-    setIsLoggedIn(loggedIn === "true");
-    setIsRegistered(registered==="true");
     let intervalId;
 
     const fetchNotifications = async () => {
       try {
         const response = await axios.get(
-          "https://crimsonsync-ebloodbank.onrender.com/api/notifications/search?status=active",
+          "http://localhost:8001/api/notifications/search?status=active",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -45,8 +40,7 @@ const Navbar = () => {
     if (accessToken && isLoggedIn) {
       fetchNotifications();
       intervalId = setInterval(() => {
-        const stillLoggedIn = localStorage.getItem("loggedIn");
-        if (stillLoggedIn !== "true") {
+        if (localStorage.getItem("loggedIn") !== "true") {
           clearInterval(intervalId);
         } else {
           fetchNotifications();
@@ -54,9 +48,7 @@ const Navbar = () => {
       }, 3000);
     }
 
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
+    return () => clearInterval(intervalId);
   }, [location, accessToken, isLoggedIn]);
 
   const handleLogout = async () => {
@@ -77,17 +69,12 @@ const Navbar = () => {
         logoutUrl,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-
       toast.success("Logged out successfully!");
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Logout failed.";
-      
-      // handel expired jwt
       if (
         errorMsg.toLowerCase().includes("jwt expired") ||
         error.response?.status === 401
@@ -104,7 +91,7 @@ const Navbar = () => {
   };
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    setIsMenuOpen((prev) => !prev);
   };
 
   return (
@@ -112,14 +99,14 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
         <Link
           to="/"
-          className="flex items-center  text-white text-2xl font-bold"
+          className="flex items-center text-white text-2xl font-bold"
         >
           <span>
             Crimson<span className="font-normal">Sync</span>
           </span>
         </Link>
 
-        {/* Hamburger Menu */}
+        {/* Hamburger */}
         <button
           onClick={toggleMenu}
           className="text-white text-3xl md:hidden focus:outline-none"
@@ -161,47 +148,34 @@ const Navbar = () => {
           </ul>
         </nav>
 
-        {/* Logout Button */}
-        {(isLoggedIn || isRegistered) && accessToken && (
-          <>
-            {role === "User" && (
-              <div className="flex gap-5 justify-center items-center">
-                <Link to="/user-dashboard">
-                  <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
-                </Link>
+        {/* Right Icons */}
+        {accessToken && (isLoggedIn || isRegistered) && (
+          <div className="flex gap-5 items-center">
+            <Link to={role === "Admin" ? "/admin-profile" : "/user-dashboard"}>
+              <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition duration-200" />
+            </Link>
+
+            {accessToken &&
+              (isLoggedIn || isRegistered) &&
+              role !== "Admin" && (
                 <Link to="/notification" className="relative">
-                  <IoNotifications className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
+                  <IoNotifications className="text-3xl text-white hover:text-gray-300 transition duration-200" />
                   {notificationCount > 0 && (
                     <span className="absolute -top-2 -right-2 text-[10px] bg-yellow-300 text-black font-bold rounded-full px-[6px] py-[2px] shadow-md">
                       {notificationCount}
                     </span>
                   )}
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition-colors duration-200"
-                >
-                  <FiLogOut className="text-lg" />
-                  Logout
-                </button>
-              </div>
-            )}
+              )}
 
-            {role === "Admin" && (
-              <div className="flex gap-5 justify-center items-center">
-                <Link to="/admin-profile">
-                  <BiSolidUserCircle className="text-3xl text-white hover:text-gray-300 transition-colors duration-200" />
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition-colors duration-200"
-                >
-                  <FiLogOut className="text-lg" />
-                  Logout
-                </button>
-              </div>
-            )}
-          </>
+            <button
+              onClick={handleLogout}
+              className="ml-auto flex items-center gap-2 text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-red-600 transition duration-200"
+            >
+              <FiLogOut className="text-lg" />
+              Logout
+            </button>
+          </div>
         )}
       </div>
     </header>

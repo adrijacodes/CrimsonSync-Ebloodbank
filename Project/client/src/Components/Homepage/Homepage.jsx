@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { SlMagnifier } from "react-icons/sl";
 import { BiDonateBlood } from "react-icons/bi";
 import woman from "../../assets/woman.png";
-import man from "../../assets/man.png";
 import human from "../../assets/human.png";
 import ChatBot from "../ChatBot/ChatBot";
 import pedro from "../../assets/Pedro.jpg";
@@ -36,22 +35,19 @@ const testimonials = [
   {
     text: "The interface is clean, and I was able to get help within minutes. Highly recommend it to everyone.",
     author: "Sofia Carson",
-    avatar:
-      sofia,
+    avatar: sofia,
     stars: 4,
   },
   {
     text: "This platform helped us during a crisis when we had no other option. Thank you for building this!",
     author: "Mona Patel",
-    avatar:
-      mona,
+    avatar: mona,
     stars: 5,
   },
   {
     text: "Volunteering as a donor on CrimsonSync is fulfilling. You truly feel part of something bigger.",
     author: "Namita Thapar ",
-    avatar:
-     namita,
+    avatar: namita,
     stars: 5,
   },
 ];
@@ -69,8 +65,13 @@ const itemVariants = {
 const HomePage = () => {
   const [activeTab, setActiveTab] = useState("blood");
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [role, setRole] = useState(null);
   const navigate = useNavigate();
-
+  useEffect(() => {
+    // Read role from localStorage on mount
+    const storedRole = localStorage.getItem("role");
+    setRole(storedRole);
+  }, []);
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % testimonials.length);
@@ -86,7 +87,6 @@ const HomePage = () => {
       <p className="text-center text-3xl font-semibold mb-8 font-serif">
         Join the heartbeat of change—find donors, give blood, save lives.
       </p>
-
       {/* Stats Section */}
       <motion.div
         className="bg-white py-8 px-4 rounded-lg mb-10 cursor-pointer"
@@ -124,28 +124,35 @@ const HomePage = () => {
           ))}
         </motion.div>
       </motion.div>
-
       {/* Tab Section */}
       <div className="py-11 px-6">
         <div className="flex gap-12 justify-center mb-6">
-          <Link to="/SearchBlood">
+          <Link to={role === "Admin" ? "#" : "/SearchBlood"}>
             <button
-              className={`flex items-center gap-2 px-10 py-6 rounded-full text-2xl  transition ${
-                activeTab === "blood"
-                  ? "bg-red-600 hover:bg-red-700 text-white shadow-lg font-serif"
-                  : "bg-gray-200 text-gray-800 font-serif"
+              className={`flex items-center gap-2 px-10 py-6 rounded-full text-2xl transition font-serif ${
+                role === "Admin"
+                  ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                  : activeTab === "blood"
+                  ? "bg-red-600 hover:bg-red-700 text-white shadow-lg"
+                  : "bg-gray-200 text-gray-800"
               }`}
-              onClick={() => setActiveTab("blood")}
+              onClick={() => {
+                if (role !== "Admin") {
+                  setActiveTab("blood");
+                }
+              }}
+              disabled={role === "Admin"}
+              style={role === "Admin" ? { opacity: 0.6 } : {}}
             >
               <BiDonateBlood className="text-3xl" />
               Search Blood
             </button>
           </Link>
           <button
-            className={`flex items-center gap-2 px-10 py-6 rounded-full text-2xl  transition ${
+            className={`flex items-center gap-2 px-10 py-6 rounded-full text-2xl transition ${
               activeTab === "event"
                 ? "bg-red-600 text-white shadow-lg font-serif"
-                : "bg-gray-100 hover:bg-gray-300 shadow-lg  text-gray-800 font-serif"
+                : "bg-gray-100 hover:bg-gray-300 shadow-lg text-gray-800 font-serif"
             }`}
             onClick={() => {
               setActiveTab("event");
@@ -157,7 +164,7 @@ const HomePage = () => {
           </button>
         </div>
       </div>
-
+      );
       {/* Review Carousel */}
       <motion.div
         className="py-16 px-4 bg-gradient-to-b from-white to-red-50"
@@ -214,56 +221,56 @@ const HomePage = () => {
           ))}
         </div>
       </motion.div>
-
       {/* Developer Carousel / About the Creators */}
-     {/* Developer Carousel / About the Creators */}
-<motion.div
-  className="py-10 px-4"
-  variants={sectionVariants}
-  initial="hidden"
-  animate="visible"
-  transition={{ duration: 0.8, delay: 0.6 }}
->
-  <h2 className="text-4xl text-center font-bold font-serif mb-8">
-    Meet the Creators
-  </h2>
-
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 place-items-center">
-    {[
-      {
-        name: "Aindrila Dutta",
-        role: "Backend & API Developer",
-        image: woman,
-        vision:
-          "By designing efficient APIs and optimizing server-side processes, we ensure that CrimsonSync operates smoothly, even during peak demand, helping save lives when it matters most.",
-      },
-      {
-        name: "Adrija Gowri",
-        role: "Frontend Developer",
-        image: human,
-        vision:
-          "Building responsive and engaging interfaces that empower users to connect quickly and easily, saving lives when it matters the most.",
-      },
-    ].map((dev, idx) => (
+      {/* Developer Carousel / About the Creators */}
       <motion.div
-        key={idx}
-        className="bg-gray-100 rounded-xl shadow-md p-6 text-center"
-        variants={itemVariants}
+        className="py-10 px-4"
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 0.8, delay: 0.6 }}
       >
-        <img
-          src={dev.image || "/default-avatar.png"}
-          alt={`Photo of ${dev.name}, ${dev.role}`}
-          className="w-24 h-24 mx-auto rounded-full mb-4 object-cover"
-        />
-        <h3 className="text-2xl font-bold text-red-600">{dev.name}</h3>
-        <p className="text-sm font-medium text-gray-600 mb-2">{dev.role}</p>
-        <p className="italic text-gray-700">"{dev.vision}"</p>
-      </motion.div>
-    ))}
-  </div>
-</motion.div>
+        <h2 className="text-4xl text-center font-bold font-serif mb-8">
+          Meet the Creators
+        </h2>
 
-      <ChatBot/>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 place-items-center">
+          {[
+            {
+              name: "Aindrila Dutta",
+              role: "Backend & API Developer",
+              image: woman,
+              vision:
+                "By designing efficient APIs and optimizing server-side processes, we ensure that CrimsonSync operates smoothly, even during peak demand, helping save lives when it matters most.",
+            },
+            {
+              name: "Adrija Gowri",
+              role: "Frontend Developer",
+              image: human,
+              vision:
+                "Building responsive and engaging interfaces that empower users to connect quickly and easily, saving lives when it matters the most.",
+            },
+          ].map((dev, idx) => (
+            <motion.div
+              key={idx}
+              className="bg-gray-100 rounded-xl shadow-md p-6 text-center"
+              variants={itemVariants}
+            >
+              <img
+                src={dev.image || "/default-avatar.png"}
+                alt={`Photo of ${dev.name}, ${dev.role}`}
+                className="w-24 h-24 mx-auto rounded-full mb-4 object-cover"
+              />
+              <h3 className="text-2xl font-bold text-red-600">{dev.name}</h3>
+              <p className="text-sm font-medium text-gray-600 mb-2">
+                {dev.role}
+              </p>
+              <p className="italic text-gray-700">&quot;{dev?.vision}&quot;</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+      <ChatBot />
     </div>
   );
 };
