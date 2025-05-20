@@ -3,21 +3,16 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import bg2 from "../../assets/bg2.jpeg"
+import bg2 from "../../assets/bg2.jpeg";
+
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [role, setRole] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!role) {
-      toast.error("Please select a role.");
-      return;
-    }
 
     const payload = {
       email,
@@ -26,24 +21,16 @@ const Register = () => {
     };
 
     try {
-      let res;
-      if (role.toLowerCase() === "admin") {
-        res = await axios.post(
-          "http://localhost:8001/api/auth/admin/register",
-          payload
-        );
-      } else {
-        res = await axios.post(
-          "http://localhost:8001/api/auth/user/register",
-          payload
-        );
-      }
+      const res = await axios.post(
+        "http://localhost:8001/api/auth/user/register",
+        payload
+      );
 
       toast.success("Register Success");
-      // setting auth details in localStorage
+
       localStorage.setItem("token", JSON.stringify(res.data.data.accessToken));
       localStorage.setItem("registered", "true");
-      localStorage.setItem("role", role);
+
       navigate("/");
     } catch (err) {
       let errorMessage = "Registration Failed";
@@ -104,20 +91,9 @@ const Register = () => {
             className="w-full p-3 rounded-full bg-white/70 text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white"
           />
 
-          <select
-            name="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="w-full p-3 rounded-full bg-white/70 text-black focus:outline-none focus:ring-2 focus:ring-white"
-          >
-            <option value="">-- Select Role --</option>
-            <option value="Admin">Admin</option>
-            <option value="User">User</option>
-          </select>
-
           <button
             type="submit"
-            className="w-full  bg-red-400 text-white font-bold py-3 rounded-full hover:bg-red-500 transition"
+            className="w-full bg-red-400 text-white font-bold py-3 rounded-full hover:bg-red-500 transition"
           >
             Register
           </button>
