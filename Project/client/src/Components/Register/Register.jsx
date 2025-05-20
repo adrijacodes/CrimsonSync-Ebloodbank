@@ -29,12 +29,12 @@ const Register = () => {
       let res;
       if (role.toLowerCase() === "admin") {
         res = await axios.post(
-          "https://crimsonsync-ebloodbank.onrender.com/api/auth/admin/register",
+          "http://localhost:8001/api/auth/admin/register",
           payload
         );
       } else {
         res = await axios.post(
-          "https://crimsonsync-ebloodbank.onrender.com/api/auth/user/register",
+          "http://localhost:8001/api/auth/user/register",
           payload
         );
       }

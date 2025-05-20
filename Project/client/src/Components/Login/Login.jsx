@@ -30,9 +30,9 @@ const Login = () => {
     try {
       let loginRes;
       if (role.toLowerCase() === "admin") {
-        loginRes = await axios.post("https://crimsonsync-ebloodbank.onrender.com/api/auth/admin/login", payload);
+        loginRes = await axios.post("http://localhost:8001/api/auth/admin/login", payload);
       } else {
-        loginRes = await axios.post("https://crimsonsync-ebloodbank.onrender.com/api/auth/user/login", payload);
+        loginRes = await axios.post("http://localhost:8001/api/auth/user/login", payload);
       }
   
       const token = loginRes.data.data.accessToken;

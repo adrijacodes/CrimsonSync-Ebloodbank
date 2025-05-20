@@ -29,7 +29,7 @@ const Navbar = () => {
     const fetchNotifications = async () => {
       try {
         const response = await axios.get(
-          "https://crimsonsync-ebloodbank.onrender.com/api/notifications/search?status=active",
+          "http://localhost:8001/api/notifications/search?status=active",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -69,8 +69,8 @@ const Navbar = () => {
 
     const logoutUrl =
       role.toLowerCase() === "admin"
-        ? "https://crimsonsync-ebloodbank.onrender.com/api/auth/admin/logout"
-        : "https://crimsonsync-ebloodbank.onrender.com/api/auth/user/logout";
+        ? "http://localhost:8001/api/auth/admin/logout"
+        : "http://localhost:8001/api/auth/user/logout";
 
     try {
       await axios.post(

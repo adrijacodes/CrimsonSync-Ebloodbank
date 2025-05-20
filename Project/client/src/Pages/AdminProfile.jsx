@@ -14,7 +14,7 @@ const AdminProfile = () => {
   useEffect(() => {
     const fetchAdminProfile = async () => {
       try {
-        const res = await fetch("https://crimsonsync-ebloodbank.onrender.com/api/auth/admin/profile", {
+        const res = await fetch("http://localhost:8001/api/auth/admin/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
