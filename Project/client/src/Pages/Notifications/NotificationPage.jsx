@@ -156,7 +156,7 @@ const NotificationPage = () => {
 
       fetchNotifications(filterRef.current);
       fetchCounts();
-      window.location.reload();
+      //window.location.reload();
     } catch (error) {
       console.error("Error marking as read:", error);
     } finally {
