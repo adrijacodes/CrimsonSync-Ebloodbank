@@ -410,12 +410,14 @@ const NotificationPage = () => {
                         ) : (
                           <>
                             <button
+                            type="button"
                               onClick={() => handleRejectionRequired(notif._id)}
                               className="text-sm bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                             >
                               Reject
                             </button>
                             <button
+                            type="button"
                               onClick={() => handleAcceptRequired(notif._id)}
                               className="text-sm bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                             >
