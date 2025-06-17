@@ -5,7 +5,7 @@ import User from "../models/userModel.js";
 import EligibilityForm from "../models/eligibilityFormModel.js";
 
 // Cron runs every 2 minutes
-cron.schedule("*/3 * * * *", async () => {
+cron.schedule("*/1 * * * *", async () => {
   try {
     console.log("🩸 Cron job triggered to process pending blood requests.");
 
